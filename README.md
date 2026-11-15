@@ -2,6 +2,6 @@
 
 - Iwang Petra Dheerendra - 250713196
 - Richard Setiawan Juwono - 250713173
-- Jonathan Lie - 250713212
+- Jonathan Lie - 250713212 - D
 - Maximillian Marveloise Tristiandika - 250713195
 - Aprick Christian - 250713635
