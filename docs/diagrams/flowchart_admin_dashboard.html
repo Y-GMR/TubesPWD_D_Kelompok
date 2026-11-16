@@ -2,13 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar 4: Arsitektur Dashboard Administratif dan Analisis Sistem</title>
+<title>Gambar 4: Arsitektur Dashboard Admin, Verifikasi SKTM/KKS, & CS (Role 4 - Bonus 1)</title>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     background-color: #ffffff;
     color: #111827;
@@ -17,7 +13,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
 }
 .diagram-container {
     background: #ffffff;
@@ -30,23 +25,12 @@ body {
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
-.header h1 {
-    font-size: 19px;
-    font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.01em;
-    margin-bottom: 4px;
-}
-.header p {
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.4;
-}
+.header h1 { font-size: 19px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #374151; line-height: 1.4; }
 .workflow-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    position: relative;
 }
 .column {
     background: #ffffff;
@@ -79,32 +63,14 @@ body {
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, Consolas, monospace;
 }
-.node {
-    background: #ffffff;
-    border: 1.5px solid #000000;
-    padding: 12px;
-}
-.node.highlight {
-    background: #f9fafb;
-}
-.node-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #000000;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.node-desc {
-    font-size: 12px;
-    color: #1f2937;
-    line-height: 1.4;
-}
+.node { background: #ffffff; border: 1.5px solid #000000; padding: 12px; }
+.node.highlight { background: #f9fafb; }
+.node-title { font-size: 13px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.node-desc { font-size: 12px; color: #1f2937; line-height: 1.4; }
 .code-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 11px;
     background: #f3f4f6;
     color: #000000;
@@ -115,8 +81,8 @@ body {
     font-weight: 600;
 }
 .decision-box {
-    background: #ffffff;
-    border: 1.5px solid #000000;
+    background: #fffbeb;
+    border: 1.5px dashed #000000;
     padding: 10px;
     font-size: 11.5px;
     line-height: 1.35;
@@ -138,197 +104,88 @@ body {
     color: #000000;
     font-size: 15px;
     font-weight: 700;
-    margin: -4px 0;
 }
-.horizontal-flow {
+.footer-bar {
     margin-top: 18px;
-    border: 1.5px solid #000000;
-    padding: 14px;
-    background: #f9fafb;
-}
-.flow-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    color: #000000;
-}
-.steps-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.step-item {
-    background: #ffffff;
-    border: 1px solid #000000;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
-}
-.step-arrow {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-}
-.caption {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: #374151;
-    line-height: 1.5;
-    border-top: 1px solid #000000;
+    border-top: 1.5px solid #000000;
     padding-top: 10px;
+    font-size: 12px;
+    color: #1f2937;
+    display: flex;
+    justify-content: space-between;
 }
+
 </style>
 </head>
 <body>
 <div class="diagram-container">
-    <div class="header">
-        <h1>Gambar 4: Arsitektur Dashboard Administratif dan Analisis Sistem</h1>
-        <p>Alur arsitektur untuk otentikasi RBAC lapis ganda, agregasi data KPI sistem, moderasi akun pengguna dengan proteksi anti-lockout, dan jembatan manajemen lintas modul.</p>
-    </div>
-
-    <div class="workflow-grid">
-        <!-- Kolom 1: Gerbang RBAC -->
-        <div class="column">
-            <div class="col-header">
-                <span>1. Penjaga Gerbang RBAC</span>
-                <span class="col-num">01</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Penjaga Otentikasi Sesi</div>
-                <div class="node-desc">Mengevaluasi $_SESSION['user_id']. Jika kosong, redirect pengguna belum login ke login.php.</div>
-                <div class="code-tag">require_login()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node highlight">
-                <div class="node-title">Verifikasi Otoritas Peran</div>
-                <div class="node-desc">Mengevaluasi $_SESSION['role'] === 'admin'. Jika customer biasa, tolak dengan HTTP 403 Forbidden.</div>
-                <div class="code-tag">require_admin()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tampilan Dashboard Admin</div>
-                <div class="node-desc">Layar utama eksekutif menampilkan KPI bisnis, peringatan stok menipis, dan transaksi terkini.</div>
-                <div class="code-tag">admin/dashboard.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Isolasi CSS Administratif</div>
-                <div class="node-desc">Stylesheet terdedikasi mengatur tata letak sidebar admin, kartu ringkasan metrik, dan tabel data.</div>
-                <div class="code-tag">assets/css/admin.css</div>
-            </div>
-        </div>
-
-        <!-- Kolom 2: Mesin Analisis & KPI -->
-        <div class="column">
-            <div class="col-header">
-                <span>2. Mesin Analisis &amp; KPI</span>
-                <span class="col-num">02</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Agregator Total Pendapatan</div>
-                <div class="node-desc">Menghitung omzet kotor di luar pesanan yang dibatalkan melalui kueri agregat SQL SUM.</div>
-                <div class="code-tag">SUM(total_amount)</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Penghitung Volume Pesanan</div>
-                <div class="node-desc">Mengagregasi total order yang dikelompokkan per status (pending, paid, shipped, completed, cancelled).</div>
-                <div class="code-tag">COUNT(*) GROUP BY status</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Penghitung Akun Pengguna</div>
-                <div class="node-desc">Menghitung total akun pelanggan terdaftar dan jumlah personel tim administrator aktif.</div>
-                <div class="code-tag">COUNT(id) FROM users</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Filter Peringatan Stok Rendah</div>
-                <div class="node-desc">Menyaring inventaris WHERE stock &lt;= 5, memberi sinyal peringatan kepada admin untuk restock.</div>
-                <div class="code-tag">WHERE stock &lt;= 5</div>
-            </div>
-        </div>
-
-        <!-- Kolom 3: Moderasi & Anti-Lockout -->
-        <div class="column">
-            <div class="col-header">
-                <span>3. Moderasi &amp; Proteksi Sesi</span>
-                <span class="col-num">03</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Direktori Akun Pengguna</div>
-                <div class="node-desc">Daftar seluruh pengguna dengan inspeksi peran, tanggal registrasi, dan tombol tindakan.</div>
-                <div class="code-tag">admin/manage_users.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Promosi &amp; Demosi Peran</div>
-                <div class="node-desc">Memberi wewenang admin untuk mengubah hak akses akun pengguna antara customer dan admin.</div>
-                <div class="code-tag">UPDATE users SET role = ?</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Penjaga Anti-Lockout</div>
-                <div><strong>Kondisi:</strong> target_user_id === $_SESSION['user_id']</div>
-                <div style="margin-top: 4px;">• <strong>AKUN SENDIRI:</strong> Tolak aksi, tampilkan pesan: "Anda tidak dapat mengubah status atau menghapus akun aktif sendiri."</div>
-                <div>• <strong>PENGGUNA LAIN:</strong> Terapkan pembaruan hak akses peran.</div>
-            </div>
-        </div>
-
-        <!-- Kolom 4: Jembatan Lintas Modul -->
-        <div class="column">
-            <div class="col-header">
-                <span>4. Jembatan Lintas Modul</span>
-                <span class="col-num">04</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Jembatan Inventaris Katalog</div>
-                <div class="node-desc">Akses manajemen langsung untuk mengelola kategori barang dan inventaris produk (CRUD 1).</div>
-                <div class="code-tag">admin/manage_items.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Jembatan Dispatch Pesanan</div>
-                <div class="node-desc">Akses manajemen antrean order, verifikasi koordinat GPS, dan pembaruan kurir pengiriman (CRUD 2).</div>
-                <div class="code-tag">admin/manage_transactions.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tabel Data W3C Strict</div>
-                <div class="node-desc">Semua metrik tabel dan elemen formulir mematuhi sintaks lowercase dan atribut berpasangan tanda kutip.</div>
-                <div class="code-tag">XHTML 1.0 Strict Valid</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pita Alur Permintaan-Respons End-to-End -->
-    <div class="horizontal-flow">
-        <div class="flow-title">Alur Permintaan-Respons Utama (Penyusunan Analisis Dashboard Administratif)</div>
-        <div class="steps-row">
-            <div class="step-item">1. Akses Halaman Admin<br /><span style="font-family: monospace; font-size: 10px;">admin/dashboard.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">2. Gerbang RBAC Ganda<br /><span style="font-family: monospace; font-size: 10px;">require_admin()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">3. Kalkulasi Omzet<br /><span style="font-family: monospace; font-size: 10px;">SUM(total_amount)</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">4. Hitung Order &amp; Akun<br /><span style="font-family: monospace; font-size: 10px;">COUNT(*) Aggregates</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">5. Pindai Stok Menipis<br /><span style="font-family: monospace; font-size: 10px;">items.stock &lt;= 5</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">6. Gabung Aktivitas Terkini<br /><span style="font-family: monospace; font-size: 10px;">transactions JOIN users</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">7. Render Layar Dashboard<br /><span style="font-family: monospace; font-size: 10px;">assets/css/admin.css</span></div>
-        </div>
-    </div>
-
-    <div class="caption">
-        <strong>Catatan Gambar 4:</strong> Portal administratif beroperasi di bawah kontrol akses berbasis peran (RBAC) yang ketat. Mekanisme anti-lockout menjamin administrator aktif tidak dapat mendemosi atau menghapus sesinya sendiri. Kueri agregasi data dieksekusi secara read-only tanpa mengunci tabel saat proses transaksi pelanggan berlangsung.
-    </div>
+  <div class="header">
+    <h1>Gambar 4: Arsitektur Dashboard Admin, Verifikasi SKTM/KKS, & CS (Role 4 - Bonus 1)</h1>
+    <p>Batas Wewenang Admin: Tata kelola website, verifikasi kelayakan Konsumen, & Customer Service (Status pick-up order dikelola oleh Produsen)</p>
+  </div>
+  <div class="workflow-grid">
+    <div class="column">
+  <div class="col-header"><span>Proteksi & Metrik Agregasi</span><span class="col-num">1</span></div>
+  <div class="node">
+  <div class="node-title">Baris Pertama admin/*</div>
+  <div class="node-desc">Wajib memanggil require_role('admin'). Jika bukan admin -> HTTP 403 dan redirect.</div>
+  <span class="code-tag">require_role('admin')</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Kueri Agregasi MySQLi</div>
+  <div>Hitung total pengguna per peran, jumlah konsumen status_verifikasi='menunggu', tiket_bantuan 'terbuka', dan makanan stok <= 5.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">admin/dashboard.php</div>
+  <div class="node-desc">Menampilkan kartu metrik ringkasan sistem secara real-time tanpa library grafik eksternal.</div>
+  <span class="code-tag">Bonus 1 UI</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Verifikasi Dokumen Konsumen</span><span class="col-num">2</span></div>
+  <div class="node">
+  <div class="node-title">admin/manage_users.php</div>
+  <div class="node-desc">Daftar akun pengguna beserta tautan pratinjau dokumen_kelayakan (SKTM / KKS / DTSEN / Slip Gaji).</div>
+  <span class="code-tag">uploads/documents/</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Tinjauan Manual Admin</div>
+  <div>Admin memeriksa keaslian/keterbacaan dokumen lalu memilih Setujui ('disetujui') atau Tolak ('ditolak') + catatan_verifikasi.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Update Status Kelayakan</div>
+  <div class="node-desc">Konsumen yang disetujui langsung bisa mengklaim makanan; yang ditolak diarahkan upload ulang di profile.php.</div>
+  <span class="code-tag">mysqli_prepare</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Layanan Konsumen (CS)</span><span class="col-num">3</span></div>
+  <div class="node">
+  <div class="node-title">Antrean tiket_bantuan</div>
+  <div class="node-desc">Menampilkan keluhan atau pertanyaan yang dikirim Konsumen dari halaman layanan konsumen.</div>
+  <span class="code-tag">status='terbuka'</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Tindak Lanjut & Balasan</div>
+  <div>Admin membaca pesan dan kode_transaksi terkait, lalu menuliskan balasan_admin.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Tandai Selesai</div>
+  <div class="node-desc">Update balasan_admin dan ubah status tiket_bantuan menjadi 'selesai'.</div>
+  <span class="code-tag">Admin CS</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Tata Letak CSS & Batas Peran</span><span class="col-num">4</span></div>
+  <div class="node">
+  <div class="node-title">assets/css/admin.css</div>
+  <div class="node-desc">Styling sidebar, kartu KPI, badge status (menunggu/disetujui/ditolak), dan tabel data responsif dengan Pure CSS.</div>
+  <span class="code-tag">Pure CSS Grid</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Validasi XHTML & Zero Emoji</div>
+  <div>Seluruh label tombol dan indikator status menggunakan teks bersih tanpa emoji.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Pemisahan Wewenang</div>
+  <div class="node-desc">Admin hanya mengelola website, verifikasi, kategori, dan CS. Status pick-up (siap_diambil/selesai) ditangani Produsen.</div>
+  <span class="code-tag">RBAC Terpisah</span>
+</div>
+</div>
+  </div>
+  <div class="footer-bar">
+    <span>Role 4: Admin Dashboard UI | Channel: #role-admin-dashboard</span>
+    <span>Tabel: pengguna, tiket_bantuan, makanan, transaksi</span>
+  </div>
 </div>
 </body>
 </html>

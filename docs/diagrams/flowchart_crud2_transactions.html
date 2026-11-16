@@ -2,13 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar 3: Arsitektur Transaksi Pemesanan dan Checkout Geolocation (CRUD 2)</title>
+<title>Gambar 3: Arsitektur Keranjang, Checkout Pick-up, & Riwayat Klaim (Role 3 - CRUD 2)</title>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     background-color: #ffffff;
     color: #111827;
@@ -17,7 +13,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
 }
 .diagram-container {
     background: #ffffff;
@@ -30,23 +25,12 @@ body {
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
-.header h1 {
-    font-size: 19px;
-    font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.01em;
-    margin-bottom: 4px;
-}
-.header p {
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.4;
-}
+.header h1 { font-size: 19px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #374151; line-height: 1.4; }
 .workflow-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    position: relative;
 }
 .column {
     background: #ffffff;
@@ -79,32 +63,14 @@ body {
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, Consolas, monospace;
 }
-.node {
-    background: #ffffff;
-    border: 1.5px solid #000000;
-    padding: 12px;
-}
-.node.highlight {
-    background: #f9fafb;
-}
-.node-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #000000;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.node-desc {
-    font-size: 12px;
-    color: #1f2937;
-    line-height: 1.4;
-}
+.node { background: #ffffff; border: 1.5px solid #000000; padding: 12px; }
+.node.highlight { background: #f9fafb; }
+.node-title { font-size: 13px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.node-desc { font-size: 12px; color: #1f2937; line-height: 1.4; }
 .code-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 11px;
     background: #f3f4f6;
     color: #000000;
@@ -115,8 +81,8 @@ body {
     font-weight: 600;
 }
 .decision-box {
-    background: #ffffff;
-    border: 1.5px solid #000000;
+    background: #fffbeb;
+    border: 1.5px dashed #000000;
     padding: 10px;
     font-size: 11.5px;
     line-height: 1.35;
@@ -138,197 +104,88 @@ body {
     color: #000000;
     font-size: 15px;
     font-weight: 700;
-    margin: -4px 0;
 }
-.horizontal-flow {
+.footer-bar {
     margin-top: 18px;
-    border: 1.5px solid #000000;
-    padding: 14px;
-    background: #f9fafb;
-}
-.flow-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    color: #000000;
-}
-.steps-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.step-item {
-    background: #ffffff;
-    border: 1px solid #000000;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
-}
-.step-arrow {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-}
-.caption {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: #374151;
-    line-height: 1.5;
-    border-top: 1px solid #000000;
+    border-top: 1.5px solid #000000;
     padding-top: 10px;
+    font-size: 12px;
+    color: #1f2937;
+    display: flex;
+    justify-content: space-between;
 }
+
 </style>
 </head>
 <body>
 <div class="diagram-container">
-    <div class="header">
-        <h1>Gambar 3: Arsitektur Transaksi Pemesanan dan Checkout Geolocation (CRUD 2)</h1>
-        <p>Alur arsitektur untuk pengelolaan keranjang belanja sesi, penangkapan koordinat geolocation HTML5, eksekusi transaksi atomik ACID, validasi stok, dan dispatch status order.</p>
-    </div>
-
-    <div class="workflow-grid">
-        <!-- Kolom 1: Tampilan Checkout -->
-        <div class="column">
-            <div class="col-header">
-                <span>1. Lapisan Checkout Klien</span>
-                <span class="col-num">01</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Tinjauan Keranjang Sesi</div>
-                <div class="node-desc">Membaca item dalam $_SESSION['cart'], kuantitas barang, harga aktif, dan kalkulasi total subtotal.</div>
-                <div class="code-tag">cart.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Konfirmasi Checkout</div>
-                <div class="node-desc">Membutuhkan sesi login. Meminta instruksi catatan pengiriman dan memicu penangkapan lokasi GPS.</div>
-                <div class="code-tag">checkout.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node highlight">
-                <div class="node-title">HTML5 Geolocation (Bonus 2)</div>
-                <div class="node-desc">navigator.geolocation.getCurrentPosition() mengekstrak latitude/longitude ke hidden input formulir.</div>
-                <div class="code-tag">assets/js/geolocation.js</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Riwayat Pesanan Pelanggan</div>
-                <div class="node-desc">Menampilkan daftar historis order, linimasa status, koordinat GPS pengantaran, dan rincian item.</div>
-                <div class="code-tag">transactions.php</div>
-            </div>
-        </div>
-
-        <!-- Kolom 2: Pengendali Aksi -->
-        <div class="column">
-            <div class="col-header">
-                <span>2. Pengendali Aksi</span>
-                <span class="col-num">02</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Pengendali Aksi Checkout</div>
-                <div class="node-desc">Menerima payload POST berisi latitude, longitude, dan catatan. Membaca keranjang dari $_SESSION.</div>
-                <div class="code-tag">actions/crud2_transaction.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Generator Kode Pesanan</div>
-                <div class="node-desc">Membuat kode pelacakan order terstandarisasi yang unik: TRX-{YYYYMMDD}-{4_DIGIT_ACAK}.</div>
-                <div class="code-tag">TRX-20261110-XXXX</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Aksi Dispatch Status Order</div>
-                <div class="node-desc">Endpoint admin pembaruan status: pending -&gt; paid -&gt; shipped -&gt; completed | cancelled.</div>
-                <div class="code-tag">actions/crud2_status_update.php</div>
-            </div>
-        </div>
-
-        <!-- Kolom 3: Pemroses Atomik ACID -->
-        <div class="column">
-            <div class="col-header">
-                <span>3. Pemroses Atomik ACID</span>
-                <span class="col-num">03</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Awal Transaksi Basis Data</div>
-                <div class="node-desc">$pdo-&gt;beginTransaction() mengisolasi transaksi untuk mencegah race condition dan pengurangan stok berlebih.</div>
-                <div class="code-tag">$pdo-&gt;beginTransaction()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Pemeriksaan Ketersediaan Stok</div>
-                <div><strong>Kueri:</strong> SELECT stock FROM items WHERE id = :id FOR UPDATE</div>
-                <div style="margin-top: 4px;">• <strong>STOK KURANG (stok &lt; qty):</strong> $pdo-&gt;rollBack(), simpan flash error, redirect 302 ke cart.php.</div>
-                <div>• <strong>STOK CUKUP (stok &gt;= qty):</strong> Potong stok, sisipkan header &amp; rincian, $pdo-&gt;commit().</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Komit &amp; Pengosongan Keranjang</div>
-                <div class="node-desc">Setelah commit(), mengosongkan $_SESSION['cart'] = [] dan redirect pelanggan ke transactions.php.</div>
-                <div class="code-tag">$pdo-&gt;commit() -&gt; unset($_SESSION['cart'])</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Restorasi Stok saat Pembatalan</div>
-                <div class="node-desc">Jika admin membatalkan pesanan: UPDATE items SET stock = stock + :qty memulihkan inventaris.</div>
-                <div class="code-tag">Pemulihan Stok Atomik</div>
-            </div>
-        </div>
-
-        <!-- Kolom 4: Skema Basis Data -->
-        <div class="column">
-            <div class="col-header">
-                <span>4. Skema Basis Data</span>
-                <span class="col-num">04</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Tabel: transactions</div>
-                <div class="node-desc">Tabel header order. Kolom: id (PK), user_id (FK), order_number (UNIQUE), total_amount, latitude, longitude, status, notes.</div>
-                <div class="code-tag">sql/schema.sql</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tabel: transaction_details</div>
-                <div class="node-desc">Tabel rincian item. Kolom: id (PK), transaction_id (FK), item_id (FK), quantity, unit_price, subtotal.</div>
-                <div class="code-tag">sql/schema.sql</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tabel: items (Saldo Stok)</div>
-                <div class="node-desc">Kuantitas inventaris dijaga ketat secara atomik di bawah kuncian baris selama transaksi checkout.</div>
-                <div class="code-tag">items.stock INT &gt;= 0</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pita Alur Permintaan-Respons End-to-End -->
-    <div class="horizontal-flow">
-        <div class="flow-title">Alur Permintaan-Respons Utama (Eksekusi Checkout Atomik dengan Geolocation)</div>
-        <div class="steps-row">
-            <div class="step-item">1. Tinjau Keranjang<br /><span style="font-family: monospace; font-size: 10px;">cart.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">2. Tangkap GPS<br /><span style="font-family: monospace; font-size: 10px;">geolocation.js</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">3. Kirim Pesanan<br /><span style="font-family: monospace; font-size: 10px;">actions/crud2_transaction.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">4. Kunci &amp; Cek Stok<br /><span style="font-family: monospace; font-size: 10px;">SELECT FOR UPDATE</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">5. Potong Stok &amp; Simpan<br /><span style="font-family: monospace; font-size: 10px;">Header + Details</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">6. Komit Transaksi ACID<br /><span style="font-family: monospace; font-size: 10px;">$pdo-&gt;commit()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">7. Tampilan Konfirmasi<br /><span style="font-family: monospace; font-size: 10px;">transactions.php</span></div>
-        </div>
-    </div>
-
-    <div class="caption">
-        <strong>Catatan Gambar 3:</strong> Seluruh operasi checkout dieksekusi dalam transaksi atomik PDO dengan proteksi rollback terhadap race condition dan penjualan berlebih (overselling). Koordinat Geolocation HTML5 menyediakan data audit lokasi pengantaran yang akurat, disertai pemulihan stok otomatis saat pembatalan.
-    </div>
+  <div class="header">
+    <h1>Gambar 3: Arsitektur Keranjang, Checkout Pick-up, & Riwayat Klaim (Role 3 - CRUD 2)</h1>
+    <p>Model Marketplace Pick-up Only | Auto-split 1 kode_transaksi per Produsen | Batas Kuota Harian (DAILY_CLAIM_LIMIT) | ACID MySQLi</p>
+  </div>
+  <div class="workflow-grid">
+    <div class="column">
+  <div class="col-header"><span>Keranjang & Kuota Harian</span><span class="col-num">1</span></div>
+  <div class="node">
+  <div class="node-title">cart.php ($_SESSION['cart'])</div>
+  <div class="node-desc">Menampung daftar makanan pilihan Konsumen lintas Produsen beserta tombol ubah jumlah atau hapus.</div>
+  <span class="code-tag">Multi-Produsen OK</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Re-validasi Live MySQL</div>
+  <div>Saat halaman dibuka, cek ulang stok live, kedaluwarsa_pada > NOW(), dan total porsi hari ini <= DAILY_CLAIM_LIMIT.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Blokir Jika Stale</div>
+  <div class="node-desc">Jika stok berubah atau makanan kedaluwarsa saat di keranjang, tampilkan peringatan sebelum lanjut checkout.</div>
+  <span class="code-tag">Stale Guard</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Konfirmasi Pick-up</span><span class="col-num">2</span></div>
+  <div class="node">
+  <div class="node-title">checkout.php (XHTML)</div>
+  <div class="node-desc">Menampilkan ringkasan makanan dikelompokkan per Produsen beserta alamat_ambil dan koordinat pick-up Produsen.</div>
+  <span class="code-tag">Pick-up Only</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Harga Gratis / Bayar di Tempat</div>
+  <div>Jika total_harga = 0 tampilkan Gratis; jika > 0 bayar langsung ke Produsen saat pengambilan (Pay-on-Pickup).</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Submit Konfirmasi Klaim</div>
+  <div class="node-desc">Mengirim POST ke actions/crud2_transaction.php dengan validasi token CSRF.</div>
+  <span class="code-tag">POST Checkout</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Transaksi Atomik & Auto-Split</span><span class="col-num">3</span></div>
+  <div class="node">
+  <div class="node-title">mysqli_begin_transaction()</div>
+  <div class="node-desc">Kunci baris pengguna (FOR UPDATE) untuk cek status_verifikasi='disetujui' dan kuota harian bebas race condition.</div>
+  <span class="code-tag">ACID Lock</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Cek Stok & Kedaluwarsa</div>
+  <div>Lock semua makanan FOR UPDATE. Jika stok < jumlah atau sudah kedaluwarsa -> mysqli_rollback() dan kembali ke cart.php.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/crud2_transaction.php</div>
+  <div class="node-desc">Pecah item berdasarkan produsen_id: buat 1 kode_transaksi unik per Produsen, potong stok, INSERT detail_transaksi, mysqli_commit().</div>
+  <span class="code-tag">Auto-split TRX</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Riwayat, Batal, & Status</span><span class="col-num">4</span></div>
+  <div class="node">
+  <div class="node-title">transactions.php</div>
+  <div class="node-desc">Menampilkan daftar klaim Konsumen (ketat WHERE konsumen_id = $_SESSION['user_id']) dan status terbaru.</div>
+  <span class="code-tag">Anti-IDOR</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Aturan Update Status</div>
+  <div>Konsumen hanya boleh batalkan klaim saat status='menunggu'. Produsen memajukan status: menunggu -> siap_diambil -> selesai / dibatalkan.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/crud2_status_update.php</div>
+  <div class="node-desc">Jika status menjadi 'dibatalkan', kembalikan stok makanan dan otomatis refund kuota klaim harian Konsumen.</div>
+  <span class="code-tag">Restore Stok</span>
+</div>
+</div>
+  </div>
+  <div class="footer-bar">
+    <span>Role 3: CRUD 2 Transaksi & Pick-up | Channel: #role-crud2-transactions</span>
+    <span>Tabel: transaksi, detail_transaksi, makanan | Driver: MySQLi</span>
+  </div>
 </div>
 </body>
 </html>

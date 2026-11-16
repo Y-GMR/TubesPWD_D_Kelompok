@@ -2,13 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar 2: Arsitektur Manajemen Katalog Master dan Inventaris (CRUD 1)</title>
+<title>Gambar 2: Arsitektur Master Kategori & Katalog Makanan (Role 2 - CRUD 1)</title>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     background-color: #ffffff;
     color: #111827;
@@ -17,7 +13,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
 }
 .diagram-container {
     background: #ffffff;
@@ -30,23 +25,12 @@ body {
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
-.header h1 {
-    font-size: 19px;
-    font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.01em;
-    margin-bottom: 4px;
-}
-.header p {
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.4;
-}
+.header h1 { font-size: 19px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #374151; line-height: 1.4; }
 .workflow-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    position: relative;
 }
 .column {
     background: #ffffff;
@@ -79,32 +63,14 @@ body {
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, Consolas, monospace;
 }
-.node {
-    background: #ffffff;
-    border: 1.5px solid #000000;
-    padding: 12px;
-}
-.node.highlight {
-    background: #f9fafb;
-}
-.node-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #000000;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.node-desc {
-    font-size: 12px;
-    color: #1f2937;
-    line-height: 1.4;
-}
+.node { background: #ffffff; border: 1.5px solid #000000; padding: 12px; }
+.node.highlight { background: #f9fafb; }
+.node-title { font-size: 13px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.node-desc { font-size: 12px; color: #1f2937; line-height: 1.4; }
 .code-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 11px;
     background: #f3f4f6;
     color: #000000;
@@ -115,8 +81,8 @@ body {
     font-weight: 600;
 }
 .decision-box {
-    background: #ffffff;
-    border: 1.5px solid #000000;
+    background: #fffbeb;
+    border: 1.5px dashed #000000;
     padding: 10px;
     font-size: 11.5px;
     line-height: 1.35;
@@ -138,198 +104,88 @@ body {
     color: #000000;
     font-size: 15px;
     font-weight: 700;
-    margin: -4px 0;
 }
-.horizontal-flow {
+.footer-bar {
     margin-top: 18px;
-    border: 1.5px solid #000000;
-    padding: 14px;
-    background: #f9fafb;
-}
-.flow-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    color: #000000;
-}
-.steps-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.step-item {
-    background: #ffffff;
-    border: 1px solid #000000;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
-}
-.step-arrow {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-}
-.caption {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: #374151;
-    line-height: 1.5;
-    border-top: 1px solid #000000;
+    border-top: 1.5px solid #000000;
     padding-top: 10px;
+    font-size: 12px;
+    color: #1f2937;
+    display: flex;
+    justify-content: space-between;
 }
+
 </style>
 </head>
 <body>
 <div class="diagram-container">
-    <div class="header">
-        <h1>Gambar 2: Arsitektur Manajemen Katalog Master dan Inventaris (CRUD 1)</h1>
-        <p>Alur arsitektur untuk penjelajahan katalog produk, operasi CRUD kategori dan inventaris item oleh admin, pemrosesan media multipart, dan validasi integritas relasional.</p>
-    </div>
-
-    <div class="workflow-grid">
-        <!-- Kolom 1: Tampilan Klien -->
-        <div class="column">
-            <div class="col-header">
-                <span>1. Lapisan Tampilan Klien</span>
-                <span class="col-num">01</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Penjelajah Katalog Publik</div>
-                <div class="node-desc">Menampilkan daftar kartu produk dengan filter kategori (?category_id=) dan pencarian (?search=).</div>
-                <div class="code-tag">catalog.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tampilan Rincian Produk</div>
-                <div class="node-desc">Halaman detail item menampilkan harga, ketersediaan stok, deskripsi, dan aksi Tambah ke Keranjang.</div>
-                <div class="code-tag">item_detail.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Manajemen Kategori Admin</div>
-                <div class="node-desc">Tabel seluruh kategori dengan modal formulir Tambah, Edit, dan konfirmasi Hapus kategori.</div>
-                <div class="code-tag">admin/manage_categories.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Manajemen Inventaris Item</div>
-                <div class="node-desc">Grid pengelolaan stok produk dengan file picker foto produk, editor stok, dan aksi CRUD.</div>
-                <div class="code-tag">admin/manage_items.php</div>
-            </div>
-        </div>
-
-        <!-- Kolom 2: Pengendali Aksi -->
-        <div class="column">
-            <div class="col-header">
-                <span>2. Pengendali Aksi</span>
-                <span class="col-num">02</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Aksi CRUD Kategori</div>
-                <div class="node-desc">Memproses action=create|update|delete. Memvalidasi keunikan nama kategori (2-100 karakter).</div>
-                <div class="code-tag">actions/crud1_category.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Aksi CRUD Item Produk</div>
-                <div class="node-desc">Memproses action=create|update|delete. Memvalidasi category_id, harga &gt;= 0, dan stok &gt;= 0.</div>
-                <div class="code-tag">actions/crud1_item.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Saluran Upload Media Aman</div>
-                <div class="node-desc">Validasi byte biner MIME via finfo_file, penamaan acak random_bytes, simpan ke uploads/items/.</div>
-                <div class="code-tag">finfo_file() -&gt; uploads/items/</div>
-            </div>
-        </div>
-
-        <!-- Kolom 3: Penjaga Hak Akses & Integritas -->
-        <div class="column">
-            <div class="col-header">
-                <span>3. Penjaga Hak Akses &amp; Integritas</span>
-                <span class="col-num">03</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Penjaga Hak Akses Admin</div>
-                <div class="node-desc">require_admin() mengadang permintaan non-admin dan menghentikan eksekusi dengan status HTTP 403 Forbidden.</div>
-                <div class="code-tag">require_admin()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Pemeriksaan Hapus Kategori</div>
-                <div><strong>Kondisi:</strong> SELECT COUNT(*) FROM items WHERE category_id = :id</div>
-                <div style="margin-top: 4px;">• <strong>JUMLAH &gt; 0:</strong> Tolak penghapusan, kirim flash error "Kategori masih memiliki produk terkait", redirect 302.</div>
-                <div>• <strong>JUMLAH == 0:</strong> Lanjutkan eksekusi DELETE kategori.</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Pemeriksaan Audit Hapus Item</div>
-                <div><strong>Kondisi:</strong> SELECT COUNT(*) FROM transaction_details WHERE item_id = :id</div>
-                <div style="margin-top: 4px;">• <strong>TERCATAT TRANSAKSI:</strong> Tolak penghapusan demi menjaga audit historis. Minta admin menyetel stok ke 0.</div>
-                <div>• <strong>TIDAK TERCATAT:</strong> Hapus file gambar &amp; eksekusi DELETE item.</div>
-            </div>
-        </div>
-
-        <!-- Kolom 4: Basis Data & Storage -->
-        <div class="column">
-            <div class="col-header">
-                <span>4. Lapisan Basis Data &amp; Storage</span>
-                <span class="col-num">04</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Tabel Relasional: categories</div>
-                <div class="node-desc">Entitas master kategori. Kolom: id (PK), name (UNIQUE), description, created_at.</div>
-                <div class="code-tag">sql/schema.sql</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tabel Relasional: items</div>
-                <div class="node-desc">Foreign key category_id REFERENCES categories(id). Kolom: id, name, price, stock, image_url.</div>
-                <div class="code-tag">sql/schema.sql</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Prepared Statements JOIN</div>
-                <div class="node-desc">Kueri katalog menggabungkan tabel items dan categories menggunakan parameter binding aman.</div>
-                <div class="code-tag">SELECT i.*, c.name FROM items i JOIN categories c</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Penyimpanan: uploads/items/</div>
-                <div class="node-desc">Foto katalog produk tersimpan dengan nama unik dan proteksi .htaccess dari eksekusi skrip PHP.</div>
-                <div class="code-tag">uploads/items/</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pita Alur Permintaan-Respons End-to-End -->
-    <div class="horizontal-flow">
-        <div class="flow-title">Alur Permintaan-Respons Utama (Penambahan Item Inventaris dengan Upload Gambar)</div>
-        <div class="steps-row">
-            <div class="step-item">1. Kirim Formulir<br /><span style="font-family: monospace; font-size: 10px;">manage_items.php (POST)</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">2. Rute ke Aksi<br /><span style="font-family: monospace; font-size: 10px;">actions/crud1_item.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">3. Penjaga Admin<br /><span style="font-family: monospace; font-size: 10px;">require_admin()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">4. Validasi Tipe MIME<br /><span style="font-family: monospace; font-size: 10px;">finfo_file() &lt;= 2MB</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">5. Simpan Media ke Disk<br /><span style="font-family: monospace; font-size: 10px;">uploads/items/hash.ext</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">6. Sisipkan Baris Data<br /><span style="font-family: monospace; font-size: 10px;">INSERT INTO items</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">7. Redirect Sukses<br /><span style="font-family: monospace; font-size: 10px;">302 ke manage_items.php</span></div>
-        </div>
-    </div>
-
-    <div class="caption">
-        <strong>Catatan Gambar 2:</strong> Seluruh kapabilitas administratif diisolasi ketat di balik penjaga hak akses require_admin(). Pencegahan baris anak yatim (orphan items) dan foreign key constraints menegakkan integritas basis data relasional. Semua berkas gambar yang diunggah melewati inspeksi biner magic number di sisi server.
-    </div>
+  <div class="header">
+    <h1>Gambar 2: Arsitektur Master Kategori & Katalog Makanan (Role 2 - CRUD 1)</h1>
+    <p>Pembagian Peran: Admin kelola kategori | Produsen kelola makanan (harga >= 0, kedaluwarsa, pick-up) | Konsumen jelajah katalog</p>
+  </div>
+  <div class="workflow-grid">
+    <div class="column">
+  <div class="col-header"><span>Master Kategori (Admin)</span><span class="col-num">1</span></div>
+  <div class="node">
+  <div class="node-title">admin/manage_categories.php</div>
+  <div class="node-desc">Antarmuka khusus Admin (require_role('admin')) untuk melihat, menambah, mengubah, dan menghapus kategori.</div>
+  <span class="code-tag">Admin Only</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Cek Referensi Foreign Key</div>
+  <div>Sebelum DELETE kategori, cek apakah masih ada baris di tabel makanan yang memakai kategori_id tersebut.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/crud1_category.php</div>
+  <div class="node-desc">Eksekusi INSERT, UPDATE, DELETE tabel kategori dengan MySQLi prepared statements.</div>
+  <span class="code-tag">mysqli_prepare</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Kelola Makanan (Produsen)</span><span class="col-num">2</span></div>
+  <div class="node">
+  <div class="node-title">Portal Produsen Makanan</div>
+  <div class="node-desc">Produsen mengisi nama_makanan, kategori_id, harga (0 = Gratis / surplus), stok, kedaluwarsa_pada, alamat_ambil, dan GPS.</div>
+  <span class="code-tag">geolocation.js</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Validasi Foto & Kepemilikan</div>
+  <div>Cek MIME finfo_file (<= 2MB) ke uploads/items/ serta pastikan UPDATE/DELETE hanya untuk produsen_id = $_SESSION['user_id'].</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/crud1_item.php</div>
+  <div class="node-desc">Simpan/ubah makanan di MySQL. Tolak DELETE jika makanan sudah ada di detail_transaksi (sarankan set stok = 0).</div>
+  <span class="code-tag">Scoped Produsen</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Katalog & Pencarian (Konsumen)</span><span class="col-num">3</span></div>
+  <div class="node">
+  <div class="node-title">catalog.php (XHTML)</div>
+  <div class="node-desc">Halaman eksplorasi dan pencarian kata kunci (?q=...) serta filter kategori (?kategori_id=...).</div>
+  <span class="code-tag">require_login()</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Filter Kelayakan & Stok</div>
+  <div>Query JOIN makanan + kategori + pengguna wajib menyaring stok > 0 AND (kedaluwarsa_pada IS NULL OR kedaluwarsa_pada > NOW()).</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Tampilan Kartu Makanan</div>
+  <div class="node-desc">Menampilkan badge Gratis jika harga=0, nama Produsen, alamat pick-up, dan sisa stok porsi.</div>
+  <span class="code-tag">htmlspecialchars()</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Rincian & Gerbang Klaim</span><span class="col-num">4</span></div>
+  <div class="node">
+  <div class="node-title">item_detail.php</div>
+  <div class="node-desc">Menampilkan detail lengkap 1 makanan, tanggal kedaluwarsa, titik pick-up Produsen, dan form input jumlah klaim.</div>
+  <span class="code-tag">GET ?id=...</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Validasi Item & Status</div>
+  <div>Jika ID tidak valid/kedaluwarsa/stok habis -> redirect ke catalog.php. Jika klik Klaim -> cek status_verifikasi='disetujui'.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Lanjut ke Keranjang</div>
+  <div class="node-desc">Validasi awal jumlah + isi $_SESSION['cart'] <= stok, lalu serahkan ke Role 3 (cart.php).</div>
+  <span class="code-tag">Hand-off CRUD 2</span>
+</div>
+</div>
+  </div>
+  <div class="footer-bar">
+    <span>Role 2: CRUD 1 Master Data & Katalog | Channel: #role-crud1-catalog</span>
+    <span>Tabel: kategori, makanan | Driver: MySQLi</span>
+  </div>
 </div>
 </body>
 </html>

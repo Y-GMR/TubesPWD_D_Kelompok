@@ -2,13 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar 5: Arsitektur Interaktivitas Frontend, AJAX Asinkron, dan API Klien</title>
+<title>Gambar 5: Arsitektur XHTML 1.0 Strict, Pure CSS, & Bonus Pack JS (Role 5 - Bonus 2, 3, 4)</title>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     background-color: #ffffff;
     color: #111827;
@@ -17,7 +13,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
 }
 .diagram-container {
     background: #ffffff;
@@ -30,23 +25,12 @@ body {
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
-.header h1 {
-    font-size: 19px;
-    font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.01em;
-    margin-bottom: 4px;
-}
-.header p {
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.4;
-}
+.header h1 { font-size: 19px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #374151; line-height: 1.4; }
 .workflow-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    position: relative;
 }
 .column {
     background: #ffffff;
@@ -79,32 +63,14 @@ body {
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, Consolas, monospace;
 }
-.node {
-    background: #ffffff;
-    border: 1.5px solid #000000;
-    padding: 12px;
-}
-.node.highlight {
-    background: #f9fafb;
-}
-.node-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #000000;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.node-desc {
-    font-size: 12px;
-    color: #1f2937;
-    line-height: 1.4;
-}
+.node { background: #ffffff; border: 1.5px solid #000000; padding: 12px; }
+.node.highlight { background: #f9fafb; }
+.node-title { font-size: 13px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.node-desc { font-size: 12px; color: #1f2937; line-height: 1.4; }
 .code-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 11px;
     background: #f3f4f6;
     color: #000000;
@@ -115,8 +81,8 @@ body {
     font-weight: 600;
 }
 .decision-box {
-    background: #ffffff;
-    border: 1.5px solid #000000;
+    background: #fffbeb;
+    border: 1.5px dashed #000000;
     padding: 10px;
     font-size: 11.5px;
     line-height: 1.35;
@@ -138,204 +104,88 @@ body {
     color: #000000;
     font-size: 15px;
     font-weight: 700;
-    margin: -4px 0;
 }
-.horizontal-flow {
+.footer-bar {
     margin-top: 18px;
-    border: 1.5px solid #000000;
-    padding: 14px;
-    background: #f9fafb;
-}
-.flow-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    color: #000000;
-}
-.steps-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.step-item {
-    background: #ffffff;
-    border: 1px solid #000000;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
-}
-.step-arrow {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-}
-.caption {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: #374151;
-    line-height: 1.5;
-    border-top: 1px solid #000000;
+    border-top: 1.5px solid #000000;
     padding-top: 10px;
+    font-size: 12px;
+    color: #1f2937;
+    display: flex;
+    justify-content: space-between;
 }
+
 </style>
 </head>
 <body>
 <div class="diagram-container">
-    <div class="header">
-        <h1>Gambar 5: Arsitektur Interaktivitas Frontend, AJAX Asinkron, dan API Klien</h1>
-        <p>Alur arsitektur untuk template modular XHTML 1.0 Strict, validasi realtime AJAX dengan debounce (Bonus 3), penangkapan koordinat Geolocation HTML5 (Bonus 2), dan pratinjau media FileReader (Bonus 4).</p>
-    </div>
-
-    <div class="workflow-grid">
-        <!-- Kolom 1: Templat Modular -->
-        <div class="column">
-            <div class="col-header">
-                <span>1. Templat Modular Klien</span>
-                <span class="col-num">01</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Header XHTML Strict</div>
-                <div class="node-desc">Deklarasi W3C XHTML 1.0 Strict DOCTYPE, charset UTF-8, viewport, dan impor stylesheet terisolasi.</div>
-                <div class="code-tag">includes/header.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Bilah Navigasi Dinamis</div>
-                <div class="node-desc">Menu adaptif peran sesi merender tautan navigasi untuk Tamu, Pelanggan, dan Administrator.</div>
-                <div class="code-tag">includes/navbar.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Footer XHTML Strict</div>
-                <div class="node-desc">Penutupan tag rapi, pernyataan hak cipta, dan pemuatan bundel skrip JavaScript native.</div>
-                <div class="code-tag">includes/footer.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Mesin CSS Modular Murni</div>
-                <div class="node-desc">Stylesheet CSS modular untuk tipografi, formulir, tabel data, modal, notifikasi, dan tata letak responsif.</div>
-                <div class="code-tag">assets/css/style.css</div>
-            </div>
-        </div>
-
-        <!-- Kolom 2: AJAX Asinkron -->
-        <div class="column">
-            <div class="col-header">
-                <span>2. AJAX Asinkron (Bonus 3)</span>
-                <span class="col-num">02</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Pendengar Debounce Input</div>
-                <div class="node-desc">Mendeteksi event input pada kolom username dan email dengan timer debounce 300ms mencegah banjir kueri.</div>
-                <div class="code-tag">assets/js/ajax_validator.js</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Pengiriman Kueri Fetch API</div>
-                <div class="node-desc">Mengirim kueri GET asinkron: check_user_ajax.php?field=username&amp;value=... tanpa reload halaman.</div>
-                <div class="code-tag">fetch() -&gt; HTTP GET</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Aksi JSON Ketersediaan Akun</div>
-                <div class="node-desc">Backend mengecek basis data via prepared statement dan mengembalikan respons envelope JSON.</div>
-                <div class="code-tag">actions/check_user_ajax.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Umpan Balik Status DOM</div>
-                <div class="node-desc">Memperbarui elemen DOM secara dinamis dengan status [Tersedia] atau [Sudah digunakan] beserta kelas CSS.</div>
-                <div class="code-tag">Node Umpan Balik DOM</div>
-            </div>
-        </div>
-
-        <!-- Kolom 3: API Geolocation -->
-        <div class="column">
-            <div class="col-header">
-                <span>3. API Geolocation (Bonus 2)</span>
-                <span class="col-num">03</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Pemicu Geolocation Browser</div>
-                <div class="node-desc">Memanggil navigator.geolocation.getCurrentPosition() saat pelanggan membuka halaman checkout.</div>
-                <div class="code-tag">assets/js/geolocation.js</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Injeksi Nilai Koordinat</div>
-                <div class="node-desc">Mengekstrak latitude dan longitude secara presisi, lalu mengisi nilai input tersembunyi formulir checkout.</div>
-                <div class="code-tag">Input hidden lat &amp; lng</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Penanganan Izin &amp; Error</div>
-                <div><strong>Kondisi:</strong> Pengguna mengizinkan atau menolak akses GPS</div>
-                <div style="margin-top: 4px;">• <strong>DIIZINKAN:</strong> Koordinat disisipkan otomatis ke formulir, tampilkan pratinjau koordinat.</div>
-                <div>• <strong>DITOLAK / TIMEOUT:</strong> Mengalihkan ke pengisian alamat manual tanpa memblokir checkout.</div>
-            </div>
-        </div>
-
-        <!-- Kolom 4: Pratinjau Media -->
-        <div class="column">
-            <div class="col-header">
-                <span>4. Pratinjau Media (Bonus 4)</span>
-                <span class="col-num">04</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Event Change Pemilih Berkas</div>
-                <div class="node-desc">Memasang listener change pada input file avatar profil dan unggah foto item katalog.</div>
-                <div class="code-tag">assets/js/image_preview.js</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Filter Validasi Klien</div>
-                <div><strong>Kriteria:</strong> file.size &lt;= 2MB dan ekstensi dalam [jpg, jpeg, png, webp]</div>
-                <div style="margin-top: 4px;">• <strong>TIDAK VALID:</strong> Kosongkan input berkas, tampilkan alert "Ukuran file maksimal 2MB".</div>
-                <div>• <strong>VALID:</strong> Inisialisasi FileReader dan lanjutkan proses pembacaan.</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Pembacaan FileReader</div>
-                <div class="node-desc">reader.readAsDataURL(file) mengonversi berkas biner menjadi representasi string Data URL base64.</div>
-                <div class="code-tag">FileReader.readAsDataURL()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Binding Pratinjau Gambar</div>
-                <div class="node-desc">Event reader.onload menyetel img.src = e.target.result, memberi umpan balik visual sebelum submit.</div>
-                <div class="code-tag">preview.src = e.target.result</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pita Alur Permintaan-Respons End-to-End -->
-    <div class="horizontal-flow">
-        <div class="flow-title">Alur Permintaan-Respons Utama (Saluran Validasi Real-Time Asinkron)</div>
-        <div class="steps-row">
-            <div class="step-item">1. Pengguna Input<br /><span style="font-family: monospace; font-size: 10px;">register.php (input)</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">2. Debounce 300ms<br /><span style="font-family: monospace; font-size: 10px;">ajax_validator.js</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">3. Kueri HTTP Asinkron<br /><span style="font-family: monospace; font-size: 10px;">fetch() ke check_user</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">4. Kueri Prepared SQL<br /><span style="font-family: monospace; font-size: 10px;">SELECT id FROM users</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">5. Respons JSON<br /><span style="font-family: monospace; font-size: 10px;">HTTP 200 {available}</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">6. Parsing JSON<br /><span style="font-family: monospace; font-size: 10px;">response.json()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">7. Perbarui DOM<br /><span style="font-family: monospace; font-size: 10px;">Umpan Balik Instan</span></div>
-        </div>
-    </div>
-
-    <div class="caption">
-        <strong>Catatan Gambar 5:</strong> Lapisan frontend menggunakan JavaScript ES6 murni (Vanilla JS) tanpa dependensi pustaka pihak ketiga. Validasi real-time menerapkan pembatasan frekuensi debounce untuk menjaga kapasitas server. HTML5 Geolocation API dan FileReader API menghadirkan pengalaman klien yang interaktif dalam kerangka kerja W3C XHTML 1.0 Strict.
-    </div>
+  <div class="header">
+    <h1>Gambar 5: Arsitektur XHTML 1.0 Strict, Pure CSS, & Bonus Pack JS (Role 5 - Bonus 2, 3, 4)</h1>
+    <p>Template Modular + Vanilla JS ES6+ (Fetch AJAX, Produsen Geolocation, FileReader Preview) | 0 Framework Eksternal</p>
+  </div>
+  <div class="workflow-grid">
+    <div class="column">
+  <div class="col-header"><span>Template XHTML & CSS Modular</span><span class="col-num">1</span></div>
+  <div class="node">
+  <div class="node-title">includes/header, navbar, footer</div>
+  <div class="node-desc">Header DOCTYPE XHTML 1.0 Strict, navigasi dinamis sesuai $_SESSION['peran'], dan pemanggilan JS modular.</div>
+  <span class="code-tag">W3C XHTML 1.0 Strict</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Aturan Markup Ketat</div>
+  <div>Tag huruf kecil, void tags tutup ' />', atribut berkuotasi ganda, zero <font>/<center>/<b>, zero emoji.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">style.css & components.css</div>
+  <div class="node-desc">Pure CSS Flexbox/Grid, variabel warna, kartu katalog, form, tombol, dan kotak flash alert.</div>
+  <span class="code-tag">Pure CSS3</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>AJAX Check Akun (Bonus 3)</span><span class="col-num">2</span></div>
+  <div class="node">
+  <div class="node-title">assets/js/ajax_validator.js</div>
+  <div class="node-desc">Mendengar event input/blur dengan debounce 300ms pada username & email di register.php.</div>
+  <span class="code-tag">Fetch API</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">actions/check_user_ajax.php</div>
+  <div>Kueri MySQLi prepared SELECT COUNT(*) FROM pengguna WHERE username = ? atau email = ?.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Respons JSON Standar</div>
+  <div class="node-desc">Kembalikan application/json {status, message, data}. DOM tampilkan pesan tersedia/terpakai tanpa reload.</div>
+  <span class="code-tag">Bonus 3</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Geolocation Produsen (Bonus 2)</span><span class="col-num">3</span></div>
+  <div class="node">
+  <div class="node-title">assets/js/geolocation.js</div>
+  <div class="node-desc">Dipakai di form unggah/edit makanan milik Produsen untuk mengambil koordinat lokasi pick-up.</div>
+  <span class="code-tag">navigator.geolocation</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Sukses vs Izin Ditolak</div>
+  <div>Jika diizinkan -> isi latitude_ambil & longitude_ambil. Jika ditolak -> fallback NULL dan pakai alamat_ambil manual.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">Tampil di Checkout Konsumen</div>
+  <div class="node-desc">Koordinat pick-up Produsen ditampilkan sebagai panduan lokasi ambil di checkout.php & transactions.php.</div>
+  <span class="code-tag">Bonus 2</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Preview Upload (Bonus 4) & UX</span><span class="col-num">4</span></div>
+  <div class="node">
+  <div class="node-title">assets/js/image_preview.js</div>
+  <div class="node-desc">Membaca file gambar via FileReader API untuk pratinjau instan foto profil, foto makanan, dan dokumen sebelum submit.</div>
+  <span class="code-tag">Bonus 4</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Validasi Pra-Kirim Klien</div>
+  <div>Cek ukuran <= 2MB dan ekstensi gambar di sisi klien agar tidak gagal saat upload ke server.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">assets/js/main.js</div>
+  <div class="node-desc">Menangani auto-dismiss flash alert dan konfirmasi aksi tombol dengan Vanilla JS murni.</div>
+  <span class="code-tag">Vanilla ES6+</span>
+</div>
+</div>
+  </div>
+  <div class="footer-bar">
+    <span>Role 5: Frontend & Bonus Pack | Channel: #role-frontend-interactivity</span>
+    <span>Standar: XHTML 1.0 Strict + Pure CSS + Vanilla JS</span>
+  </div>
 </div>
 </body>
 </html>

@@ -2,13 +2,9 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8" />
-<title>Gambar 1: Arsitektur Siklus Hidup Otentikasi dan Akun Pengguna</title>
+<title>Gambar 1: Arsitektur Otentikasi, Verifikasi Dokumen, & Sesi (Role 1)</title>
 <style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 body {
     background-color: #ffffff;
     color: #111827;
@@ -17,7 +13,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    min-height: 100vh;
 }
 .diagram-container {
     background: #ffffff;
@@ -30,23 +25,12 @@ body {
     padding-bottom: 16px;
     margin-bottom: 24px;
 }
-.header h1 {
-    font-size: 19px;
-    font-weight: 700;
-    color: #000000;
-    letter-spacing: -0.01em;
-    margin-bottom: 4px;
-}
-.header p {
-    font-size: 13px;
-    color: #374151;
-    line-height: 1.4;
-}
+.header h1 { font-size: 19px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.header p { font-size: 13px; color: #374151; line-height: 1.4; }
 .workflow-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    position: relative;
 }
 .column {
     background: #ffffff;
@@ -79,32 +63,14 @@ body {
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: ui-monospace, Consolas, monospace;
 }
-.node {
-    background: #ffffff;
-    border: 1.5px solid #000000;
-    padding: 12px;
-}
-.node.highlight {
-    background: #f9fafb;
-}
-.node-title {
-    font-size: 13px;
-    font-weight: 700;
-    color: #000000;
-    margin-bottom: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.node-desc {
-    font-size: 12px;
-    color: #1f2937;
-    line-height: 1.4;
-}
+.node { background: #ffffff; border: 1.5px solid #000000; padding: 12px; }
+.node.highlight { background: #f9fafb; }
+.node-title { font-size: 13px; font-weight: 700; color: #000000; margin-bottom: 4px; }
+.node-desc { font-size: 12px; color: #1f2937; line-height: 1.4; }
 .code-tag {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: ui-monospace, Consolas, monospace;
     font-size: 11px;
     background: #f3f4f6;
     color: #000000;
@@ -115,8 +81,8 @@ body {
     font-weight: 600;
 }
 .decision-box {
-    background: #ffffff;
-    border: 1.5px solid #000000;
+    background: #fffbeb;
+    border: 1.5px dashed #000000;
     padding: 10px;
     font-size: 11.5px;
     line-height: 1.35;
@@ -138,197 +104,88 @@ body {
     color: #000000;
     font-size: 15px;
     font-weight: 700;
-    margin: -4px 0;
 }
-.horizontal-flow {
+.footer-bar {
     margin-top: 18px;
-    border: 1.5px solid #000000;
-    padding: 14px;
-    background: #f9fafb;
-}
-.flow-title {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    color: #000000;
-}
-.steps-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-.step-item {
-    background: #ffffff;
-    border: 1px solid #000000;
-    padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-align: center;
-    flex: 1;
-}
-.step-arrow {
-    font-size: 14px;
-    font-weight: 700;
-    color: #000000;
-}
-.caption {
-    margin-top: 16px;
-    font-size: 11.5px;
-    color: #374151;
-    line-height: 1.5;
-    border-top: 1px solid #000000;
+    border-top: 1.5px solid #000000;
     padding-top: 10px;
+    font-size: 12px;
+    color: #1f2937;
+    display: flex;
+    justify-content: space-between;
 }
+
 </style>
 </head>
 <body>
 <div class="diagram-container">
-    <div class="header">
-        <h1>Gambar 1: Arsitektur Siklus Hidup Otentikasi dan Akun Pengguna</h1>
-        <p>Alur arsitektur untuk registrasi pengguna, verifikasi kredensial, middleware session guard, hashing password BCrypt, dan persistensi relasional MySQL.</p>
-    </div>
-
-    <div class="workflow-grid">
-        <!-- Kolom 1: Tampilan Klien -->
-        <div class="column">
-            <div class="col-header">
-                <span>1. Lapisan Tampilan Klien</span>
-                <span class="col-num">01</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Formulir Registrasi</div>
-                <div class="node-desc">Formulir XHTML 1.0 Strict untuk menangkap username, email, nama lengkap, dan password.</div>
-                <div class="code-tag">register.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Portal Login</div>
-                <div class="node-desc">Formulir standar pengiriman kredensial via HTTP POST dengan wadah pesan flash error.</div>
-                <div class="code-tag">login.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tampilan &amp; Edit Profil</div>
-                <div class="node-desc">Halaman terotentikasi untuk inspeksi profil dan upload foto avatar multipart/form-data.</div>
-                <div class="code-tag">profile.php</div>
-            </div>
-        </div>
-
-        <!-- Kolom 2: Pengendali Aksi -->
-        <div class="column">
-            <div class="col-header">
-                <span>2. Pengendali Aksi</span>
-                <span class="col-num">02</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Aksi Registrasi Pengguna</div>
-                <div class="node-desc">Validasi regex ^[a-zA-Z0-9_]{4,30}$, format email, kecocokan konfirmasi password, eksekusi BCrypt.</div>
-                <div class="code-tag">actions/auth_register.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Aksi Login Pengguna</div>
-                <div class="node-desc">Kueri data pengguna via username/email, eksekusi password_verify(), dan regenerasi sesi login.</div>
-                <div class="code-tag">actions/auth_login.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Pembaruan Profil &amp; Upload</div>
-                <div class="node-desc">Validasi tipe MIME via finfo_file, penamaan unik acak, simpan file ke uploads/avatars/.</div>
-                <div class="code-tag">actions/auth_profile_update.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Aksi Logout Pengguna</div>
-                <div class="node-desc">Menghapus array $_SESSION, menghancurkan data sesi, menghapus cookie, redirect 302 ke login.php.</div>
-                <div class="code-tag">actions/auth_logout.php</div>
-            </div>
-        </div>
-
-        <!-- Kolom 3: Penjaga Sesi & Logika Bisnis -->
-        <div class="column">
-            <div class="col-header">
-                <span>3. Penjaga Sesi &amp; Logika Bisnis</span>
-                <span class="col-num">03</span>
-            </div>
-            <div class="node highlight">
-                <div class="node-title">Pengerasan &amp; Penjaga Sesi</div>
-                <div class="node-desc">Menetapkan cookie_httponly=1, cookie_samesite=Lax, dan use_strict_mode=1 sebelum session_start().</div>
-                <div class="code-tag">includes/session.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="decision-box">
-                <div class="decision-title">Keputusan Verifikasi Kredensial</div>
-                <div><strong>Kondisi:</strong> password_verify($pwd, $user['password_hash'])</div>
-                <div style="margin-top: 4px;">• <strong>VALID (COCOK):</strong> session_regenerate_id(true), simpan user_id &amp; role, redirect 302 sesuai hak akses.</div>
-                <div>• <strong>TIDAK VALID:</strong> Simpan $_SESSION['flash_error'], redirect 302 ke login.php.</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Kontrol Akses Berbasis Peran</div>
-                <div class="node-desc">require_login() memverifikasi $_SESSION['user_id']. require_admin() memastikan role === 'admin' atau tolak HTTP 403.</div>
-                <div class="code-tag">require_login() | require_admin()</div>
-            </div>
-        </div>
-
-        <!-- Kolom 4: Basis Data & Penyimpanan -->
-        <div class="column">
-            <div class="col-header">
-                <span>4. Lapisan Basis Data &amp; Storage</span>
-                <span class="col-num">04</span>
-            </div>
-            <div class="node">
-                <div class="node-title">Koneksi Basis Data PDO</div>
-                <div class="node-desc">Instance koneksi database PDO tunggal (singleton) dengan ERRMODE_EXCEPTION dan charset UTF8MB4.</div>
-                <div class="code-tag">config/database.php</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Tabel Relasional: users</div>
-                <div class="node-desc">Skema tabel menyimpan id (PK), username (UNIQUE), email (UNIQUE), password_hash, full_name, role, avatar_url.</div>
-                <div class="code-tag">sql/schema.sql</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Eksekusi Prepared Statements</div>
-                <div class="node-desc">Semua kueri SQL menggunakan parameter binding (SELECT ... WHERE username = :u) mencegah SQL Injection.</div>
-                <div class="code-tag">PDO::prepare() -&gt; execute()</div>
-            </div>
-            <div class="flow-arrow">↓</div>
-            <div class="node">
-                <div class="node-title">Penyimpanan: uploads/avatars/</div>
-                <div class="node-desc">Direktori media terisolasi dengan proteksi penolakan eksekusi skrip melalui file .htaccess.</div>
-                <div class="code-tag">uploads/avatars/</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Pita Alur Permintaan-Respons End-to-End -->
-    <div class="horizontal-flow">
-        <div class="flow-title">Alur Permintaan-Respons Utama (Siklus Hidup Otentikasi End-to-End)</div>
-        <div class="steps-row">
-            <div class="step-item">1. Kirim Formulir<br /><span style="font-family: monospace; font-size: 10px;">login.php (POST)</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">2. Rute ke Aksi<br /><span style="font-family: monospace; font-size: 10px;">actions/auth_login.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">3. Penjaga Sesi<br /><span style="font-family: monospace; font-size: 10px;">includes/session.php</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">4. Kueri Akun Pengguna<br /><span style="font-family: monospace; font-size: 10px;">SELECT FROM users</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">5. Verifikasi BCrypt<br /><span style="font-family: monospace; font-size: 10px;">password_verify()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">6. Regenerasi ID Sesi<br /><span style="font-family: monospace; font-size: 10px;">session_regenerate_id()</span></div>
-            <div class="step-arrow">→</div>
-            <div class="step-item">7. Redirect Peran<br /><span style="font-family: monospace; font-size: 10px;">302 ke index atau admin</span></div>
-        </div>
-    </div>
-
-    <div class="caption">
-        <strong>Catatan Gambar 1:</strong> Seluruh interaksi klien-server sepenuhnya mematuhi standar W3C XHTML 1.0 Strict. Password pengguna tidak pernah disimpan dalam format teks biasa dan dienkripsi menggunakan algoritma BCrypt (faktor biaya 10). Konfigurasi parameter keamanan sesi melindungi sistem dari pencurian cookie melalui serangan XSS dan CSRF.
-    </div>
+  <div class="header">
+    <h1>Gambar 1: Arsitektur Otentikasi, Verifikasi Dokumen, & Sesi (Role 1)</h1>
+    <p>Food Bank System (3 Peran: admin, produsen, konsumen) | Driver Wajib: MySQLi Prepared Statements | Tabel: pengguna</p>
+  </div>
+  <div class="workflow-grid">
+    <div class="column">
+  <div class="col-header"><span>Registrasi & Dokumen</span><span class="col-num">1</span></div>
+  <div class="node">
+  <div class="node-title">register.php (XHTML)</div>
+  <div class="node-desc">Input username, email, nama_lengkap, kata_sandi, dan unggah dokumen kelayakan (SKTM / KKS / DTSEN / Slip Gaji).</div>
+  <span class="code-tag">multipart/form-data</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">Validasi & Upload</div>
+  <div>Cek AJAX keunikan + validasi MIME riil (finfo_file <= 2MB). Simpan file ke uploads/documents/.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/auth_register.php</div>
+  <div class="node-desc">Hash password_hash(PASSWORD_BCRYPT), INSERT pengguna dengan peran='konsumen' dan status_verifikasi='menunggu'.</div>
+  <span class="code-tag">mysqli_prepare</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Login & Role Router</span><span class="col-num">2</span></div>
+  <div class="node">
+  <div class="node-title">login.php (XHTML)</div>
+  <div class="node-desc">Kirim username atau email dan kata_sandi melalui POST.</div>
+  <span class="code-tag">CSRF token</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">password_verify()</div>
+  <div>Ambil kata_sandi_hash dari tabel pengguna. Jika gagal -> flash_error ke login.php. Jika cocok -> session_regenerate_id(true).</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/auth_login.php</div>
+  <div class="node-desc">Set $_SESSION['user_id'], ['peran'], ['foto_profil']. Arahkan ke halaman konsumen, produsen, atau admin.</div>
+  <span class="code-tag">3-Role Routing</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Session Guard & RBAC</span><span class="col-num">3</span></div>
+  <div class="node">
+  <div class="node-title">config/database.php</div>
+  <div class="node-desc">Koneksi tunggal MySQLi prosedural ke database tubespwd_db dan konstanta config.php (DAILY_CLAIM_LIMIT, MAX_FILE_SIZE).</div>
+  <span class="code-tag">mysqli_connect</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">includes/session.php</div>
+  <div>Konfigurasi cookie httponly=1, samesite=Lax, use_strict_mode=1. Wajib dipanggil di baris teratas halaman terproteksi.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">require_login() / require_role()</div>
+  <div class="node-desc">Memastikan akses sesuai peran ('admin', 'produsen', 'konsumen') dan mencegah eksekusi oleh tamu.</div>
+  <span class="code-tag">RBAC Guard</span>
+</div>
+</div><div class="column">
+  <div class="col-header"><span>Profil & Logout</span><span class="col-num">4</span></div>
+  <div class="node">
+  <div class="node-title">profile.php (Bonus 4)</div>
+  <div class="node-desc">Edit nama_lengkap, kata_sandi, unggah foto_profil, atau unggah ulang dokumen_kelayakan jika status_verifikasi='ditolak'.</div>
+  <span class="code-tag">uploads/avatars/</span>
+</div><div class="flow-arrow">|</div><div class="decision-box">
+  <div class="decision-title">auth_profile_update.php</div>
+  <div>Jika dokumen baru diunggah, reset status_verifikasi kembali menjadi 'menunggu' untuk ditinjau Admin.</div>
+</div><div class="flow-arrow">|</div><div class="node highlight">
+  <div class="node-title">actions/auth_logout.php</div>
+  <div class="node-desc">Kosongkan $_SESSION, jalankan session_destroy(), hapus cookie sesi, redirect 302 ke login.php.</div>
+  <span class="code-tag">End Session</span>
+</div>
+</div>
+  </div>
+  <div class="footer-bar">
+    <span>Role 1: Auth & Akun Core | Channel: #role-auth-core</span>
+    <span>Standar: PHP 8 Native + MySQLi + XHTML 1.0 Strict</span>
+  </div>
 </div>
 </body>
 </html>
