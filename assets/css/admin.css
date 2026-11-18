@@ -1,0 +1,225 @@
+/* Stylesheet khusus Panel Admin (Role 4 - Pure CSS) */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f6f8;
+    color: #222222;
+}
+
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    width: 220px;
+    background-color: #1f2937;
+    color: #ffffff;
+    padding: 20px;
+}
+
+.sidebar-title {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+}
+
+.sidebar-menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 8px;
+}
+
+.sidebar-menu a {
+    display: block;
+    padding: 10px 12px;
+    color: #d1d5db;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.sidebar-menu a.active,
+.sidebar-menu a:hover {
+    background-color: #374151;
+    color: #ffffff;
+}
+
+.admin-main {
+    flex: 1;
+    padding: 24px;
+}
+
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+}
+
+.page-subtitle {
+    margin: 0;
+    color: #555555;
+    font-size: 14px;
+}
+
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.kpi-card {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.kpi-label {
+    display: block;
+    font-size: 13px;
+    color: #555555;
+    margin-bottom: 8px;
+}
+
+.kpi-value {
+    font-size: 26px;
+    color: #111827;
+}
+
+.section-box {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 24px;
+}
+
+.section-box h2 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.table-modern th,
+.table-modern td {
+    border: 1px solid #dddddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.table-header th {
+    background-color: #f3f4f6;
+}
+
+.table-striped tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.form-control {
+    padding: 6px 8px;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #ffffff;
+}
+
+.btn-primary {
+    background-color: #2563eb;
+}
+
+.btn-success {
+    background-color: #16a34a;
+}
+
+.btn-danger {
+    background-color: #dc2626;
+}
+
+.badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    background-color: #e5e7eb;
+    color: #111827;
+}
+
+.badge-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.alert {
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.alert-error {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.alert-warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+@media (max-width: 768px) {
+    .admin-wrapper {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+}
