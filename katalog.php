@@ -98,7 +98,7 @@ if ($conn) {
         <?php endif; ?>
 
         <div class="filter-section">
-            <form action="catalog.php" method="get" class="filter-form">
+            <form action="katalog.php" method="get" class="filter-form">
                 <div class="form-group">
                     <label for="inputSearch" class="form-label">Cari Makanan</label>
                     <input type="text" id="inputSearch" name="q" class="form-control" value="<?php echo htmlspecialchars($kata_kunci, ENT_QUOTES, 'UTF-8'); ?>" />
@@ -119,7 +119,7 @@ if ($conn) {
 
                 <div class="form-group">
                     <button type="submit" id="btnFilter" class="btn btn-primary">Terapkan Filter</button>
-                    <a href="catalog.php" class="btn btn-secondary">Reset</a>
+                    <a href="katalog.php" class="btn btn-secondary">Reset</a>
                 </div>
             </form>
         </div>
