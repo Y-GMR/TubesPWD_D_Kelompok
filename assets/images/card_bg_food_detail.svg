@@ -1,0 +1,35 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="720" height="241" viewBox="0 0 720 241" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Card Background - Food Detail" filter="url(#filter0_dddd_0_19)">
+<path d="M0 18C0 8.05888 8.05888 0 18 0H692C701.941 0 710 8.05888 710 18V212C710 221.941 701.941 230 692 230H18C8.05888 230 0 221.941 0 212V18Z" fill="white"/>
+<mask id="stroke0_0_19" fill="white">
+<path d="M0 18C0 8.05888 8.05888 0 18 0H692C701.941 0 710 8.05888 710 18V212C710 221.941 701.941 230 692 230H18C8.05888 230 0 221.941 0 212V18Z"/>
+</mask>
+<path d="M18 230H692C701.941 230 710 221.941 710 212V18C710 8.05887 701.941 0 692 0H18C8.05888 0 0 8.05888 0 18V212C0 221.941 8.05888 230 18 230Z" stroke-width="4" stroke="#0D4347" mask="url(#stroke0_0_19)"/>
+</g>
+<defs>
+<filter id="filter0_dddd_0_19" x="0" y="0" width="720" height="241" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="10" dy="11"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.960784 0 0 0 0 0.705882 0 0 0 0 0.258824 0 0 0 1 0"/>
+<feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_0_19"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="7" dy="8"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.909804 0 0 0 0 0.52549 0 0 0 0 0.207843 0 0 0 1 0"/>
+<feBlend mode="normal" in2="effect1_dropShadow_0_19" result="effect2_dropShadow_0_19"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="4" dy="5"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.709804 0 0 0 0 0.254902 0 0 0 0 0.156863 0 0 0 1 0"/>
+<feBlend mode="normal" in2="effect2_dropShadow_0_19" result="effect3_dropShadow_0_19"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dx="1.5" dy="2"/>
+<feComposite in2="hardAlpha" operator="out"/>
+<feColorMatrix type="matrix" values="0 0 0 0 0.0509804 0 0 0 0 0.262745 0 0 0 0 0.278431 0 0 0 1 0"/>
+<feBlend mode="normal" in2="effect3_dropShadow_0_19" result="effect4_dropShadow_0_19"/>
+<feBlend mode="normal" in="SourceGraphic" in2="effect4_dropShadow_0_19" result="shape"/>
+</filter>
+</defs>
+</svg>

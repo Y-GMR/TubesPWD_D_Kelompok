@@ -5,7 +5,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pangkalan Pangan - Bersama Merawat Kebaikan</title>
-    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&amp;display=swap" />
     <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/catalog.css" />
 </head>
@@ -24,7 +23,7 @@
                     <li><a href="#help">Bantuan</a></li>
                 </ul>
                 <div class="nav-cta-wrap">
-                    <a href="#share" class="btn-share-header">Saya ingin berbagi</a>
+                    <a href="register.xhtml?role=donor" class="btn-share-header">Saya ingin berbagi</a>
                 </div>
             </div>
         </div>
@@ -56,9 +55,20 @@
                 </form>
             </div>
 
+            <div class="category-filter-wrap">
+                <ul class="category-filter-list">
+                    <li><a href="food_catalogue.xhtml?cat=all" class="category-pill active" data-cat="all">Semua Makanan</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=roti-kue" class="category-pill" data-cat="roti-kue">Roti &amp; Kue</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=gorengan" class="category-pill" data-cat="gorengan">Gorengan</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=tradisional" class="category-pill" data-cat="tradisional">Tradisional</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=cepat-saji" class="category-pill" data-cat="cepat-saji">Cepat Saji</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=minuman" class="category-pill" data-cat="minuman">Minuman</a></li>
+                </ul>
+            </div>
+
             <div class="merchant-cards-grid">
 
-                <div class="merchant-main-card">
+                <div class="merchant-main-card" data-category="roti-kue">
                     <div class="merchant-header-block">
                         <div class="merchant-thumb-wrap">
                             <img src="assets/images/merchant_dunkin.png" alt="Dunkin Donuts" class="merchant-thumb-img" />
@@ -139,7 +149,7 @@
                     </div>
                 </div>
 
-                <div class="merchant-main-card">
+                <div class="merchant-main-card" data-category="roti-kue">
                     <div class="merchant-header-block">
                         <div class="merchant-thumb-wrap">
                             <img src="assets/images/merchant_breadtalk.png" alt="BreadTalk" class="merchant-thumb-img" />
@@ -220,7 +230,7 @@
                     </div>
                 </div>
 
-                <div class="merchant-main-card">
+                <div class="merchant-main-card" data-category="cepat-saji">
                     <div class="merchant-header-block">
                         <div class="merchant-thumb-wrap">
                             <img src="assets/images/merchant_pizzahut.png" alt="Pizza Hut" class="merchant-thumb-img" />
@@ -243,7 +253,7 @@
                                 <span class="price-val-text">Rp9.000</span>
                                 <span class="price-unit-text">/pcs</span>
                                 <span class="bullet-dot">&#8226;</span>
-                                <span class="category-label">Pizza</span>
+                                <span class="category-label">Cepat Saji</span>
                             </div>
                             <a href="checkout.xhtml?merchant=pizzahut" class="btn-merchant-claim">Klaim Pangan</a>
                         </div>
@@ -301,7 +311,7 @@
                     </div>
                 </div>
 
-                <div class="merchant-main-card">
+                <div class="merchant-main-card" data-category="gorengan cepat-saji">
                     <div class="merchant-header-block">
                         <div class="merchant-thumb-wrap">
                             <img src="assets/images/merchant_kfc.png" alt="KFC" class="merchant-thumb-img" />
@@ -382,6 +392,15 @@
                     </div>
                 </div>
 
+                <div class="catalog-empty-state" id="catalogEmptyState" style="display: none;">
+                    <div class="empty-state-card">
+                        <img src="assets/images/logo_sprout.svg" alt="Pangkalan Pangan" class="empty-state-icon" />
+                        <h3 class="empty-state-title">Belum ada makanan untuk kategori ini</h3>
+                        <p class="empty-state-desc">Stok untuk kategori yang Anda pilih saat ini sedang kosong atau belum tersedia di posko terdekat.</p>
+                        <a href="#katalog" class="btn-reset-filter" id="btnResetFilter">Tampilkan Semua Makanan</a>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -400,8 +419,8 @@
                     <div class="footer-col-right">
                         <div class="footer-heading">Ambil peran</div>
                         <ul class="footer-link-list">
-                            <li><a href="#donatur">Donatur pangan</a></li>
-                            <li><a href="#mitra">Mitra penyaluran</a></li>
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
                         </ul>
                     </div>
                 </div>
@@ -416,5 +435,6 @@
 
     </div>
 
+    <script type="text/javascript" src="assets/js/catalog.js"></script>
 </body>
 </html>
