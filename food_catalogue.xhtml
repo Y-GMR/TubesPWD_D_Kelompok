@@ -1,0 +1,420 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pangkalan Pangan - Bersama Merawat Kebaikan</title>
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&amp;display=swap" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/catalog.css" />
+</head>
+<body>
+
+    <div class="page-wrapper">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="food_catalogue.xhtml" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+                <ul class="nav-menu-list">
+                    <li><a href="#about">Tentang kami</a></li>
+                    <li><a href="#settings">Pengaturan</a></li>
+                    <li><a href="#help">Bantuan</a></li>
+                </ul>
+                <div class="nav-cta-wrap">
+                    <a href="#share" class="btn-share-header">Saya ingin berbagi</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <div class="hero-left-content">
+                <img src="assets/images/pangkalan_pangan_title.svg" alt="Pangkalan Pangan" class="hero-title-svg" />
+                <p class="hero-subtitle">Menghubungkan pangan dengan mereka yang membutuhkan. Bersama, kita hadirkan lebih banyak senyum.</p>
+                <div class="hero-cta-btn-wrap">
+                    <a href="#katalog" class="btn-hero-claim">Mulai klaim pangan</a>
+                </div>
+            </div>
+            <div class="hero-right-photo">
+                <img src="assets/images/hero_volunteer_photo.png" alt="Relawan Berbagi Pangan" class="hero-volunteer-img" />
+            </div>
+        </div>
+
+        <div class="catalog-section" id="katalog">
+
+            <div class="catalog-mascot-block">
+                <img src="assets/images/katalog_curved_text.svg" alt="Katalog" class="katalog-curved-img" />
+                <img src="assets/images/database_mascot.svg" alt="Maskot Database Pangkalan Pangan" class="database-mascot-img" />
+            </div>
+
+            <div class="catalog-search-wrap">
+                <form action="food_catalogue.xhtml" method="get" class="catalog-search-form">
+                    <img src="assets/images/icon_search.svg" alt="Ikon Cari" class="search-icon-img" />
+                    <input type="text" name="q" class="catalog-search-input" placeholder="Cari makanan, resto, atau lokasi pengambilan" />
+                </form>
+            </div>
+
+            <div class="merchant-cards-grid">
+
+                <div class="merchant-main-card">
+                    <div class="merchant-header-block">
+                        <div class="merchant-thumb-wrap">
+                            <img src="assets/images/merchant_dunkin.png" alt="Dunkin Donuts" class="merchant-thumb-img" />
+                        </div>
+                        <div class="merchant-meta-block">
+                            <div class="merchant-heading-row">
+                                <h2 class="merchant-name-title">Dunkin Donuts</h2>
+                            </div>
+                            <div class="merchant-location-stock-row">
+                                <div class="location-meta-wrap">
+                                    <img src="assets/images/icon_gps.svg" alt="Lokasi" class="pin-icon" />
+                                    <span>Posko Bulaksumur</span>
+                                    <span class="bullet-dot">&#8226;</span>
+                                    <span>1,2 km</span>
+                                </div>
+                                <span class="stock-tag-pill">Stok: 12</span>
+                            </div>
+                            <div class="merchant-price-category-row">
+                                <img src="assets/images/icon_price.svg" alt="Harga" class="price-tag-icon" />
+                                <span class="price-val-text">Rp6.000</span>
+                                <span class="price-unit-text">/pcs</span>
+                                <span class="bullet-dot">&#8226;</span>
+                                <span class="category-label">Roti &amp; Kue</span>
+                            </div>
+                            <a href="checkout.xhtml?merchant=dunkin" class="btn-merchant-claim">Klaim Pangan</a>
+                        </div>
+                    </div>
+
+                    <hr class="merchant-card-hr" />
+
+                    <div class="today-menu-top-row">
+                        <span class="today-menu-title">Menu tersedia hari ini</span>
+                        <a href="checkout.xhtml?merchant=dunkin" class="today-menu-all-link">Lihat semua &gt;</a>
+                    </div>
+
+                    <div class="mini-cards-row">
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_donat_cokelat.png" alt="Donat Cokelat" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Donat Cokelat</div>
+                            <div class="mini-food-stock">Stok: 5</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp7.000</span>
+                                <a href="checkout.xhtml?item=donat-cokelat" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_donat_glaze.png" alt="Donat Glaze" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Donat Glaze</div>
+                            <div class="mini-food-stock">Stok: 5</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp7.000</span>
+                                <a href="checkout.xhtml?item=donat-glaze" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_donat_oreo.png" alt="Donat Oreo" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Donat Oreo</div>
+                            <div class="mini-food-stock">Stok: 2</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp6.000</span>
+                                <a href="checkout.xhtml?item=donat-oreo" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="merchant-main-card">
+                    <div class="merchant-header-block">
+                        <div class="merchant-thumb-wrap">
+                            <img src="assets/images/merchant_breadtalk.png" alt="BreadTalk" class="merchant-thumb-img" />
+                        </div>
+                        <div class="merchant-meta-block">
+                            <div class="merchant-heading-row">
+                                <h2 class="merchant-name-title">BreadTalk</h2>
+                            </div>
+                            <div class="merchant-location-stock-row">
+                                <div class="location-meta-wrap">
+                                    <img src="assets/images/icon_gps.svg" alt="Lokasi" class="pin-icon" />
+                                    <span>Posko Seturan</span>
+                                    <span class="bullet-dot">&#8226;</span>
+                                    <span>0,9 km</span>
+                                </div>
+                                <span class="stock-tag-pill">Stok: 15</span>
+                            </div>
+                            <div class="merchant-price-category-row">
+                                <img src="assets/images/icon_price.svg" alt="Harga" class="price-tag-icon" />
+                                <span class="price-val-text">Rp7.500</span>
+                                <span class="price-unit-text">/pcs</span>
+                                <span class="bullet-dot">&#8226;</span>
+                                <span class="category-label">Roti &amp; Kue</span>
+                            </div>
+                            <a href="checkout.xhtml?merchant=breadtalk" class="btn-merchant-claim">Klaim Pangan</a>
+                        </div>
+                    </div>
+
+                    <hr class="merchant-card-hr" />
+
+                    <div class="today-menu-top-row">
+                        <span class="today-menu-title">Menu tersedia hari ini</span>
+                        <a href="checkout.xhtml?merchant=breadtalk" class="today-menu-all-link">Lihat semua &gt;</a>
+                    </div>
+
+                    <div class="mini-cards-row">
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_fire_flosss.png" alt="Fire Flosss" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Fire Flosss</div>
+                            <div class="mini-food-stock">Stok: 5</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp8.000</span>
+                                <a href="checkout.xhtml?item=fire-flosss" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_choco_bun.png" alt="Choco Bun" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Choco Bun</div>
+                            <div class="mini-food-stock">Stok: 5</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp7.500</span>
+                                <a href="checkout.xhtml?item=choco-bun" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_cheese_boat.png" alt="Cheese Boat" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Cheese Boat</div>
+                            <div class="mini-food-stock">Stok: 5</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp9.000</span>
+                                <a href="checkout.xhtml?item=cheese-boat" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="merchant-main-card">
+                    <div class="merchant-header-block">
+                        <div class="merchant-thumb-wrap">
+                            <img src="assets/images/merchant_pizzahut.png" alt="Pizza Hut" class="merchant-thumb-img" />
+                        </div>
+                        <div class="merchant-meta-block">
+                            <div class="merchant-heading-row">
+                                <h2 class="merchant-name-title">Pizza Hut</h2>
+                            </div>
+                            <div class="merchant-location-stock-row">
+                                <div class="location-meta-wrap">
+                                    <img src="assets/images/icon_gps.svg" alt="Lokasi" class="pin-icon" />
+                                    <span>Posko Gejayan</span>
+                                    <span class="bullet-dot">&#8226;</span>
+                                    <span>1,8 km</span>
+                                </div>
+                                <span class="stock-tag-pill">Stok: 8</span>
+                            </div>
+                            <div class="merchant-price-category-row">
+                                <img src="assets/images/icon_price.svg" alt="Harga" class="price-tag-icon" />
+                                <span class="price-val-text">Rp9.000</span>
+                                <span class="price-unit-text">/pcs</span>
+                                <span class="bullet-dot">&#8226;</span>
+                                <span class="category-label">Pizza</span>
+                            </div>
+                            <a href="checkout.xhtml?merchant=pizzahut" class="btn-merchant-claim">Klaim Pangan</a>
+                        </div>
+                    </div>
+
+                    <hr class="merchant-card-hr" />
+
+                    <div class="today-menu-top-row">
+                        <span class="today-menu-title">Menu tersedia hari ini</span>
+                        <a href="checkout.xhtml?merchant=pizzahut" class="today-menu-all-link">Lihat semua &gt;</a>
+                    </div>
+
+                    <div class="mini-cards-row">
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_pepperoni.png" alt="Pepperoni Slice" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Pepperoni Slice</div>
+                            <div class="mini-food-stock">Stok: 2</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp12.000</span>
+                                <a href="checkout.xhtml?item=pepperoni-slice" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_cheese_slice.png" alt="Cheese Slice" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Cheese Slice</div>
+                            <div class="mini-food-stock">Stok: 3</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp11.000</span>
+                                <a href="checkout.xhtml?item=cheese-slice" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_garlic_bread.png" alt="Garlic Bread" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Garlic Bread</div>
+                            <div class="mini-food-stock">Stok: 3</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp9.000</span>
+                                <a href="checkout.xhtml?item=garlic-bread" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="merchant-main-card">
+                    <div class="merchant-header-block">
+                        <div class="merchant-thumb-wrap">
+                            <img src="assets/images/merchant_kfc.png" alt="KFC" class="merchant-thumb-img" />
+                        </div>
+                        <div class="merchant-meta-block">
+                            <div class="merchant-heading-row">
+                                <h2 class="merchant-name-title">KFC</h2>
+                            </div>
+                            <div class="merchant-location-stock-row">
+                                <div class="location-meta-wrap">
+                                    <img src="assets/images/icon_gps.svg" alt="Lokasi" class="pin-icon" />
+                                    <span>Posko Babarsari</span>
+                                    <span class="bullet-dot">&#8226;</span>
+                                    <span>1,4 km</span>
+                                </div>
+                                <span class="stock-tag-pill">Stok: 10</span>
+                            </div>
+                            <div class="merchant-price-category-row">
+                                <img src="assets/images/icon_price.svg" alt="Harga" class="price-tag-icon" />
+                                <span class="price-val-text">Rp5.000</span>
+                                <span class="price-unit-text">/pcs</span>
+                                <span class="bullet-dot">&#8226;</span>
+                                <span class="category-label">Ayam</span>
+                            </div>
+                            <a href="checkout.xhtml?merchant=kfc" class="btn-merchant-claim">Klaim Pangan</a>
+                        </div>
+                    </div>
+
+                    <hr class="merchant-card-hr" />
+
+                    <div class="today-menu-top-row">
+                        <span class="today-menu-title">Menu tersedia hari ini</span>
+                        <a href="checkout.xhtml?merchant=kfc" class="today-menu-all-link">Lihat semua &gt;</a>
+                    </div>
+
+                    <div class="mini-cards-row">
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_ayam_crispy.png" alt="Ayam Crispy" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Ayam Crispy</div>
+                            <div class="mini-food-stock">Stok: 3</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp11.000</span>
+                                <a href="checkout.xhtml?item=ayam-crispy" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_ayam_original.png" alt="Ayam Original" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Ayam Original</div>
+                            <div class="mini-food-stock">Stok: 3</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp11.000</span>
+                                <a href="checkout.xhtml?item=ayam-original" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="mini-food-card">
+                            <div class="mini-food-img-wrap">
+                                <img src="assets/images/menu_perkedel.png" alt="Perkedel" class="mini-food-img" />
+                            </div>
+                            <div class="mini-food-title">Perkedel</div>
+                            <div class="mini-food-stock">Stok: 4</div>
+                            <div class="mini-food-bottom-row">
+                                <span class="mini-food-price">Rp5.000</span>
+                                <a href="checkout.xhtml?item=perkedel" class="btn-add-mini-item">
+                                    <img src="assets/images/button_add.svg" alt="Tambah" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="#donatur">Donatur pangan</a></li>
+                            <li><a href="#mitra">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&copy; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

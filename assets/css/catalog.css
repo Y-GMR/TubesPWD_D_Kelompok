@@ -1,0 +1,576 @@
+/* Stylesheet Khusus Halaman Katalog & Consumer Homepage */
+
+/* ==========================================================================
+   1. HERO SECTION (Pangkalan Pangan & Foto Relawan)
+   ========================================================================== */
+.hero-section {
+    width: 1329px;
+    max-width: 100%;
+    margin: 0 auto;
+    height: 513px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 50px 0 102px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.hero-left-content {
+    width: 582px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.hero-title-svg {
+    width: 582px;
+    height: 243.88px;
+    display: block;
+    margin-bottom: 24px;
+}
+
+.hero-subtitle {
+    width: 543px;
+    max-width: 100%;
+    font-size: 19px;
+    line-height: 1.35;
+    font-weight: 600;
+    color: #54716d;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.hero-cta-btn-wrap {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.btn-hero-claim {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 231.4px;
+    height: 43.5px;
+    background-color: #b54128;
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: 900;
+    text-decoration: none;
+    border-radius: 8px;
+    box-shadow: 0px 5px 0px 0px #d56826,
+                0px 11px 0px 0px #ef8b2c,
+                0px 18px 0px 0px #ffb43b;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.btn-hero-claim:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 7px 0px 0px #d56826,
+                0px 13px 0px 0px #ef8b2c,
+                0px 20px 0px 0px #ffb43b;
+}
+
+.btn-hero-claim:active {
+    transform: translateY(4px);
+    box-shadow: 0px 2px 0px 0px #d56826,
+                0px 6px 0px 0px #ef8b2c,
+                0px 10px 0px 0px #ffb43b;
+}
+
+.hero-right-photo {
+    width: 467px;
+    height: 411px;
+    border-radius: 180px 120px 180px 120px;
+    overflow: hidden;
+    background-color: #444343;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.hero-volunteer-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* ==========================================================================
+   2. KATALOG SECTION (Teks Melengkung, Maskot DB, & Bilah Pencarian)
+   ========================================================================== */
+.catalog-section {
+    width: 1329px;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 60px 40px 90px 40px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.catalog-mascot-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.katalog-curved-img {
+    width: 445.9px;
+    height: 172.5px;
+    display: block;
+    margin-bottom: -40px;
+    position: relative;
+    z-index: 2;
+}
+
+.database-mascot-img {
+    width: 259.1px;
+    height: 321px;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+/* Bilah Pencarian (Search Bar 4-Lapisan Retro Shadow) */
+.catalog-search-wrap {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 64px;
+}
+
+.catalog-search-form {
+    width: 855.86px;
+    max-width: 100%;
+    height: 73px;
+    background-color: #ffffff;
+    border: 2px solid #0d4347;
+    border-radius: 29px;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    box-shadow: 0px 2px 0px 0px #0d4347,
+                0px 4.5px 0px 0px #b54128,
+                0px 7px 0px 0px #e88635,
+                0px 10px 0px 0px #f5b442;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.catalog-search-form:focus-within {
+    transform: translateY(-2px);
+    box-shadow: 0px 3px 0px 0px #0d4347,
+                0px 6px 0px 0px #b54128,
+                0px 9px 0px 0px #e88635,
+                0px 13px 0px 0px #f5b442;
+}
+
+.search-icon-img {
+    width: 20.2px;
+    height: 20.2px;
+    margin-right: 18px;
+    flex-shrink: 0;
+    display: block;
+}
+
+.catalog-search-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 15px;
+    color: #1a202c;
+    line-height: 1.5;
+}
+
+.catalog-search-input::placeholder {
+    color: #7c9392;
+}
+
+/* ==========================================================================
+   3. MERCHANT CARDS GRID (2x2 Kolom Presisi)
+   ========================================================================== */
+.merchant-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 520px);
+    justify-content: center;
+    column-gap: 124px;
+    row-gap: 72px;
+    margin: 0 auto;
+}
+
+.merchant-main-card {
+    width: 520px;
+    background-color: #ffffff;
+    border: 2px solid #0d4347;
+    border-radius: 24px;
+    padding: 22px 24px 20px 24px;
+    box-shadow: 1.5px 2px 0px 0px #0d4347,
+                4px 5px 0px 0px #b54128,
+                7px 8px 0px 0px #e88635,
+                10px 11px 0px 0px #f5b442;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.merchant-main-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 2px 3px 0px 0px #0d4347,
+                5px 7px 0px 0px #b54128,
+                9px 11px 0px 0px #e88635,
+                13px 15px 0px 0px #f5b442;
+}
+
+/* Bagian Atas Kartu Merchant */
+.merchant-header-block {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.merchant-thumb-wrap {
+    width: 175px;
+    height: 172px;
+    border-radius: 16px;
+    overflow: hidden;
+    background-color: #f3efe7;
+    border: 1px solid #e3ddd1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.merchant-thumb-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.merchant-meta-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.merchant-heading-row {
+    margin-bottom: 4px;
+}
+
+.merchant-name-title {
+    font-size: 34px;
+    font-weight: 800;
+    color: #000000;
+    line-height: 1.12;
+    letter-spacing: -0.5px;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.merchant-location-stock-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    margin-top: 4px;
+}
+
+.location-meta-wrap {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #000000;
+    font-weight: 400;
+}
+
+.pin-icon {
+    width: 9px;
+    height: 12px;
+    margin-right: 5px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.bullet-dot {
+    color: #0d4347;
+    font-weight: 700;
+    margin: 0 4px;
+}
+
+.stock-tag-pill {
+    background-color: #f5b442;
+    color: #000000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+
+.merchant-price-category-row {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+    color: #000000;
+    margin-bottom: 12px;
+}
+
+.price-tag-icon {
+    width: 10px;
+    height: 10px;
+    margin-right: 4px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.price-val-text {
+    font-size: 19px;
+    font-weight: 700;
+    color: #b54128;
+}
+
+.price-unit-text {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b54128;
+    margin-right: 6px;
+}
+
+.category-label {
+    font-size: 13px;
+    color: #000000;
+    font-weight: 400;
+}
+
+.btn-merchant-claim {
+    display: block;
+    width: 100%;
+    max-width: 280px;
+    height: 39px;
+    background-color: #b54128;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    line-height: 39px;
+    border-radius: 999px;
+    text-decoration: none;
+    box-shadow: 0px 3px 0px 0px #e88635,
+                0px 6px 0px 0px #f5b442;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+}
+
+.btn-merchant-claim:hover {
+    background-color: #9c341e;
+    transform: translateY(-1px);
+}
+
+.btn-merchant-claim:active {
+    transform: translateY(2px);
+    box-shadow: 0px 1px 0px 0px #e88635,
+                0px 2px 0px 0px #f5b442;
+}
+
+/* Garis Pemisah Kartu */
+.merchant-card-hr {
+    height: 1px;
+    background-color: #e4ecea;
+    border: none;
+    margin: 14px 0 16px 0;
+}
+
+/* Sub-section Menu Tersedia */
+.today-menu-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+
+.today-menu-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #000000;
+}
+
+.today-menu-all-link {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000000;
+    text-decoration: none;
+}
+
+.today-menu-all-link:hover {
+    color: #b54128;
+}
+
+/* Mini Cards Row */
+.mini-cards-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.mini-food-card {
+    width: 136px;
+    height: 153px;
+    background-color: #ffffff;
+    border: 1px solid #d9e4e2;
+    border-radius: 14px;
+    padding: 8px 10px 10px 10px;
+    box-shadow: 0px 2px 4px 0px rgba(13, 66, 71, 0.06);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.mini-food-img-wrap {
+    width: 118px;
+    height: 76px;
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: #f7f5f0;
+    margin: 0 auto 6px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mini-food-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.mini-food-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0d4347;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mini-food-stock {
+    font-size: 10px;
+    color: #000000;
+    margin-bottom: 4px;
+}
+
+.mini-food-bottom-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+.mini-food-price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #b54128;
+}
+
+.btn-add-mini-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.btn-add-mini-item img {
+    width: 24px;
+    height: 24px;
+    display: block;
+}
+
+/* Responsif: Layar Tablet & Mobile */
+@media (max-width: 1200px) {
+    .merchant-cards-grid {
+        grid-template-columns: 520px;
+        row-gap: 48px;
+    }
+    .hero-section {
+        flex-direction: column;
+        height: auto;
+        padding: 40px 20px;
+        gap: 36px;
+    }
+    .hero-left-content {
+        width: 100%;
+    }
+    .hero-title-svg {
+        max-width: 100%;
+        height: auto;
+    }
+}
+
+@media (max-width: 576px) {
+    .merchant-cards-grid {
+        grid-template-columns: 100%;
+    }
+    .merchant-main-card {
+        width: 100%;
+        padding: 16px;
+    }
+    .merchant-header-block {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    .merchant-location-stock-row {
+        justify-content: center;
+        gap: 12px;
+    }
+    .merchant-price-category-row {
+        justify-content: center;
+    }
+    .btn-merchant-claim {
+        margin: 0 auto;
+    }
+    .mini-cards-row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .mini-food-card {
+        width: 100%;
+        height: auto;
+    }
+    .hero-right-photo {
+        width: 100%;
+        max-width: 340px;
+        height: 300px;
+    }
+    .katalog-curved-img {
+        max-width: 90%;
+        height: auto;
+    }
+    .database-mascot-img {
+        max-width: 70%;
+        height: auto;
+    }
+}
