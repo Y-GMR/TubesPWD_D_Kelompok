@@ -557,6 +557,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    text-decoration: none;
 }
 
 .mini-food-img {
@@ -574,6 +575,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    display: block;
+    text-decoration: none;
+}
+
+.mini-food-title:hover {
+    color: #135b60;
+    text-decoration: none;
 }
 
 .mini-food-stock {
@@ -655,7 +663,7 @@
     gap: 14px;
     box-shadow: 0 4px 16px rgba(13, 67, 71, 0.35);
     border: 1.5px solid #b54128;
-    z-index: 9999;
+    z-index: 10001;
     transform: translateY(100px);
     opacity: 0;
     transition: transform 0.25s ease, opacity 0.25s ease;
@@ -787,7 +795,7 @@
 
 .food-modal-card {
     background-color: #ffffff;
-    border: 2px solid #0d4347;
+    border: 2.5px solid #0d4347;
     border-radius: 24px;
     box-shadow: 1.5px 2px 0px 0px #0d4347,
                 4px 5px 0px 0px #b54128,
@@ -810,13 +818,13 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .food-modal-merchant {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
 }
 
 .food-modal-merchant-logo {
@@ -828,7 +836,7 @@
 }
 
 .food-modal-merchant-name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     color: #0d4347;
     line-height: 1.2;
@@ -838,6 +846,7 @@
     font-size: 11px;
     color: #6b7280;
     margin-top: 2px;
+    line-height: 1.2;
 }
 
 .food-modal-close-btn {
@@ -853,6 +862,8 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    text-decoration: none;
+    line-height: 1;
     transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
@@ -881,34 +892,8 @@
     display: block;
 }
 
-.food-modal-badges {
-    position: absolute;
-    bottom: 12px;
-    left: 12px;
-    display: flex;
-    gap: 8px;
-}
-
-.food-modal-cat-badge {
-    background-color: #0d4347;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 12px;
-}
-
-.food-modal-stock-badge {
-    background-color: #059669;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 12px;
-}
-
 .food-modal-info-body {
-    margin-top: 16px;
+    margin-top: 12px;
 }
 
 .food-modal-title-row {
@@ -920,52 +905,46 @@
 
 .food-modal-title {
     font-size: 20px;
-    font-weight: 800;
-    color: #1f2937;
+    font-weight: 700;
+    color: #000000;
     margin: 0;
-}
-
-.food-modal-price-box {
-    text-align: right;
-    flex-shrink: 0;
+    line-height: 1.2;
 }
 
 .food-modal-price {
-    font-size: 19px;
-    font-weight: 800;
-    color: #059669;
+    font-size: 20px;
+    font-weight: 700;
+    color: #b54128;
+    white-space: nowrap;
+    text-align: right;
+    line-height: 1.2;
 }
 
-.food-modal-price-ori {
+.food-modal-meta-row {
     font-size: 11px;
-    color: #9ca3af;
-    text-decoration: line-through;
-    margin-top: 2px;
+    font-weight: 700;
+    color: #000000;
+    margin: 4px 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.food-modal-desc {
-    font-size: 12.5px;
-    color: #374151;
-    line-height: 1.5;
-    margin: 10px 0 14px 0;
-}
-
-.food-modal-divider {
-    height: 1px;
-    background-color: #e5e7eb;
-    border: none;
-    margin: 0 0 14px 0;
+.food-modal-meta-row .meta-dot {
+    color: #0d4347;
+    font-weight: 700;
 }
 
 .food-modal-quick-info {
     background-color: #f9fafb;
     border: 1px solid #f3f4f6;
     border-radius: 12px;
-    padding: 10px 14px;
+    padding: 8px 14px;
     display: flex;
     justify-content: space-between;
     gap: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
 }
 
 .food-modal-info-col {
@@ -980,7 +959,7 @@
 }
 
 .food-modal-info-val {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
     color: #0d4347;
 }
@@ -1004,7 +983,8 @@
     transition: background-color 0.2s ease, transform 0.15s ease;
     cursor: pointer;
     border: none;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
+    box-sizing: border-box;
 }
 
 .food-modal-claim-btn:hover {
@@ -1020,7 +1000,7 @@
     color: #6b7280;
     text-decoration: none;
     cursor: pointer;
-    padding: 6px 0;
+    padding: 4px 0;
     transition: color 0.15s ease;
 }
 

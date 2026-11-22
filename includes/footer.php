@@ -18,8 +18,8 @@ if (!isset($base_url)) {
                 <div class="footer-col-right">
                     <div class="footer-heading">Ambil peran</div>
                     <ul class="footer-link-list">
-                        <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>register.xhtml?role=donor">Donatur pangan</a></li>
-                        <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>register.php?role=donor">Donatur pangan</a></li>
+                        <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>register.php?role=donor">Mitra penyaluran</a></li>
                     </ul>
                 </div>
             </div>

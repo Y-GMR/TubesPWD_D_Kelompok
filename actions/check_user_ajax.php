@@ -15,7 +15,8 @@ if ($field !== 'username' && $field !== 'email') {
     http_response_code(400);
     echo json_encode(array(
         'status' => 'error',
-        'message' => "Parameter tidak valid. Field harus bernilai 'username' atau 'email'."
+        'message' => "Parameter tidak valid. Field harus bernilai 'username' atau 'email'.",
+        'data' => null
     ));
     exit();
 }
@@ -24,7 +25,8 @@ if ($value === '') {
     http_response_code(400);
     echo json_encode(array(
         'status' => 'error',
-        'message' => 'Nilai isian tidak boleh kosong.'
+        'message' => 'Nilai isian tidak boleh kosong.',
+        'data' => null
     ));
     exit();
 }
@@ -53,15 +55,15 @@ if ($conn && $conn instanceof mysqli) {
         if ($num_rows > 0) {
             echo json_encode(array(
                 'status' => 'error',
-                'available' => false,
-                'message' => ($field === 'username' ? 'Username sudah digunakan, silakan pilih yang lain.' : 'Email sudah terdaftar, silakan gunakan email lain.')
+                'message' => ($field === 'username' ? 'Username sudah digunakan, silakan pilih yang lain.' : 'Email sudah terdaftar, silakan gunakan email lain.'),
+                'data' => array('available' => false)
             ));
             exit();
         } else {
             echo json_encode(array(
                 'status' => 'success',
-                'available' => true,
-                'message' => ($field === 'username' ? 'Username tersedia.' : 'Email tersedia.')
+                'message' => ($field === 'username' ? 'Username tersedia.' : 'Email tersedia.'),
+                'data' => array('available' => true)
             ));
             exit();
         }
@@ -83,14 +85,14 @@ if ($field === 'username') {
 if ($is_taken) {
     echo json_encode(array(
         'status' => 'error',
-        'available' => false,
-        'message' => ($field === 'username' ? 'Username sudah digunakan, silakan pilih yang lain.' : 'Email sudah terdaftar, silakan gunakan email lain.')
+        'message' => ($field === 'username' ? 'Username sudah digunakan, silakan pilih yang lain.' : 'Email sudah terdaftar, silakan gunakan email lain.'),
+        'data' => array('available' => false)
     ));
 } else {
     echo json_encode(array(
         'status' => 'success',
-        'available' => true,
-        'message' => ($field === 'username' ? 'Username tersedia.' : 'Email tersedia.')
+        'message' => ($field === 'username' ? 'Username tersedia.' : 'Email tersedia.'),
+        'data' => array('available' => true)
     ));
 }
 exit();

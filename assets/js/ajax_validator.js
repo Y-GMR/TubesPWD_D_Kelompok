@@ -71,7 +71,7 @@
                 return res.json();
             })
             .then(function (data) {
-                if (data && data.available) {
+                if (data && data.status === 'success' && data.data && data.data.available) {
                     feedbackEl.textContent = data.message || (field === 'username' ? 'Username tersedia.' : 'Email tersedia.');
                     feedbackEl.style.color = '#15803d';
                     feedbackEl.style.display = 'block';
