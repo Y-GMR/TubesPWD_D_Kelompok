@@ -759,3 +759,276 @@
         height: auto;
     }
 }
+
+.food-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(8, 20, 25, 0.65);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.food-modal-backdrop.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.food-modal-card {
+    background-color: #ffffff;
+    border: 2px solid #0d4347;
+    border-radius: 24px;
+    box-shadow: 1.5px 2px 0px 0px #0d4347,
+                4px 5px 0px 0px #b54128,
+                7px 8px 0px 0px #e88635,
+                10px 11px 0px 0px #f5b442;
+    max-width: 580px;
+    width: 100%;
+    padding: 24px;
+    box-sizing: border-box;
+    position: relative;
+    transform: scale(0.92);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.food-modal-backdrop.is-active .food-modal-card {
+    transform: scale(1);
+}
+
+.food-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.food-modal-merchant {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.food-modal-merchant-logo {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid #e5e7eb;
+}
+
+.food-modal-merchant-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: #0d4347;
+    line-height: 1.2;
+}
+
+.food-modal-merchant-sub {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+.food-modal-close-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    border: none;
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.food-modal-close-btn:hover {
+    background-color: #e5e7eb;
+    transform: scale(1.05);
+}
+
+.food-modal-img-wrap {
+    width: 100%;
+    height: 220px;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    border: 1.5px solid #f3f4f6;
+    background-color: #fefaf2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.food-modal-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.food-modal-badges {
+    position: absolute;
+    bottom: 12px;
+    left: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.food-modal-cat-badge {
+    background-color: #0d4347;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.food-modal-stock-badge {
+    background-color: #059669;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+}
+
+.food-modal-info-body {
+    margin-top: 16px;
+}
+
+.food-modal-title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.food-modal-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #1f2937;
+    margin: 0;
+}
+
+.food-modal-price-box {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.food-modal-price {
+    font-size: 19px;
+    font-weight: 800;
+    color: #059669;
+}
+
+.food-modal-price-ori {
+    font-size: 11px;
+    color: #9ca3af;
+    text-decoration: line-through;
+    margin-top: 2px;
+}
+
+.food-modal-desc {
+    font-size: 12.5px;
+    color: #374151;
+    line-height: 1.5;
+    margin: 10px 0 14px 0;
+}
+
+.food-modal-divider {
+    height: 1px;
+    background-color: #e5e7eb;
+    border: none;
+    margin: 0 0 14px 0;
+}
+
+.food-modal-quick-info {
+    background-color: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.food-modal-info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.food-modal-info-label {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.food-modal-info-val {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #0d4347;
+}
+
+.food-modal-info-val.amber {
+    color: #b45309;
+}
+
+.food-modal-claim-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 48px;
+    background-color: #0d4347;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: background-color 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 8px;
+}
+
+.food-modal-claim-btn:hover {
+    background-color: #135b60;
+    transform: translateY(-1px);
+}
+
+.food-modal-cancel-link {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 6px 0;
+    transition: color 0.15s ease;
+}
+
+.food-modal-cancel-link:hover {
+    color: #1f2937;
+}
+
+.mini-food-card {
+    cursor: pointer;
+}
+

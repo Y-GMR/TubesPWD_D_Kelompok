@@ -175,17 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (e) {}
     }
 
-    function syncBackendCart(action, itemKey, merchantKey, qty) {
-        if (!window.fetch || window.location.protocol === 'file:') return;
-        try {
-            var endpoint = (isViews ? '../' : '') + 'actions/cart_action.php?action=' + encodeURIComponent(action);
-            if (itemKey) endpoint += '&item=' + encodeURIComponent(itemKey);
-            if (merchantKey) endpoint += '&merchant=' + encodeURIComponent(merchantKey);
-            if (qty) endpoint += '&qty=' + encodeURIComponent(qty);
-            fetch(endpoint, { method: 'POST' }).catch(function () {});
-        } catch (e) {}
-    }
-
     var urlParams = new URLSearchParams(window.location.search);
     var paramMerchant = (urlParams.get('merchant') || '').toLowerCase();
     var paramItem = (urlParams.get('item') || '').toLowerCase();
@@ -201,7 +190,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         cart.items[paramItem] = (cart.items[paramItem] || 0) + 1;
         saveCart(cart);
-        syncBackendCart('add', paramItem, itemMerchant, 1);
     } else if (paramMerchant && merchantsData[paramMerchant]) {
         if (cart.merchant && cart.merchant !== paramMerchant) {
             var hasOtherItems = false;
@@ -405,7 +393,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         delete cart.items[key];
                     }
                     saveCart(cart);
-                    syncBackendCart('update', key, cart.merchant, cart.items[key] || 0);
                     renderCheckoutList();
                 }
             });
@@ -419,7 +406,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (key) {
                     cart.items[key] = (cart.items[key] || 0) + 1;
                     saveCart(cart);
-                    syncBackendCart('update', key, cart.merchant, cart.items[key]);
                     renderCheckoutList();
                 }
             });
@@ -443,7 +429,6 @@ document.addEventListener('DOMContentLoaded', function () {
             alert(successMsg);
             cart.items = {};
             saveCart(cart);
-            syncBackendCart('clear', '', '', 0);
             window.location.href = isViews ? 'food_catalogue.xhtml' : 'food_catalogue.xhtml';
         });
     }

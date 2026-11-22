@@ -70,17 +70,6 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (err) {}
     }
 
-    function syncBackendCart(action, itemKey, merchantKey, qty) {
-        if (!window.fetch || window.location.protocol === 'file:') return;
-        try {
-            var endpoint = (isViews ? '../' : '') + 'actions/cart_action.php?action=' + encodeURIComponent(action);
-            if (itemKey) endpoint += '&item=' + encodeURIComponent(itemKey);
-            if (merchantKey) endpoint += '&merchant=' + encodeURIComponent(merchantKey);
-            if (qty) endpoint += '&qty=' + encodeURIComponent(qty);
-            fetch(endpoint, { method: 'POST' }).catch(function () {});
-        } catch (e) {}
-    }
-
     var toastTimeout = null;
     function showCartToast(msg, merchantKey) {
         var existingToast = document.getElementById('catalogCartToast');
@@ -192,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function () {
             cart.merchant = merchantKey;
             cart.items[itemKey] = (cart.items[itemKey] || 0) + 1;
             saveCart(cart);
-            syncBackendCart('add', itemKey, merchantKey, 1);
             updateCartUI();
 
             var displayName = itemNames[itemKey] || itemKey;
@@ -342,6 +330,322 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (err) {}
         });
     }
+
+    var foodDatabase = {
+        'donat-glaze': {
+            name: 'Donat Glaze (Paket 3 Pcs)',
+            merchant: "Dunkin' Donuts Sudirman",
+            merchantLogo: 'assets/images/merchant_dunkin.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 5 Paket',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp21.000',
+            desc: 'Donat surplus varian glaze madu segar produksi pagi hari, higienis dan siap dikonsumsi.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: "Gerai Dunkin' Sudirman (1,2 km)",
+            img: 'assets/images/menu_donat_glaze.png',
+            merchantKey: 'dunkin'
+        },
+        'donat-cokelat': {
+            name: 'Donat Cokelat Tabur (3 Pcs)',
+            merchant: "Dunkin' Donuts Sudirman",
+            merchantLogo: 'assets/images/merchant_dunkin.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 5 Paket',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp21.000',
+            desc: 'Donat cokelat klasik bertabur meises cokelat premium, dibuat dari bahan bermutu dan bersih.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: "Gerai Dunkin' Sudirman (1,2 km)",
+            img: 'assets/images/menu_donat_cokelat.png',
+            merchantKey: 'dunkin'
+        },
+        'donat-oreo': {
+            name: 'Donat Oreo Delight (3 Pcs)',
+            merchant: "Dunkin' Donuts Sudirman",
+            merchantLogo: 'assets/images/merchant_dunkin.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 2 Paket',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp24.000',
+            desc: 'Donat lembut berbalut krim vanila dan remahan biskuit oreo gurih yang lezat.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: "Gerai Dunkin' Sudirman (1,2 km)",
+            img: 'assets/images/menu_donat_oreo.png',
+            merchantKey: 'dunkin'
+        },
+        'fire-flosss': {
+            name: 'Fire Flosss Abon Pedas',
+            merchant: 'BreadTalk Seturan',
+            merchantLogo: 'assets/images/merchant_breadtalk.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 6 Pcs',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp15.000',
+            desc: 'Roti lembut berlumur saus spesial dan taburan abon ayam pedas gurih yang melimpah.',
+            deadline: 'Hari ini, 20:30 WIB',
+            location: 'Gerai BreadTalk Seturan (0,9 km)',
+            img: 'assets/images/menu_fire_flosss.png',
+            merchantKey: 'breadtalk'
+        },
+        'choco-bun': {
+            name: 'Choco Bun Cokelat Lumer',
+            merchant: 'BreadTalk Seturan',
+            merchantLogo: 'assets/images/merchant_breadtalk.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 4 Pcs',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp12.000',
+            desc: 'Roti manis dengan isian pasta cokelat pekat yang lumer dan nikmat saat disantap.',
+            deadline: 'Hari ini, 20:30 WIB',
+            location: 'Gerai BreadTalk Seturan (0,9 km)',
+            img: 'assets/images/menu_choco_bun.png',
+            merchantKey: 'breadtalk'
+        },
+        'cheese-boat': {
+            name: 'Cheese Boat Gurih',
+            merchant: 'BreadTalk Seturan',
+            merchantLogo: 'assets/images/merchant_breadtalk.png',
+            category: 'Roti & Kue',
+            stock: 'Stok: 5 Pcs',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp14.000',
+            desc: 'Roti berbentuk perahu bertabur keju cheddar gurih panggang yang harum dan renyah.',
+            deadline: 'Hari ini, 20:30 WIB',
+            location: 'Gerai BreadTalk Seturan (0,9 km)',
+            img: 'assets/images/menu_cheese_boat.png',
+            merchantKey: 'breadtalk'
+        },
+        'pepperoni-slice': {
+            name: 'Pepperoni Slice Pan Pizza',
+            merchant: 'Pizza Hut Gejayan',
+            merchantLogo: 'assets/images/merchant_pizzahut.png',
+            category: 'Cepat Saji',
+            stock: 'Stok: 6 Slice',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp18.000',
+            desc: 'Potongan pizza pan tebal dengan saus tomat khas, lelehan keju mozzarella dan irisan daging pepperoni sapi.',
+            deadline: 'Hari ini, 17:00 WIB',
+            location: 'Gerai Pizza Hut Gejayan (1,8 km)',
+            img: 'assets/images/menu_pepperoni.png',
+            merchantKey: 'pizzahut'
+        },
+        'cheese-slice': {
+            name: 'Cheese Slice Pan Pizza',
+            merchant: 'Pizza Hut Gejayan',
+            merchantLogo: 'assets/images/merchant_pizzahut.png',
+            category: 'Cepat Saji',
+            stock: 'Stok: 4 Slice',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp16.000',
+            desc: 'Pizza gurih kaya keju dengan pinggiran pan renyah, aman dan layak santap untuk keluarga.',
+            deadline: 'Hari ini, 17:00 WIB',
+            location: 'Gerai Pizza Hut Gejayan (1,8 km)',
+            img: 'assets/images/menu_cheese_slice.png',
+            merchantKey: 'pizzahut'
+        },
+        'garlic-bread': {
+            name: 'Garlic Bread Panggang',
+            merchant: 'Pizza Hut Gejayan',
+            merchantLogo: 'assets/images/merchant_pizzahut.png',
+            category: 'Cepat Saji',
+            stock: 'Stok: 5 Porsi',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp15.000',
+            desc: 'Roti panggang bawang putih mentega gurih renyah, pendamping sempurna santap pangan bergizi.',
+            deadline: 'Hari ini, 17:00 WIB',
+            location: 'Gerai Pizza Hut Gejayan (1,8 km)',
+            img: 'assets/images/menu_garlic_bread.png',
+            merchantKey: 'pizzahut'
+        },
+        'ayam-crispy': {
+            name: 'Ayam Crispy Renyah (2 Pcs)',
+            merchant: 'KFC Sudirman',
+            merchantLogo: 'assets/images/merchant_kfc.png',
+            category: 'Makanan Berat',
+            stock: 'Stok: 8 Porsi',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp35.000',
+            desc: 'Ayam goreng tepung renyah bumbu rahasia KFC, masih hangat dalam warmer dan terjaga kualitasnya.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: 'Gerai KFC Sudirman (1,1 km)',
+            img: 'assets/images/menu_ayam_crispy.png',
+            merchantKey: 'kfc'
+        },
+        'ayam-original': {
+            name: 'Ayam Original Juicy (2 Pcs)',
+            merchant: 'KFC Sudirman',
+            merchantLogo: 'assets/images/merchant_kfc.png',
+            category: 'Makanan Berat',
+            stock: 'Stok: 6 Porsi',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp35.000',
+            desc: 'Ayam goreng resep original gurih rempah meresap sampai ke tulang, bergizi tinggi untuk keluarga.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: 'Gerai KFC Sudirman (1,1 km)',
+            img: 'assets/images/menu_ayam_original.png',
+            merchantKey: 'kfc'
+        },
+        'perkedel': {
+            name: 'Perkedel Kentang Lembut',
+            merchant: 'KFC Sudirman',
+            merchantLogo: 'assets/images/merchant_kfc.png',
+            category: 'Makanan Berat',
+            stock: 'Stok: 10 Pcs',
+            price: 'Rp 0 (Gratis)',
+            originalPrice: 'Harga Normal: Rp10.000',
+            desc: 'Perkedel kentang tumbuk lembut berbumbu gurih sedap, dipanggang bersih dan higienis.',
+            deadline: 'Hari ini, 21:00 WIB',
+            location: 'Gerai KFC Sudirman (1,1 km)',
+            img: 'assets/images/menu_perkedel.png',
+            merchantKey: 'kfc'
+        }
+    };
+
+    var modalBackdrop = document.createElement('div');
+    modalBackdrop.className = 'food-modal-backdrop';
+    modalBackdrop.id = 'foodDetailModalBackdrop';
+    modalBackdrop.innerHTML = [
+        '<div class="food-modal-card" id="foodDetailModalCard">',
+        '    <div class="food-modal-header">',
+        '        <div class="food-modal-merchant">',
+        '            <img src="assets/images/merchant_dunkin.png" alt="Merchant" class="food-modal-merchant-logo" id="modalMerchantLogo" />',
+        '            <div>',
+        '                <div class="food-modal-merchant-name" id="modalMerchantName">Dunkin\' Donuts Sudirman</div>',
+        '                <div class="food-modal-merchant-sub" id="modalMerchantSub">Gerai Resmi Donatur &bull; 1,2 km dari Anda</div>',
+        '            </div>',
+        '        </div>',
+        '        <button type="button" class="food-modal-close-btn" id="modalCloseBtn" title="Tutup">&times;</button>',
+        '    </div>',
+        '    <div class="food-modal-img-wrap">',
+        '        <img src="assets/images/menu_donat_glaze.png" alt="Makanan" class="food-modal-img" id="modalFoodImg" />',
+        '        <div class="food-modal-badges">',
+        '            <span class="food-modal-cat-badge" id="modalFoodCat">Roti &amp; Kue</span>',
+        '            <span class="food-modal-stock-badge" id="modalFoodStock">Stok: 5 Paket</span>',
+        '        </div>',
+        '    </div>',
+        '    <div class="food-modal-info-body">',
+        '        <div class="food-modal-title-row">',
+        '            <h3 class="food-modal-title" id="modalFoodTitle">Donat Glaze (Paket 3 Pcs)</h3>',
+        '            <div class="food-modal-price-box">',
+        '                <div class="food-modal-price" id="modalFoodPrice">Rp 0 (Gratis)</div>',
+        '                <div class="food-modal-price-ori" id="modalFoodPriceOri">Harga Normal: Rp21.000</div>',
+        '            </div>',
+        '        </div>',
+        '        <p class="food-modal-desc" id="modalFoodDesc">Donat surplus varian glaze madu segar produksi pagi hari, higienis dan siap dikonsumsi.</p>',
+        '        <hr class="food-modal-divider" />',
+        '        <div class="food-modal-quick-info">',
+        '            <div class="food-modal-info-col">',
+        '                <span class="food-modal-info-label">Batas Pengambilan di Gerai:</span>',
+        '                <span class="food-modal-info-val amber" id="modalFoodDeadline">Hari ini, 21:00 WIB</span>',
+        '            </div>',
+        '            <div class="food-modal-info-col">',
+        '                <span class="food-modal-info-label">Lokasi Toko Produsen:</span>',
+        '                <span class="food-modal-info-val" id="modalFoodLocation">Gerai Dunkin\' Sudirman (1,2 km)</span>',
+        '            </div>',
+        '        </div>',
+        '        <a href="#" class="food-modal-claim-btn" id="modalClaimBtn">Klaim Pangan Sekarang</a>',
+        '        <a href="#" class="food-modal-cancel-link" id="modalCancelLink">Tutup Rincian</a>',
+        '    </div>',
+        '</div>'
+    ].join('\n');
+    document.body.appendChild(modalBackdrop);
+
+    var modalCloseBtn = document.getElementById('modalCloseBtn');
+    var modalCancelLink = document.getElementById('modalCancelLink');
+    var modalMerchantLogo = document.getElementById('modalMerchantLogo');
+    var modalMerchantName = document.getElementById('modalMerchantName');
+    var modalMerchantSub = document.getElementById('modalMerchantSub');
+    var modalFoodImg = document.getElementById('modalFoodImg');
+    var modalFoodCat = document.getElementById('modalFoodCat');
+    var modalFoodStock = document.getElementById('modalFoodStock');
+    var modalFoodTitle = document.getElementById('modalFoodTitle');
+    var modalFoodPrice = document.getElementById('modalFoodPrice');
+    var modalFoodPriceOri = document.getElementById('modalFoodPriceOri');
+    var modalFoodDesc = document.getElementById('modalFoodDesc');
+    var modalFoodDeadline = document.getElementById('modalFoodDeadline');
+    var modalFoodLocation = document.getElementById('modalFoodLocation');
+    var modalClaimBtn = document.getElementById('modalClaimBtn');
+
+    function openFoodModal(itemKey) {
+        var data = foodDatabase[itemKey];
+        if (!data) return;
+
+        modalMerchantLogo.src = data.merchantLogo;
+        modalMerchantName.textContent = data.merchant;
+        modalMerchantSub.innerHTML = 'Gerai Resmi Donatur &bull; ' + data.location;
+        modalFoodImg.src = data.img;
+        modalFoodImg.alt = data.name;
+        modalFoodCat.textContent = data.category;
+        modalFoodStock.textContent = data.stock;
+        modalFoodTitle.textContent = data.name;
+        modalFoodPrice.textContent = data.price;
+        modalFoodPriceOri.textContent = data.originalPrice;
+        modalFoodDesc.textContent = data.desc;
+        modalFoodDeadline.textContent = data.deadline;
+        modalFoodLocation.textContent = data.location;
+
+        if (isAuthenticated) {
+            modalClaimBtn.href = 'checkout.xhtml?merchant=' + encodeURIComponent(data.merchantKey) + '&item=' + encodeURIComponent(itemKey);
+            modalClaimBtn.textContent = 'Klaim Pangan Sekarang';
+        } else {
+            modalClaimBtn.href = 'login.xhtml';
+            modalClaimBtn.textContent = 'Masuk Akun untuk Mengklaim';
+        }
+
+        modalBackdrop.classList.add('is-active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeFoodModal() {
+        modalBackdrop.classList.remove('is-active');
+        document.body.style.overflow = '';
+    }
+
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', closeFoodModal);
+    }
+    if (modalCancelLink) {
+        modalCancelLink.addEventListener('click', function (e) {
+            e.preventDefault();
+            closeFoodModal();
+        });
+    }
+    modalBackdrop.addEventListener('click', function (e) {
+        if (e.target === modalBackdrop) {
+            closeFoodModal();
+        }
+    });
+    document.addEventListener('keydown', function (e) {
+        if ((e.key === 'Escape' || e.keyCode === 27) && modalBackdrop.classList.contains('is-active')) {
+            closeFoodModal();
+        }
+    });
+
+    var miniCards = document.querySelectorAll('.mini-food-card');
+    miniCards.forEach(function (card) {
+        var addBtn = card.querySelector('.btn-add-mini-item');
+        var itemKey = addBtn ? addBtn.getAttribute('data-item') : null;
+        if (!itemKey) return;
+
+        var imgWrap = card.querySelector('.mini-food-img-wrap');
+        var titleEl = card.querySelector('.mini-food-title');
+
+        if (imgWrap) {
+            imgWrap.style.cursor = 'pointer';
+            imgWrap.addEventListener('click', function (e) {
+                e.preventDefault();
+                openFoodModal(itemKey);
+            });
+        }
+        if (titleEl) {
+            titleEl.style.cursor = 'pointer';
+            titleEl.addEventListener('click', function (e) {
+                e.preventDefault();
+                openFoodModal(itemKey);
+            });
+        }
+    });
 
     applyFilter();
     updateCartUI();
