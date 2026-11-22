@@ -606,12 +606,87 @@
     cursor: pointer;
     padding: 0;
     flex-shrink: 0;
+    position: relative;
+    text-decoration: none;
 }
 
 .btn-add-mini-item img {
     width: 24px;
     height: 24px;
     display: block;
+    transition: transform 0.15s ease;
+}
+
+.btn-add-mini-item:hover img {
+    transform: scale(1.15);
+}
+
+.mini-item-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #b54128;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+}
+
+.cart-toast-bar {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background-color: #0d4347;
+    color: #ffffff;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 4px 16px rgba(13, 67, 71, 0.35);
+    border: 1.5px solid #b54128;
+    z-index: 9999;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 0.25s ease, opacity 0.25s ease;
+    box-sizing: border-box;
+}
+
+.cart-toast-bar.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.cart-toast-msg {
+    flex: 1;
+}
+
+.cart-toast-btn {
+    background-color: #b54128;
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.cart-toast-btn:hover {
+    background-color: #d56826;
 }
 
 @media (max-width: 1200px) {

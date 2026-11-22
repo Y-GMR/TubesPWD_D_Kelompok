@@ -5,8 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Konfirmasi Klaim Pangan - Pangkalan Pangan</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
-    <link rel="stylesheet" type="text/css" href="assets/css/checkout.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=4" />
+    <link rel="stylesheet" type="text/css" href="assets/css/checkout.css?v=4" />
 </head>
 <body>
 
@@ -34,35 +34,70 @@
                     <div class="checkout-left-col">
 
                         <div class="checkout-card food-detail-card">
-                            <div class="food-detail-top">
-                                <div class="food-thumb-wrap">
-                                    <img src="assets/images/menu_donat_glaze.png" alt="Donat Glaze" class="food-thumb-img" />
-                                </div>
-                                <div class="food-info-wrap">
-                                    <div class="food-merchant-name">Dunkin Donuts Sudirman</div>
-                                    <h2 class="food-item-name">Donat Glaze (Paket 3 Pcs)</h2>
-                                    <p class="food-meta-info">Kategori: Roti &amp; Kue &#8226; Kedaluwarsa: 22 Nov 2026</p>
+                            <div class="checkout-merchant-header">
+                                <div class="checkout-merchant-brand">
+                                    <img src="assets/images/merchant_pizzahut.png" alt="Merchant" class="checkout-merchant-logo" id="merchantLogoImg" />
+                                    <div>
+                                        <h2 class="checkout-merchant-title" id="checkoutMerchantName">Pizza Hut Gejayan</h2>
+                                        <p class="checkout-merchant-subtitle" id="checkoutMerchantPosko">Gerai Gejayan &#8226; 1,8 km</p>
+                                    </div>
                                 </div>
                                 <div class="food-deadline-wrap">
                                     <div class="food-deadline-label">Ambil hari ini sebelum:</div>
-                                    <div class="food-deadline-time">15:00 WIB</div>
+                                    <div class="food-deadline-time" id="checkoutDeadlineTime">17:00 WIB</div>
+                                </div>
+                            </div>
+
+                            <hr class="checkout-hr" />
+
+                            <div class="checkout-items-list" id="checkoutItemsList">
+                                <div class="checkout-item-row" data-key="pepperoni-slice">
+                                    <div class="checkout-item-thumb">
+                                        <img src="assets/images/menu_pepperoni.png" alt="Pepperoni Slice" />
+                                    </div>
+                                    <div class="checkout-item-info">
+                                        <h3 class="checkout-item-name">Pepperoni Slice</h3>
+                                        <p class="checkout-item-meta">Kategori: Cepat Saji &#8226; Kedaluwarsa: 22 Nov 2026</p>
+                                        <p class="checkout-item-price-tag">Rp 0 (Gratis Pangan) <span class="checkout-item-price-original">Rp12.000</span></p>
+                                    </div>
+                                    <div class="checkout-stepper-wrap">
+                                        <button type="button" class="btn-step btn-step-minus" data-key="pepperoni-slice" title="Kurangi">-</button>
+                                        <span class="step-qty-val">1</span>
+                                        <button type="button" class="btn-step btn-step-plus" data-key="pepperoni-slice" title="Tambah">+</button>
+                                    </div>
+                                </div>
+
+                                <div class="checkout-item-row" data-key="cheese-slice">
+                                    <div class="checkout-item-thumb">
+                                        <img src="assets/images/menu_cheese_slice.png" alt="Cheese Slice" />
+                                    </div>
+                                    <div class="checkout-item-info">
+                                        <h3 class="checkout-item-name">Cheese Slice</h3>
+                                        <p class="checkout-item-meta">Kategori: Cepat Saji &#8226; Kedaluwarsa: 22 Nov 2026</p>
+                                        <p class="checkout-item-price-tag">Rp 0 (Gratis Pangan) <span class="checkout-item-price-original">Rp11.000</span></p>
+                                    </div>
+                                    <div class="checkout-stepper-wrap">
+                                        <button type="button" class="btn-step btn-step-minus" data-key="cheese-slice" title="Kurangi">-</button>
+                                        <span class="step-qty-val">1</span>
+                                        <button type="button" class="btn-step btn-step-plus" data-key="cheese-slice" title="Tambah">+</button>
+                                    </div>
                                 </div>
                             </div>
 
                             <hr class="checkout-hr" />
 
                             <div class="food-detail-bottom">
-                                <span class="food-claim-qty">Jumlah Klaim: 1 Paket</span>
-                                <span class="food-claim-price">Rp 0 (Gratis)</span>
+                                <span class="food-claim-qty" id="checkoutTotalPortions">Total Klaim: 2 Porsi Pangan</span>
+                                <span class="food-claim-price">Rp 0 (Gratis Pangan)</span>
                             </div>
                         </div>
 
                         <div class="checkout-card posko-detail-card">
-                            <h3 class="posko-card-title">Lokasi Pengambilan</h3>
-                            <div class="posko-name">Posko Bulaksumur</div>
-                            <div class="posko-address">Bulaksumur, Caturtunggal, Kec. Depok, Kabupaten Sleman, Daerah Istimewa Yogyakarta 55281</div>
-                            <div class="posko-meta">Jarak: <span class="posko-meta-orange">1,2 km</span> dari lokasi Anda &#8226; Koordinat GPS: <span class="posko-meta-orange">-7.7829, 110.3671</span></div>
-                            <div class="posko-alert-box">Tunjukkan kode tiket klaim kepada kasir atau petugas saat pengambilan.</div>
+                            <h3 class="posko-card-title">Lokasi Pengambilan di Gerai Produsen</h3>
+                            <div class="posko-name" id="poskoNameText">Gerai Pizza Hut Gejayan</div>
+                            <div class="posko-address" id="poskoAddressText">Jl. Affandi No. 25, Caturtunggal, Kec. Depok, Kabupaten Sleman, DIY 55281</div>
+                            <div class="posko-meta" id="poskoMetaText">Jarak: <span class="posko-meta-orange">1,8 km</span> dari lokasi Anda &#8226; Koordinat GPS: <span class="posko-meta-orange">-7.7654, 110.3891</span></div>
+                            <div class="posko-alert-box">Tunjukkan kode transaksi kepada kasir produsen saat pengambilan makanan.</div>
                         </div>
 
                     </div>
@@ -87,8 +122,12 @@
                                     <span class="summary-item-val val-green">Valid</span>
                                 </li>
                                 <li class="summary-item">
+                                    <span class="summary-item-label">Menu Dipilih</span>
+                                    <span class="summary-item-val val-dark" id="summaryTotalItems">2 Menu Pangan</span>
+                                </li>
+                                <li class="summary-item">
                                     <span class="summary-item-label">Sisa Kuota Hari Ini</span>
-                                    <span class="summary-item-val val-amber">1 dari 2 porsi</span>
+                                    <span class="summary-item-val val-amber" id="summaryQuotaStatus">1 dari 2 porsi</span>
                                 </li>
                                 <li class="summary-item">
                                     <span class="summary-item-label">Biaya Paket Pangan</span>
@@ -127,8 +166,8 @@
                     <div class="footer-col-right">
                         <div class="footer-heading">Ambil peran</div>
                         <ul class="footer-link-list">
-                            <li><a href="#donatur">Donatur pangan</a></li>
-                            <li><a href="#mitra">Mitra penyaluran</a></li>
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
                         </ul>
                     </div>
                 </div>
@@ -143,6 +182,6 @@
 
     </div>
 
-    <script type="text/javascript" src="assets/js/checkout.js?v=2"></script>
+    <script type="text/javascript" src="assets/js/checkout.js?v=4"></script>
 </body>
 </html>
