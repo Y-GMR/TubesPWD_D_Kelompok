@@ -6,6 +6,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var emptyState = document.getElementById('catalogEmptyState');
     var isViews = window.location.pathname.indexOf('/views/') !== -1;
 
+    var authAttr = document.body.getAttribute('data-auth');
+    var hasProfilePill = document.querySelector('.profile-consumer-pill') !== null;
+    var isAuthenticated = (authAttr === 'true') || (authAttr !== 'false' && hasProfilePill);
+
     var currentCategory = 'all';
     var currentQuery = '';
 
@@ -39,16 +43,6 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     var memoryCart = null;
-
-    function escapeXml(str) {
-        if (str === null || str === undefined) return '';
-        return String(str)
-            .replace(/&(?!(amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
 
     function getCart() {
         try {
@@ -125,6 +119,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateCartUI() {
+        if (!isAuthenticated) return;
+
         var cart = getCart();
         var addButtons = document.querySelectorAll('.btn-add-mini-item');
         addButtons.forEach(function (btn) {
@@ -170,6 +166,11 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             e.stopPropagation();
 
+            if (!isAuthenticated) {
+                window.location.href = 'login.xhtml';
+                return;
+            }
+
             var itemKey = this.getAttribute('data-item');
             var merchantKey = this.getAttribute('data-merchant');
             if (!itemKey || !merchantKey) return;
@@ -196,6 +197,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             var displayName = itemNames[itemKey] || itemKey;
             showCartToast(displayName + ' ditambahkan ke keranjang!', merchantKey);
+        });
+    });
+
+    var claimButtons = document.querySelectorAll('.btn-merchant-claim');
+    claimButtons.forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (!isAuthenticated) {
+                window.location.href = 'login.xhtml';
+                return;
+            }
+            var merchantKey = this.getAttribute('data-merchant') || 'dunkin';
+            window.location.href = 'checkout.xhtml?merchant=' + encodeURIComponent(merchantKey);
         });
     });
 
@@ -291,6 +305,40 @@ document.addEventListener('DOMContentLoaded', function () {
                     newUrl.searchParams.delete('q');
                     window.history.pushState({}, '', newUrl.toString());
                 }
+            } catch (err) {}
+        });
+    }
+
+    var profileDropdown = document.querySelector('.profile-consumer-dropdown');
+    var profilePillBtn = document.querySelector('.profile-consumer-pill');
+    if (profileDropdown && profilePillBtn) {
+        profilePillBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var isOpen = profileDropdown.classList.toggle('is-open');
+            profilePillBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('is-open');
+                profilePillBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                profileDropdown.classList.remove('is-open');
+                profilePillBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    var logoutBtn = document.getElementById('btnLogout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            try {
+                localStorage.removeItem('tubespwd_cart');
             } catch (err) {}
         });
     }

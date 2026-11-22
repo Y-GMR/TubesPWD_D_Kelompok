@@ -1,5 +1,4 @@
 <?php
-// Baris pertama: proteksi sesi admin (placeholder sampai Role 1 mengisi includes/session.php)
 if (file_exists('../../includes/session.php')) {
     require_once '../../includes/session.php';
 }
@@ -9,7 +8,6 @@ if (function_exists('require_role')) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    // Placeholder guard sementara sebelum Role 1 selesai
     if (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
         header('HTTP/1.1 403 Forbidden');
         header('Location: ../../login.php?error=unauthorized');
@@ -17,7 +15,6 @@ if (function_exists('require_role')) {
     }
 }
 
-// Koneksi database (placeholder jika Role 1 belum membuat config/database.php)
 $conn = null;
 if (file_exists('../../config/database.php')) {
     require_once '../../config/database.php';
@@ -26,7 +23,6 @@ if (file_exists('../../config/database.php')) {
 $pesan_sukses = '';
 $pesan_error = '';
 
-// Proses aksi POST: Verifikasi Dokumen atau Balas Tiket CS
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
     $aksi = isset($_POST['aksi']) ? $_POST['aksi'] : '';
 
@@ -71,7 +67,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
     }
 }
 
-// Ambil daftar pengguna dan antrean tiket bantuan
 $daftar_pengguna = array();
 $daftar_tiket = array();
 

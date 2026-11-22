@@ -5,10 +5,10 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pangkalan Pangan - Bersama Merawat Kebaikan</title>
-    <link rel="stylesheet" type="text/css" href="../assets/css/style.css?v=4" />
-    <link rel="stylesheet" type="text/css" href="../assets/css/catalog.css?v=4" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css?v=5" />
+    <link rel="stylesheet" type="text/css" href="../assets/css/catalog.css?v=5" />
 </head>
-<body>
+<body data-auth="true">
 
     <div class="page-wrapper">
 
@@ -19,11 +19,26 @@
                 </a>
                 <ul class="nav-menu-list">
                     <li><a href="#about">Tentang kami</a></li>
-                    <li><a href="#settings">Pengaturan</a></li>
+                    <li><a href="profile.xhtml">Pengaturan</a></li>
                     <li><a href="#help">Bantuan</a></li>
                 </ul>
                 <div class="nav-cta-wrap">
-                    <a href="register.xhtml?role=donor" class="btn-share-header">Saya ingin berbagi</a>
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" aria-haspopup="true" aria-expanded="false" title="Profil Konsumen - Iwang Petra">
+                            <img src="../assets/images/avatar_consumer.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">Iwang Petra</span>
+                                <span class="profile-consumer-role">Konsumen</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="claim_history.xhtml" class="profile-dropdown-item">Riwayat Klaim</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="index.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -415,10 +430,10 @@
             </div>
         </div>
 
-        <div class="site-footer">
+        <div class="site-footer" id="about">
             <div class="footer-inner">
                 <div class="footer-top-columns">
-                    <div class="footer-col-left">
+                    <div class="footer-col-left" id="help">
                         <div class="footer-heading">Tetap Terhubung</div>
                         <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
                         <div class="footer-contact-p">Instagram: @PP</div>
@@ -446,6 +461,6 @@
 
     </div>
 
-    <script type="text/javascript" src="../assets/js/catalog.js?v=4"></script>
+    <script type="text/javascript" src="../assets/js/catalog.js?v=5"></script>
 </body>
 </html>

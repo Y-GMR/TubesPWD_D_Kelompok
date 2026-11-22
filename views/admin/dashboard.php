@@ -1,5 +1,4 @@
 <?php
-// Baris pertama: proteksi sesi admin (placeholder sampai Role 1 mengisi includes/session.php)
 if (file_exists('../../includes/session.php')) {
     require_once '../../includes/session.php';
 }
@@ -9,7 +8,6 @@ if (function_exists('require_role')) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    // Placeholder guard sementara sebelum Role 1 selesai
     if (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
         header('HTTP/1.1 403 Forbidden');
         header('Location: ../../login.php?error=unauthorized');
@@ -17,13 +15,11 @@ if (function_exists('require_role')) {
     }
 }
 
-// Koneksi database (placeholder jika Role 1 belum membuat config/database.php)
 $conn = null;
 if (file_exists('../../config/database.php')) {
     require_once '../../config/database.php';
 }
 
-// Nilai default metrik ringkasan
 $total_admin = 0;
 $total_produsen = 0;
 $total_konsumen = 0;
@@ -33,9 +29,7 @@ $makanan_stok_tipis = 0;
 $total_transaksi = 0;
 $daftar_stok_tipis = array();
 
-// Kueri agregasi MySQLi jika koneksi tersedia
 if ($conn) {
-    // 1. Total pengguna per peran
     $stmt = mysqli_prepare($conn, "SELECT peran, COUNT(*) AS jumlah FROM pengguna GROUP BY peran");
     if ($stmt) {
         mysqli_stmt_execute($stmt);
@@ -52,7 +46,6 @@ if ($conn) {
         mysqli_stmt_close($stmt);
     }
 
-    // 2. Konsumen menunggu verifikasi dokumen
     $status_menunggu = 'menunggu';
     $peran_konsumen = 'konsumen';
     $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS jumlah FROM pengguna WHERE peran = ? AND status_verifikasi = ?");
@@ -66,7 +59,6 @@ if ($conn) {
         mysqli_stmt_close($stmt);
     }
 
-    // 3. Tiket bantuan CS yang masih terbuka
     $status_terbuka = 'terbuka';
     $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS jumlah FROM tiket_bantuan WHERE status = ?");
     if ($stmt) {
@@ -79,7 +71,6 @@ if ($conn) {
         mysqli_stmt_close($stmt);
     }
 
-    // 4. Makanan dengan stok menipis (stok <= 5)
     $batas_stok = 5;
     $stmt = mysqli_prepare($conn, "SELECT id, nama_makanan, stok FROM makanan WHERE stok <= ? ORDER BY stok ASC LIMIT 5");
     if ($stmt) {
@@ -93,7 +84,6 @@ if ($conn) {
         mysqli_stmt_close($stmt);
     }
 
-    // 5. Total transaksi klaim makanan
     $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS jumlah FROM transaksi");
     if ($stmt) {
         mysqli_stmt_execute($stmt);

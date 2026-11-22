@@ -54,7 +54,7 @@
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Total Riwayat Klaim</span>
-                                <span class="summary-item-val val-teal">3 Transaksi</span>
+                                <span class="summary-item-val val-teal">0 Transaksi</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Tempat Pengambilan</span>
@@ -84,15 +84,16 @@
                         <h2 class="past-history-title">Riwayat</h2>
                         <hr class="summary-divider" />
 
-                        <ul class="past-history-list">
-                            <li class="past-history-item">
-                                <h3 class="past-history-food">Roti Tawar Gandum (1 Pack)</h3>
-                                <p class="past-history-meta">TRX-8819 &#8226; BreadTalk Malioboro &#8226; 20 Nov 2026, 14:15 WIB</p>
-                            </li>
-                            <li class="past-history-item">
-                                <h3 class="past-history-food">Nasi Ayam Bakar Komplit</h3>
-                                <p class="past-history-meta">TRX-8815 &#8226; Dapur Berkah Sagan &#8226; 17 Nov 2026, 12:40 WIB</p>
-                            </li>
+                        <div class="past-history-empty" id="pastHistoryEmpty">
+                            <div class="history-empty-icon-wrap">
+                                <img src="../assets/images/logo_sprout.svg" alt="Pangkalan Pangan" class="history-empty-icon" />
+                            </div>
+                            <h3 class="history-empty-title">Belum ada riwayat klaim</h3>
+                            <p class="history-empty-desc">Daftar makanan yang berhasil Anda klaim dan ambil di gerai produsen akan otomatis tercatat di sini.</p>
+                            <a href="food_catalogue.xhtml" class="btn-history-catalog">Jelajahi Makanan</a>
+                        </div>
+
+                        <ul class="past-history-list" id="pastHistoryList" style="display: none;">
                         </ul>
                     </div>
 
@@ -100,10 +101,10 @@
             </div>
         </div>
 
-        <div class="site-footer">
+        <div class="site-footer" id="about">
             <div class="footer-inner">
                 <div class="footer-top-columns">
-                    <div class="footer-col-left">
+                    <div class="footer-col-left" id="help">
                         <div class="footer-heading">Tetap Terhubung</div>
                         <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
                         <div class="footer-contact-p">Instagram: @PP</div>

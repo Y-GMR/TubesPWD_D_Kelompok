@@ -1,5 +1,4 @@
 <?php
-// Katalog bersifat publik (tamu dapat melihat tanpa login; login wajib saat klaim item)
 if (file_exists('includes/session.php')) {
     require_once 'includes/session.php';
 }
@@ -7,13 +6,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Koneksi database (placeholder jika Role 1 belum membuat config/database.php)
 $conn = null;
 if (file_exists('config/database.php')) {
     require_once 'config/database.php';
 }
 
-// Ambil parameter GET untuk pencarian dan filter kategori
 $kata_kunci = isset($_GET['q']) ? trim($_GET['q']) : '';
 $kategori_id = isset($_GET['kategori_id']) ? (int) $_GET['kategori_id'] : 0;
 
@@ -21,7 +18,6 @@ $daftar_kategori = array();
 $daftar_makanan = array();
 
 if ($conn) {
-    // 1. Ambil daftar kategori untuk opsi dropdown filter
     $stmt_kategori = mysqli_prepare($conn, "SELECT id, nama_kategori FROM kategori ORDER BY nama_kategori ASC");
     if ($stmt_kategori) {
         mysqli_stmt_execute($stmt_kategori);
@@ -32,7 +28,6 @@ if ($conn) {
         mysqli_stmt_close($stmt_kategori);
     }
 
-    // 2. Kueri katalog makanan tersedia dengan filter pencarian & kategori
     $sql_makanan = "SELECT m.id, m.nama_makanan, m.deskripsi, m.harga, m.stok, m.foto_makanan, m.alamat_ambil,
                            k.nama_kategori, p.nama_lengkap AS nama_produsen
                     FROM makanan m

@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', function () {
             cart.items = {};
             saveCart(cart);
             syncBackendCart('clear', '', '', 0);
-            window.location.href = 'claim_history.xhtml?code=' + encodeURIComponent(ticketCode) + '&merchant=' + encodeURIComponent(currentMerchantKey);
+            window.location.href = isViews ? 'food_catalogue.xhtml' : 'food_catalogue.xhtml';
         });
     }
 });
