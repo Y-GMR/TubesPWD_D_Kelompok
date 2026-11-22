@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Akun - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/auth.css" />
+</head>
+<body>
+
+    <div class="auth-page-wrapper">
+
+        <div class="auth-nav-bar">
+            <a href="food_catalogue.xhtml" class="auth-nav-left" title="Pangkalan Pangan">
+                <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="auth-nav-logo-sprout" />
+                <img src="assets/images/pangkalan_pangan_title.svg" alt="Pangkalan Pangan" class="auth-nav-logo-text" />
+            </a>
+            <ul class="auth-nav-menu">
+                <li><a href="food_catalogue.xhtml#about">Tentang kami</a></li>
+                <li><a href="food_catalogue.xhtml">Katalog Pangan</a></li>
+                <li><a href="food_catalogue.xhtml#help">Bantuan</a></li>
+            </ul>
+            <a href="food_catalogue.xhtml" class="btn-nav-back">Kembali ke Beranda</a>
+        </div>
+
+        <div class="auth-main-section">
+            <div class="auth-card">
+                <h1 class="auth-card-title">Login Akun</h1>
+
+                <form action="food_catalogue.xhtml" method="post" class="auth-form" id="loginForm">
+                    <div class="auth-form-group">
+                        <label for="loginUsername" class="auth-label">Username</label>
+                        <input type="text" id="loginUsername" name="username" class="auth-input" placeholder="Username" />
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="loginEmail" class="auth-label">Alamat Email</label>
+                        <input type="text" id="loginEmail" name="email" class="auth-input" placeholder="Email" />
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="loginPassword" class="auth-label">Kata Sandi</label>
+                        <div class="auth-password-wrap">
+                            <input type="password" id="loginPassword" name="password" class="auth-input" placeholder="••••••••••••" />
+                            <button type="button" class="btn-toggle-eye" id="btnTogglePassword" title="Lihat kata sandi">
+                                <img src="assets/images/icon_eye.svg" alt="Lihat kata sandi" />
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="auth-options-row">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" name="remember" />
+                            <span>Ingat saya di perangkat ini</span>
+                        </label>
+                        <a href="#forgot" class="auth-forgot-link">Lupa kata sandi?</a>
+                    </div>
+
+                    <button type="submit" class="btn-auth-submit btn-auth-terracotta">Masuk Sekarang &#8594;</button>
+                </form>
+
+                <div class="auth-switch-footer">
+                    Belum memiliki akun? <a href="register.xhtml" class="auth-switch-link link-teal">Daftar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-footer">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="#donatur">Donatur pangan</a></li>
+                            <li><a href="#mitra">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&copy; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/auth.js"></script>
+</body>
+</html>

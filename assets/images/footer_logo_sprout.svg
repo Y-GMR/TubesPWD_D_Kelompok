@@ -1,0 +1,25 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="89" height="92" viewBox="0 0 89 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Group 21">
+<g id="apricot-grain">
+<path id="Vector" d="M45.1144 42.5116C26.8916 43.7743 15.6149 31.4671 17.763 13.3213C34.4672 12.1638 47.1816 22.7353 45.1144 42.5116Z" fill="#E88635"/>
+</g>
+<g id="stem">
+<path id="Vector_2" d="M44.5002 62.4286C42.9862 50.9286 42.9862 39.4286 47.5282 27.9286" stroke-width="5" stroke-linecap="round" stroke="#6E3B20"/>
+</g>
+<g id="bowl">
+<path id="Vector_3" d="M3.62195 54.2142H85.378C88.4061 54.2142 89.9201 55.857 88.4061 60.7856C82.35 80.4998 65.696 91.9998 44.5 91.9998C23.304 91.9998 6.64996 80.4998 0.59395 60.7856C-0.920052 55.857 0.59395 54.2142 3.62195 54.2142Z" fill="url(#paint0_linear_0_5)"/>
+</g>
+<g id="golden-grain">
+<path id="Vector_4" d="M47.0632 31.2143C42.5211 13.1428 53.1192 0 71.2872 0C74.3152 18.0714 63.7172 31.2143 47.0632 31.2143Z" fill="#F5B442"/>
+</g>
+<path id="Face &#226;&#128;&#148; right eye" d="M74.023 60.7857C75.2773 60.7857 76.294 61.889 76.294 63.25C76.294 64.611 75.2773 65.7143 74.023 65.7143C72.7688 65.7143 71.752 64.611 71.752 63.25C71.752 61.889 72.7688 60.7857 74.023 60.7857Z" fill="white"/>
+<path id="Face &#226;&#128;&#148; left eye" d="M54.3412 60.7857C55.5955 60.7857 56.6122 61.889 56.6122 63.25C56.6122 64.611 55.5955 65.7143 54.3412 65.7143C53.087 65.7143 52.0702 64.611 52.0702 63.25C52.0702 61.889 53.087 60.7857 54.3412 60.7857Z" fill="white"/>
+<path id="Face &#226;&#128;&#148; smile" d="M55.0982 72.2858C58.9913 76.6667 69.373 76.6667 73.2662 72.2858" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke="white"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_5" x1="44.5" y1="54.2142" x2="44.5" y2="91.9998" gradientUnits="userSpaceOnUse">
+<stop stop-color="#22CFB7"/>
+<stop offset="1" stop-color="#2E7D72"/>
+</linearGradient>
+</defs>
+</svg>
