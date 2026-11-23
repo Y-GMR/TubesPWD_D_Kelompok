@@ -61,4 +61,24 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    var loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function () {
+            var usernameInput = document.getElementById('loginUsername');
+            var val = (usernameInput && usernameInput.value) ? usernameInput.value.trim().toLowerCase() : '';
+            if (val.indexOf('kfc') !== -1 || val.indexOf('produsen') !== -1 || val.indexOf('donor') !== -1) {
+                try {
+                    localStorage.setItem('tubespwd_role', 'produsen');
+                    sessionStorage.setItem('tubespwd_role', 'produsen');
+                } catch (err) {}
+                loginForm.action = 'producer_dashboard.xhtml';
+            } else {
+                try {
+                    localStorage.setItem('tubespwd_role', 'konsumen');
+                    sessionStorage.setItem('tubespwd_role', 'konsumen');
+                } catch (err) {}
+            }
+        });
+    }
 });

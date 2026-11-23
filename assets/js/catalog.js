@@ -322,10 +322,181 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var activeRole = urlParams.get('role');
+    if (!activeRole) {
+        try {
+            activeRole = localStorage.getItem('tubespwd_role');
+            if (!activeRole) {
+                activeRole = sessionStorage.getItem('tubespwd_role');
+            }
+        } catch (err) {}
+    }
+    if (!activeRole) {
+        if (document.referrer) {
+            if (document.referrer.indexOf('producer') !== -1) {
+                activeRole = 'produsen';
+            }
+        }
+    }
+
+    if (window.location.pathname.indexOf('producer_dashboard.xhtml') !== -1) {
+        activeRole = 'produsen';
+        try {
+            localStorage.setItem('tubespwd_role', 'produsen');
+            sessionStorage.setItem('tubespwd_role', 'produsen');
+        } catch (err) {}
+    }
+
+    if (activeRole === 'produsen') {
+        try {
+            localStorage.setItem('tubespwd_role', 'produsen');
+            sessionStorage.setItem('tubespwd_role', 'produsen');
+        } catch (err) {}
+
+        var avatarImg = document.querySelector('.profile-consumer-avatar');
+        var nameSpan = document.querySelector('.profile-consumer-name');
+        var roleSpan = document.querySelector('.profile-consumer-role');
+        var pillBtn = document.querySelector('.profile-consumer-pill');
+        var dropdownMenu = document.getElementById('profileDropdownMenu');
+
+        if (avatarImg) {
+            avatarImg.src = 'assets/images/producer/avatar_produsen.png';
+            avatarImg.alt = 'Avatar KFC Sudirman';
+        }
+        if (nameSpan) {
+            nameSpan.textContent = 'KFC Sudirman';
+        }
+        if (roleSpan) {
+            roleSpan.textContent = 'Produsen';
+        }
+        if (pillBtn) {
+            pillBtn.setAttribute('title', 'Profil Produsen - KFC Sudirman');
+        }
+
+        if (dropdownMenu) {
+            while (dropdownMenu.firstChild) {
+                dropdownMenu.removeChild(dropdownMenu.firstChild);
+            }
+
+            var itemDashboard = document.createElement('a');
+            itemDashboard.href = 'producer_dashboard.xhtml';
+            itemDashboard.className = 'profile-dropdown-item';
+            itemDashboard.textContent = 'Dashboard Produsen';
+            dropdownMenu.appendChild(itemDashboard);
+
+            var itemProfile = document.createElement('a');
+            itemProfile.href = 'profile.xhtml';
+            itemProfile.className = 'profile-dropdown-item';
+            itemProfile.textContent = 'Pengaturan Profil';
+            dropdownMenu.appendChild(itemProfile);
+
+            var itemClaim = document.createElement('a');
+            itemClaim.href = 'claim.xhtml';
+            itemClaim.className = 'profile-dropdown-item';
+            itemClaim.textContent = 'Kelola Klaim';
+            dropdownMenu.appendChild(itemClaim);
+
+            var itemInventory = document.createElement('a');
+            itemInventory.href = 'inventory.xhtml';
+            itemInventory.className = 'profile-dropdown-item';
+            itemInventory.textContent = 'Kelola Inventaris';
+            dropdownMenu.appendChild(itemInventory);
+
+            var divider = document.createElement('div');
+            divider.className = 'profile-dropdown-divider';
+            dropdownMenu.appendChild(divider);
+
+            var itemSwitch = document.createElement('a');
+            itemSwitch.href = 'food_catalogue.xhtml?role=konsumen';
+            itemSwitch.className = 'profile-dropdown-item';
+            itemSwitch.style.color = '#0D4347';
+            itemSwitch.style.fontWeight = 'bold';
+            itemSwitch.textContent = 'Ganti Mode: Konsumen';
+            dropdownMenu.appendChild(itemSwitch);
+
+            var divider2 = document.createElement('div');
+            divider2.className = 'profile-dropdown-divider';
+            dropdownMenu.appendChild(divider2);
+
+            var itemLogout = document.createElement('a');
+            itemLogout.href = 'login.xhtml';
+            itemLogout.className = 'profile-dropdown-item profile-dropdown-logout';
+            itemLogout.id = 'btnLogout';
+            itemLogout.textContent = 'Keluar';
+            dropdownMenu.appendChild(itemLogout);
+        }
+
+        var navMenuList = document.querySelector('.nav-menu-list');
+        if (navMenuList && window.location.pathname.indexOf('food_catalogue.xhtml') !== -1) {
+            var existingDashboardLink = navMenuList.querySelector('.nav-link-producer-dashboard');
+            if (!existingDashboardLink) {
+                var li = document.createElement('li');
+                var a = document.createElement('a');
+                a.href = 'producer_dashboard.xhtml';
+                a.className = 'nav-link-producer-dashboard';
+                a.textContent = 'Dashboard Produsen';
+                a.style.fontWeight = 'bold';
+                a.style.color = '#E88635';
+                li.appendChild(a);
+                navMenuList.insertBefore(li, navMenuList.firstChild);
+            }
+        }
+
+        var navLogo = document.querySelector('.nav-logo-link');
+        if (navLogo && window.location.pathname.indexOf('food_catalogue.xhtml') !== -1) {
+            navLogo.href = 'food_catalogue.xhtml?role=produsen';
+        }
+
+        if (searchForm && window.location.pathname.indexOf('food_catalogue.xhtml') !== -1) {
+            var hiddenRole = searchForm.querySelector('input[name="role"]');
+            if (!hiddenRole) {
+                hiddenRole = document.createElement('input');
+                hiddenRole.type = 'hidden';
+                hiddenRole.name = 'role';
+                hiddenRole.value = 'produsen';
+                searchForm.appendChild(hiddenRole);
+            }
+        }
+
+        var catPills = document.querySelectorAll('.category-pill');
+        catPills.forEach(function (cp) {
+            var href = cp.getAttribute('href');
+            if (href && href.indexOf('role=produsen') === -1) {
+                cp.setAttribute('href', href + (href.indexOf('?') !== -1 ? '&role=produsen' : '?role=produsen'));
+            }
+        });
+    } else {
+        if (activeRole === 'konsumen') {
+            try {
+                localStorage.setItem('tubespwd_role', 'konsumen');
+                sessionStorage.setItem('tubespwd_role', 'konsumen');
+            } catch (err) {}
+        }
+        var dropdownMenuKonsumen = document.getElementById('profileDropdownMenu');
+        if (dropdownMenuKonsumen) {
+            var existingSw = dropdownMenuKonsumen.querySelector('.profile-dropdown-item-switch');
+            if (!existingSw) {
+                var div = document.createElement('div');
+                div.className = 'profile-dropdown-divider';
+                dropdownMenuKonsumen.insertBefore(div, dropdownMenuKonsumen.lastElementChild);
+
+                var sw = document.createElement('a');
+                sw.href = 'food_catalogue.xhtml?role=produsen';
+                sw.className = 'profile-dropdown-item profile-dropdown-item-switch';
+                sw.style.color = '#E88635';
+                sw.style.fontWeight = 'bold';
+                sw.textContent = 'Ganti Mode: Produsen';
+                dropdownMenuKonsumen.insertBefore(sw, dropdownMenuKonsumen.lastElementChild);
+            }
+        }
+    }
+
     var logoutBtn = document.getElementById('btnLogout');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
             try {
+                localStorage.removeItem('tubespwd_role');
+                sessionStorage.removeItem('tubespwd_role');
                 localStorage.removeItem('tubespwd_cart');
             } catch (err) {}
         });

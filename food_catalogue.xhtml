@@ -24,7 +24,7 @@
                 </ul>
                 <div class="nav-cta-wrap">
                     <div class="profile-consumer-dropdown">
-                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Konsumen - Iwang Petra">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Konsumen">
                             <img src="assets/images/avatar_consumer.png" alt="Avatar Profil" class="profile-consumer-avatar" />
                             <span class="profile-consumer-info">
                                 <span class="profile-consumer-name">Iwang Petra</span>
@@ -36,7 +36,7 @@
                             <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
                             <a href="claim_history.xhtml" class="profile-dropdown-item">Riwayat Klaim</a>
                             <div class="profile-dropdown-divider"></div>
-                            <a href="index.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
                         </div>
                     </div>
                 </div>
@@ -461,6 +461,44 @@
 
     </div>
 
-    <script type="text/javascript" src="assets/js/catalog.js?v=5"></script>
+    <script type="text/javascript" src="assets/js/catalog.js?v=20261124_0335"></script>
+    <script type="text/javascript">
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var r = params.get('role');
+        if (!r) {
+            try {
+                r = localStorage.getItem('tubespwd_role');
+                if (!r) {
+                    r = sessionStorage.getItem('tubespwd_role');
+                }
+            } catch (e) {}
+        }
+        if (!r) {
+            if (document.referrer) {
+                if (document.referrer.indexOf('producer') !== -1) {
+                    r = 'produsen';
+                }
+            }
+        }
+        if (r === 'produsen') {
+            try {
+                localStorage.setItem('tubespwd_role', 'produsen');
+                sessionStorage.setItem('tubespwd_role', 'produsen');
+            } catch (e) {}
+            var n = document.querySelector('.profile-consumer-name');
+            var rl = document.querySelector('.profile-consumer-role');
+            var a = document.querySelector('.profile-consumer-avatar');
+            var p = document.querySelector('.profile-consumer-pill');
+            if (n) { n.textContent = 'KFC Sudirman'; }
+            if (rl) { rl.textContent = 'Produsen'; }
+            if (a) {
+                a.src = 'assets/images/producer/avatar_produsen.png';
+                a.alt = 'Avatar KFC Sudirman';
+            }
+            if (p) { p.title = 'Profil Produsen - KFC Sudirman'; }
+        }
+    })();
+    </script>
 </body>
 </html>

@@ -57,6 +57,8 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['username'])) {
                     <div class="profile-dropdown-content" id="profileDropdownMenu">
 <?php if (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'admin'): ?>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>views/admin/dashboard.php" class="profile-dropdown-item">Panel Admin</a>
+<?php elseif (isset($_SESSION['role']) && strtolower($_SESSION['role']) === 'produsen'): ?>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>producer_dashboard.php" class="profile-dropdown-item">Dashboard Produsen</a>
 <?php endif; ?>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php" class="profile-dropdown-item">Pengaturan Profil</a>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>transactions.php" class="profile-dropdown-item">Riwayat Klaim</a>
