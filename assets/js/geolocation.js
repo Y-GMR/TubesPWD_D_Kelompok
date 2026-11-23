@@ -19,7 +19,7 @@
                 latInput.name = 'latitude';
                 form.appendChild(latInput);
             }
-            latInput.value = lat;
+            latInput.value = (typeof lat === 'number') ? lat.toFixed(6) : lat;
 
             if (!lngInput) {
                 lngInput = document.createElement('input');
@@ -27,19 +27,27 @@
                 lngInput.name = 'longitude';
                 form.appendChild(lngInput);
             }
-            lngInput.value = lng;
+            lngInput.value = (typeof lng === 'number') ? lng.toFixed(6) : lng;
         });
 
         var previewEl = document.getElementById('geoCoordinatesPreview') || document.querySelector('.geo-preview-text');
         if (previewEl) {
-            previewEl.textContent = 'Koordinat GPS Anda: ' + lat.toFixed(5) + ', ' + lng.toFixed(5);
-            previewEl.style.display = 'block';
+            previewEl.style.display = 'none';
         }
 
         var statusEl = document.getElementById('geoStatusText');
         if (statusEl) {
-            statusEl.textContent = 'Lokasi GPS berhasil terdeteksi.';
+            var latFormatted = (typeof lat === 'number') ? lat.toFixed(5) : lat;
+            var lngFormatted = (typeof lng === 'number') ? lng.toFixed(5) : lng;
+            statusEl.textContent = 'Lokasi GPS berhasil diperbarui (' + latFormatted + ', ' + lngFormatted + ')';
             statusEl.style.color = '#15803d';
+        }
+
+        var statusBox = document.querySelector('.geo-status-box');
+        if (statusBox) {
+            statusBox.style.display = 'flex';
+            statusBox.style.justifyContent = 'center';
+            statusBox.style.textAlign = 'center';
         }
     }
 
@@ -47,13 +55,13 @@
         var statusEl = document.getElementById('geoStatusText');
         if (!statusEl) return;
 
-        var message = 'Gagal mengakses GPS. Menggunakan alamat pengambilan default.';
+        var message = 'Gagal mengakses GPS';
         if (err && err.code === 1) {
-            message = 'Akses lokasi ditolak pengguna. Menggunakan alamat pengambilan default.';
+            message = 'Akses lokasi ditolak pengguna';
         } else if (err && err.code === 2) {
-            message = 'Posisi GPS tidak tersedia. Menggunakan alamat pengambilan default.';
+            message = 'Posisi GPS tidak tersedia';
         } else if (err && err.code === 3) {
-            message = 'Waktu permintaan GPS habis. Menggunakan alamat pengambilan default.';
+            message = 'Waktu permintaan GPS habis';
         }
 
         statusEl.textContent = message;
@@ -62,14 +70,14 @@
 
     function requestLocation(onSuccess, onError) {
         if (!('geolocation' in navigator)) {
-            if (onError) onError(new Error('Geolocation tidak didukung oleh peramban ini.'));
+            if (onError) onError(new Error('Geolocation tidak didukung oleh peramban ini'));
             return;
         }
 
         var options = {
             enableHighAccuracy: true,
             timeout: 10000,
-            maximumAge: 60000
+            maximumAge: 0
         };
 
         navigator.geolocation.getCurrentPosition(
@@ -104,7 +112,7 @@
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 btn.disabled = true;
-                btn.textContent = 'Mendeteksi...';
+                btn.textContent = 'Mendeteksi Lokasi GPS...';
                 requestLocation(
                     function () {
                         btn.disabled = false;
@@ -112,7 +120,7 @@
                     },
                     function () {
                         btn.disabled = false;
-                        btn.textContent = 'Deteksi Ulang GPS';
+                        btn.textContent = 'Perbarui Lokasi GPS';
                     }
                 );
             });
