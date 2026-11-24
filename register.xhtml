@@ -34,16 +34,24 @@
                     <button type="button" class="btn-role-tab" id="btnRoleDonor">Donatur Pangan (Produsen)</button>
                 </div>
 
-                <form action="login.xhtml" method="post" class="auth-form" id="registerForm">
+                <form action="actions/auth_register.php" method="post" class="auth-form" id="registerForm">
+                    <input type="hidden" name="role" id="regRole" value="konsumen" />
+
                     <div class="auth-form-group">
                         <label for="regFullname" class="auth-label">Nama Lengkap</label>
-                        <input type="text" id="regFullname" name="fullname" class="auth-input" placeholder="Nama" />
+                        <input type="text" id="regFullname" name="fullname" class="auth-input" placeholder="Nama Lengkap" />
                     </div>
 
                     <div class="auth-form-group">
                         <label for="regUsername" class="auth-label">Username</label>
                         <input type="text" id="regUsername" name="username" class="auth-input" placeholder="Username" />
                         <span class="auth-helper-text" id="usernameFeedback" style="display: none;">Username tersedia</span>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="regEmail" class="auth-label">Alamat Email</label>
+                        <input type="text" id="regEmail" name="email" class="auth-input" placeholder="nama@email.com" />
+                        <span class="auth-helper-text" id="emailFeedback" style="display: none;">Email tersedia</span>
                     </div>
 
                     <div class="auth-input-row">

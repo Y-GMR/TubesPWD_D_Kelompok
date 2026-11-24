@@ -59,13 +59,15 @@ require_once 'includes/header.php';
                 <h1 class="auth-card-title">Login Akun</h1>
 
                 <?php if ($pesan_error !== ''): ?>
-                    <div class="alert alert-error" style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; line-height: 1.4; background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca;">
+                    <div class="alert alert-error" style="padding: 12px 16px; border-radius: 8px; 
+                    margin-bottom: 20px; font-size: 13px; line-height: 1.4; background-color: #fee2e2; color: #991b1b; border: 1px solid #fecaca; text-align: center;">
                         <?php echo escapeHtml($pesan_error); ?>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($pesan_sukses !== ''): ?>
-                    <div class="alert alert-success" style="padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 13px; line-height: 1.4; background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0;">
+                    <div class="alert alert-success" style="padding: 12px 16px; border-radius: 8px; 
+                    margin-bottom: 20px; font-size: 13px; line-height: 1.4; background-color: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; text-align: center;">
                         <?php echo escapeHtml($pesan_sukses); ?>
                     </div>
                 <?php endif; ?>

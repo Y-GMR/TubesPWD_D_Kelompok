@@ -55,6 +55,8 @@ simpanSesiPengguna($pengguna);
 
 if ($pengguna['peran'] === 'admin') {
     header('Location: ../views/admin/dashboard.php');
+} elseif ($pengguna['peran'] === 'produsen') {
+    header('Location: ../producer_dashboard.xhtml');
 } else {
     header('Location: ../katalog.php');
 }

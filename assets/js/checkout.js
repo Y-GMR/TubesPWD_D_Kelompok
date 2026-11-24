@@ -421,10 +421,10 @@ document.addEventListener('DOMContentLoaded', function () {
             var successMsg = 'Klaim pangan berhasil dikonfirmasi!\n\n' +
                 'Merchant Produsen: ' + merchantInfo.name + '\n' +
                 'Lokasi Pengambilan: ' + merchantInfo.storeName + '\n' +
-                'Alamat Gerai: ' + merchantInfo.poskoAddr + '\n' +
-                'Kode Transaksi: ' + ticketCode + '\n' +
+                'Alamat: ' + merchantInfo.poskoAddr + '\n' +
                 'Batas Waktu Pengambilan: ' + merchantInfo.deadline + '\n\n' +
-                'Tunjukkan kode transaksi ini kepada kasir atau staf di gerai produsen saat pengambilan.';
+                'Kode Transaksi: ' + ticketCode + '\n' +
+                'Tunjukkan kode ini kepada kasir atau staf di tempat pengambilan.';
 
             alert(successMsg);
             cart.items = {};

@@ -406,18 +406,6 @@ document.addEventListener('DOMContentLoaded', function () {
             divider.className = 'profile-dropdown-divider';
             dropdownMenu.appendChild(divider);
 
-            var itemSwitch = document.createElement('a');
-            itemSwitch.href = 'food_catalogue.xhtml?role=konsumen';
-            itemSwitch.className = 'profile-dropdown-item';
-            itemSwitch.style.color = '#0D4347';
-            itemSwitch.style.fontWeight = 'bold';
-            itemSwitch.textContent = 'Ganti Mode: Konsumen';
-            dropdownMenu.appendChild(itemSwitch);
-
-            var divider2 = document.createElement('div');
-            divider2.className = 'profile-dropdown-divider';
-            dropdownMenu.appendChild(divider2);
-
             var itemLogout = document.createElement('a');
             itemLogout.href = 'login.xhtml';
             itemLogout.className = 'profile-dropdown-item profile-dropdown-logout';
@@ -471,23 +459,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('tubespwd_role', 'konsumen');
                 sessionStorage.setItem('tubespwd_role', 'konsumen');
             } catch (err) {}
-        }
-        var dropdownMenuKonsumen = document.getElementById('profileDropdownMenu');
-        if (dropdownMenuKonsumen) {
-            var existingSw = dropdownMenuKonsumen.querySelector('.profile-dropdown-item-switch');
-            if (!existingSw) {
-                var div = document.createElement('div');
-                div.className = 'profile-dropdown-divider';
-                dropdownMenuKonsumen.insertBefore(div, dropdownMenuKonsumen.lastElementChild);
-
-                var sw = document.createElement('a');
-                sw.href = 'food_catalogue.xhtml?role=produsen';
-                sw.className = 'profile-dropdown-item profile-dropdown-item-switch';
-                sw.style.color = '#E88635';
-                sw.style.fontWeight = 'bold';
-                sw.textContent = 'Ganti Mode: Produsen';
-                dropdownMenuKonsumen.insertBefore(sw, dropdownMenuKonsumen.lastElementChild);
-            }
         }
     }
 
