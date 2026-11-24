@@ -16,16 +16,18 @@
     function ensureFeedbackElement(inputEl) {
         var parent = inputEl.parentElement;
         if (!parent) return null;
-        var feedback = parent.querySelector('.ajax-feedback-msg');
-        if (!feedback) {
-            feedback = document.createElement('div');
-            feedback.className = 'ajax-feedback-msg';
-            feedback.style.fontSize = '12px';
-            feedback.style.marginTop = '4px';
-            feedback.style.fontWeight = '600';
-            feedback.style.transition = 'all 0.2s ease';
-            parent.appendChild(feedback);
+        var existing = parent.querySelector('#usernameFeedback, #emailFeedback, .ajax-feedback-msg');
+        if (existing) {
+            existing.className = 'ajax-feedback-msg auth-helper-text';
+            return existing;
         }
+        var feedback = document.createElement('div');
+        feedback.className = 'ajax-feedback-msg';
+        feedback.style.fontSize = '12px';
+        feedback.style.marginTop = '4px';
+        feedback.style.fontWeight = '600';
+        feedback.style.transition = 'all 0.2s ease';
+        parent.appendChild(feedback);
         return feedback;
     }
 
@@ -44,7 +46,7 @@
         if (field === 'username') {
             var usernameRegex = /^[a-zA-Z0-9_]{4,30}$/;
             if (!usernameRegex.test(trimmedVal)) {
-                feedbackEl.textContent = 'Username minimal 4 karakter (alfanumerik dan _).';
+                feedbackEl.textContent = '\u2717 Username minimal 4 karakter (alfanumerik dan _).';
                 feedbackEl.style.color = '#dc2626';
                 feedbackEl.style.display = 'block';
                 inputEl.style.borderColor = '#dc2626';
@@ -53,7 +55,7 @@
         } else if (field === 'email') {
             var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(trimmedVal)) {
-                feedbackEl.textContent = 'Format alamat email tidak valid.';
+                feedbackEl.textContent = '\u2717 Format alamat email tidak valid.';
                 feedbackEl.style.color = '#dc2626';
                 feedbackEl.style.display = 'block';
                 inputEl.style.borderColor = '#dc2626';
@@ -65,19 +67,22 @@
         feedbackEl.style.color = '#6b7280';
         feedbackEl.style.display = 'block';
 
-        var url = 'actions/check_user_ajax.php?field=' + encodeURIComponent(field) + '&value=' + encodeURIComponent(trimmedVal);
+        var basePath = (window.location.pathname.indexOf('/views/') !== -1 ? '../../actions/check_user_ajax.php' : 'actions/check_user_ajax.php');
+        var url = basePath + '?field=' + encodeURIComponent(field) + '&value=' + encodeURIComponent(trimmedVal);
         fetch(url)
             .then(function (res) {
                 return res.json();
             })
             .then(function (data) {
                 if (data && data.status === 'success' && data.data && data.data.available) {
-                    feedbackEl.textContent = data.message || (field === 'username' ? 'Username tersedia.' : 'Email tersedia.');
+                    var msg = data.message || (field === 'username' ? 'Username tersedia.' : 'Email tersedia.');
+                    feedbackEl.textContent = '\u2713 ' + msg;
                     feedbackEl.style.color = '#15803d';
                     feedbackEl.style.display = 'block';
                     inputEl.style.borderColor = '#15803d';
                 } else {
-                    feedbackEl.textContent = (data && data.message) ? data.message : (field === 'username' ? 'Username sudah digunakan.' : 'Email sudah terdaftar.');
+                    var errMsg = (data && data.message) ? data.message : (field === 'username' ? 'Username sudah digunakan.' : 'Email sudah terdaftar.');
+                    feedbackEl.textContent = '\u2717 ' + errMsg;
                     feedbackEl.style.color = '#dc2626';
                     feedbackEl.style.display = 'block';
                     inputEl.style.borderColor = '#dc2626';

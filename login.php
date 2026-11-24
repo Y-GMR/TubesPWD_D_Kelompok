@@ -49,7 +49,7 @@ require_once 'includes/header.php';
             <ul class="auth-nav-menu">
                 <li><a href="katalog.php#about">Tentang kami</a></li>
                 <li><a href="katalog.php">Katalog Pangan</a></li>
-                <li><a href="katalog.php#help">Bantuan</a></li>
+                <li><a href="customer_service.xhtml">Bantuan</a></li>
             </ul>
             <a href="katalog.php" class="btn-nav-back">Kembali ke Beranda</a>
         </div>
@@ -98,7 +98,7 @@ require_once 'includes/header.php';
                             <input type="checkbox" name="remember" />
                             <span>Ingat saya di perangkat ini</span>
                         </label>
-                        <a href="katalog.php#help" class="auth-forgot-link">Lupa kata sandi?</a>
+                        <a href="customer_service.xhtml" class="auth-forgot-link">Lupa kata sandi?</a>
                     </div>
 
                     <button type="submit" class="btn-auth-submit btn-auth-terracotta">Masuk Sekarang &#8594;</button>

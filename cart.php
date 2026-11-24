@@ -19,7 +19,6 @@ if (file_exists('includes/functions.php')) {
     require_once 'includes/functions.php';
 }
 
-// 1. Session Guard: Pengguna wajib login untuk mengelola keranjang klaim
 if (!function_exists('is_logged_in') || !is_logged_in()) {
     header("Location: login.php?error=login_required");
     exit();
@@ -28,12 +27,10 @@ if (!function_exists('is_logged_in') || !is_logged_in()) {
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
-// Inisialisasi keranjang belanja pada sesi jika belum ada
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
 }
 
-// 2. Pemetaan slug nama makanan ke database (jika dikirim dari tautan katalog/detail JS)
 $slug_map = array(
     'donat-cokelat'   => 1,
     'donat-glaze'     => 2,
@@ -49,7 +46,6 @@ $slug_map = array(
     'perkedel'        => 12
 );
 
-// 3. Handler Aksi Keranjang (Tambah via GET/POST, Ubah Jumlah, Hapus Item, Kosongkan)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     $item_id = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
 

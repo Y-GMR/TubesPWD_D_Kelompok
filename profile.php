@@ -58,7 +58,7 @@ if (isset($_GET['pesan'])) {
 $page_title = 'Pengaturan Profil - Pangkalan Pangan';
 $page_wrapper_class = 'profile-page-wrapper';
 $extra_css = array('profile.css?v=6');
-$extra_js = array('profile.js');
+$extra_js = array('image_preview.js');
 
 require_once 'includes/header.php';
 ?>
@@ -71,7 +71,7 @@ require_once 'includes/header.php';
             <ul class="auth-nav-menu">
                 <li><a href="katalog.php#about">Tentang kami</a></li>
                 <li><a href="katalog.php">Katalog Pangan</a></li>
-                <li><a href="katalog.php#help">Bantuan</a></li>
+                <li><a href="customer_service.xhtml">Bantuan</a></li>
             </ul>
             <a href="katalog.php" class="btn-nav-back">Kembali ke Katalog</a>
         </div>
@@ -109,6 +109,7 @@ require_once 'includes/header.php';
                                         </svg>
                                     <?php endif; ?>
                                 </div>
+                                <button type="button" class="btn-upload-photo" style="margin-top: 10px; padding: 6px 14px; font-size: 13px; font-weight: 600; background-color: #0e3b43; color: #ffffff; border: none; border-radius: 6px; cursor: pointer;">Unggah Foto Baru</button>
                                 <span class="upload-photo-hint">Format: JPG, PNG maks 2MB</span>
                             </div>
 

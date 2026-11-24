@@ -25,7 +25,7 @@
             return;
         }
 
-        var isTypeAllowed = ALLOWED_TYPES.indexOf(file.type) !== -1 || isValidImageExtension(file.name);
+        var isTypeAllowed = (file.type && ALLOWED_TYPES.indexOf(file.type) !== -1) || isValidImageExtension(file.name);
         if (!isTypeAllowed) {
             alert('Format berkas harus berupa JPG, PNG, atau WEBP.');
             fileInput.value = '';
@@ -46,7 +46,7 @@
                     } else {
                         var newImg = document.createElement('img');
                         newImg.src = e.target.result;
-                        newImg.alt = 'Pratinjau Foto';
+                        newImg.alt = 'Pratinjau Foto Profil';
                         newImg.style.width = '100%';
                         newImg.style.height = '100%';
                         newImg.style.objectFit = 'cover';
@@ -70,27 +70,39 @@
     }
 
     function initImagePreview() {
+        var avatarCircle = document.querySelector('.profile-large-avatar-circle') || document.getElementById('avatarPreviewContainer');
+
+        var inputFoto = document.getElementById('inputFotoProfil') || document.getElementById('profilePhotoInput');
+        if (inputFoto && avatarCircle) {
+            bindFileInput(inputFoto, avatarCircle);
+        }
+
         var uploadButtons = document.querySelectorAll('.btn-upload-photo, #btnUploadPhoto');
         uploadButtons.forEach(function (btn) {
-            var fileInput = document.getElementById('profilePhotoInput');
-            if (!fileInput) {
-                fileInput = document.createElement('input');
-                fileInput.type = 'file';
-                fileInput.id = 'profilePhotoInput';
-                fileInput.name = 'foto_profil';
-                fileInput.accept = 'image/jpeg,image/png,image/webp';
-                fileInput.style.display = 'none';
-                document.body.appendChild(fileInput);
-            }
-
-            var avatarCircle = document.querySelector('.profile-large-avatar-circle') || document.getElementById('avatarPreviewContainer');
-
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                fileInput.click();
-            });
 
-            bindFileInput(fileInput, avatarCircle);
+                var targetInput = document.getElementById('inputFotoProfil') || document.getElementById('profilePhotoInput');
+                if (!targetInput) {
+                    targetInput = document.createElement('input');
+                    targetInput.type = 'file';
+                    targetInput.id = 'profilePhotoInput';
+                    targetInput.name = 'foto_profil';
+                    targetInput.accept = 'image/jpeg,image/png,image/webp';
+                    targetInput.style.display = 'none';
+
+                    var parentForm = document.querySelector('form#profileEditForm') || document.querySelector('form.profile-edit-form') || document.querySelector('form');
+                    if (parentForm) {
+                        parentForm.appendChild(targetInput);
+                    } else {
+                        document.body.appendChild(targetInput);
+                    }
+
+                    bindFileInput(targetInput, avatarCircle);
+                }
+
+                targetInput.click();
+            });
         });
 
         var genericFileInputs = document.querySelectorAll('input[type="file"].image-preview-input, input[type="file"][data-preview-target]');

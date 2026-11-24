@@ -83,6 +83,7 @@
                             <hr class="profile-divider" />
 
                             <form action="actions/auth_profile_update.php" method="post" enctype="multipart/form-data" class="profile-edit-form" id="profileEditForm">
+                                <input type="file" id="profilePhotoInput" name="foto_profil" accept="image/jpeg,image/png,image/webp" style="display: none;" />
                                 <div class="form-group-full">
                                     <label for="inputNamaLengkap" class="profile-form-label">Nama Lengkap</label>
                                     <input type="text" id="inputNamaLengkap" name="nama_lengkap" class="profile-form-input" placeholder="Nama Lengkap" />
@@ -157,5 +158,6 @@
 
     </div>
 
+    <script type="text/javascript" src="assets/js/image_preview.js"></script>
 </body>
 </html>

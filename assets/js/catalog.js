@@ -423,8 +423,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 a.href = 'producer_dashboard.xhtml';
                 a.className = 'nav-link-producer-dashboard';
                 a.textContent = 'Dashboard Produsen';
-                a.style.fontWeight = 'bold';
-                a.style.color = '#E88635';
                 li.appendChild(a);
                 navMenuList.insertBefore(li, navMenuList.firstChild);
             }

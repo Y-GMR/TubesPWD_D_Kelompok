@@ -80,7 +80,9 @@ if ($conn) {
     <link rel="stylesheet" type="text/css" href="assets/css/components.css" />
 </head>
 <body>
-    <div id="mainContainer" class="container">
+    <div class="page-wrapper">
+        <?php require_once 'includes/navbar.php'; ?>
+        <div id="mainContainer" class="container" style="padding-top: 30px; padding-bottom: 50px;">
         <div class="page-header">
             <h1>Katalog Makanan Tersedia</h1>
             <p class="page-subtitle">Temukan makanan layak konsumsi yang tersedia untuk diklaim dari produsen terdaftar.</p>
@@ -172,6 +174,7 @@ if ($conn) {
                 <?php endforeach; ?>
             <?php endif; ?>
         </div>
+        <?php require_once 'includes/footer.php'; ?>
     </div>
 </body>
 </html>

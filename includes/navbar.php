@@ -41,7 +41,7 @@ if (isset($_SESSION['user_id']) || isset($_SESSION['username'])) {
             <ul class="nav-menu-list">
                 <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>katalog.php#about">Tentang kami</a></li>
                 <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php">Pengaturan</a></li>
-                <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>katalog.php#help">Bantuan</a></li>
+                <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>customer_service.xhtml">Bantuan</a></li>
             </ul>
             <div class="nav-cta-wrap">
 <?php if ($is_logged_in): ?>
