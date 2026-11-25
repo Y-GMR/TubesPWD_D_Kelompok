@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Registrasi Akun - Pangkalan Pangan</title>
     <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=4" />
-    <link rel="stylesheet" type="text/css" href="assets/css/auth.css?v=4" />
+    <link rel="stylesheet" type="text/css" href="assets/css/auth.css?v=7" />
 </head>
 <body>
 
@@ -34,38 +34,51 @@
                     <button type="button" class="btn-role-tab" id="btnRoleDonor">Donatur Pangan (Produsen)</button>
                 </div>
 
-                <form action="actions/auth_register.php" method="post" class="auth-form" id="registerForm">
-                    <input type="hidden" name="role" id="regRole" value="konsumen" />
+                <form action="actions/auth_register.php" method="post" enctype="multipart/form-data" class="auth-form" id="registerForm">
+                    <div>
+                        <input type="hidden" name="role" id="regRole" value="konsumen" />
+                    </div>
 
                     <div class="auth-form-group">
                         <label for="regFullname" class="auth-label">Nama Lengkap</label>
-                        <input type="text" id="regFullname" name="fullname" class="auth-input" placeholder="Nama Lengkap" />
+                        <input type="text" id="regFullname" name="fullname" class="auth-input" />
                     </div>
 
                     <div class="auth-form-group">
                         <label for="regUsername" class="auth-label">Username</label>
-                        <input type="text" id="regUsername" name="username" class="auth-input" placeholder="Username" />
+                        <input type="text" id="regUsername" name="username" class="auth-input" />
                         <span class="auth-helper-text" id="usernameFeedback" style="display: none;">Username tersedia</span>
                     </div>
 
                     <div class="auth-form-group">
                         <label for="regEmail" class="auth-label">Alamat Email</label>
-                        <input type="text" id="regEmail" name="email" class="auth-input" placeholder="nama@email.com" />
+                        <input type="text" id="regEmail" name="email" class="auth-input" />
                         <span class="auth-helper-text" id="emailFeedback" style="display: none;">Email tersedia</span>
                     </div>
 
                     <div class="auth-input-row">
                         <div class="auth-form-group">
                             <label for="regPassword" class="auth-label">Kata Sandi</label>
-                            <input type="password" id="regPassword" name="password" class="auth-input" placeholder="••••••••" />
+                            <input type="password" id="regPassword" name="password" class="auth-input" />
                         </div>
                         <div class="auth-form-group">
                             <label for="regConfirmPassword" class="auth-label">Konfirmasi Sandi</label>
-                            <input type="password" id="regConfirmPassword" name="confirm_password" class="auth-input" placeholder="••••••••" />
+                            <input type="password" id="regConfirmPassword" name="confirm_password" class="auth-input" />
                         </div>
                     </div>
 
-                    <button type="submit" class="btn-auth-submit btn-auth-teal">Daftar Akun Baru &#8594;</button>
+                    <div class="auth-form-group" id="sktmUploadGroup">
+                        <label for="regDocument" class="auth-label">Dokumen Kelayakan SKTM / KKS (Opsional)</label>
+                        <div class="auth-file-box">
+                            <input type="file" id="regDocument" name="dokumen_kelayakan" accept="application/pdf,image/jpeg,image/png" class="auth-file-input" />
+                            <span class="auth-file-name" id="regDocumentName">Format: PDF, JPG, atau PNG (Maks. 2MB)</span>
+                        </div>
+                        <span class="auth-doc-note">Khusus penerima manfaat untuk mempercepat verifikasi oleh admin.</span>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn-auth-submit btn-auth-teal">Daftar Akun Baru &#8594;</button>
+                    </div>
                 </form>
 
                 <div class="auth-switch-footer">
@@ -105,7 +118,7 @@
 
     </div>
 
-    <script type="text/javascript" src="assets/js/auth.js"></script>
+    <script type="text/javascript" src="assets/js/auth.js?v=2"></script>
     <script type="text/javascript" src="assets/js/ajax_validator.js"></script>
 </body>
 </html>

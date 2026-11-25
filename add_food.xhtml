@@ -68,13 +68,13 @@
 
                         <div class="form-group">
                             <label for="inputFoodName" class="form-label">Nama Makanan *</label>
-                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" placeholder="Paket Super Besar 1 (Ayam Crispy + Nasi)" required="required" value="Paket Super Besar 1 (Ayam Crispy + Nasi)" />
+                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" value="Paket Super Besar 1 (Ayam Crispy + Nasi)" />
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="selectCategory" class="form-label">Kategori *</label>
-                                <select id="selectCategory" name="kategori" class="form-control" required="required">
+                                <select id="selectCategory" name="kategori" class="form-control">
                                     <option value="ayam_daging" selected="selected">Ayam &amp; Daging Olahan</option>
                                     <option value="makanan_berat">Makanan Berat / Nasi</option>
                                     <option value="roti_kue">Roti &amp; Kue</option>
@@ -85,18 +85,18 @@
                             </div>
                             <div class="form-group">
                                 <label for="inputPortion" class="form-label">Jumlah Porsi *</label>
-                                <input type="number" id="inputPortion" name="jumlah_porsi" class="form-control" min="1" max="1000" placeholder="10" required="required" value="10" />
+                                <input type="text" id="inputPortion" name="jumlah_porsi" class="form-control" value="10" />
                             </div>
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="inputReadyTime" class="form-label">Waktu Siap Diambil *</label>
-                                <input type="text" id="inputReadyTime" name="waktu_siap" class="form-control" placeholder="Hari ini &#8226; 11:30 WIB" required="required" value="Hari ini &#8226; 11:30 WIB" />
+                                <input type="text" id="inputReadyTime" name="waktu_siap" class="form-control" value="Hari ini &#8226; 11:30 WIB" />
                             </div>
                             <div class="form-group">
                                 <label for="inputExpiryTime" class="form-label">Batas Pengambilan *</label>
-                                <input type="text" id="inputExpiryTime" name="batas_ambil" class="form-control" placeholder="Hari ini &#8226; 15:30 WIB" required="required" value="Hari ini &#8226; 15:30 WIB" />
+                                <input type="text" id="inputExpiryTime" name="batas_ambil" class="form-control" value="Hari ini &#8226; 15:30 WIB" />
                             </div>
                         </div>
 
@@ -114,7 +114,7 @@
 
                         <div class="form-group">
                             <label for="inputAddress" class="form-label">Alamat Gerai *</label>
-                            <input type="text" id="inputAddress" name="alamat_gerai" class="form-control" placeholder="KFC Sudirman, Jl. Jend. Sudirman No. 54, Yogyakarta" required="required" value="KFC Sudirman, Jl. Jend. Sudirman No. 54, Yogyakarta" />
+                            <input type="text" id="inputAddress" name="alamat_gerai" class="form-control" value="KFC Sudirman, Jl. Jend. Sudirman No. 54, Yogyakarta" />
                         </div>
 
                         <button type="button" id="btnDetectLocation" class="btn-detect-gps-full btn-detect-gps">Perbarui Lokasi GPS</button>
@@ -193,7 +193,7 @@
                         <hr class="summary-divider" />
 
                         <label class="summary-checkbox-wrap">
-                            <input type="checkbox" name="konfirmasi_higienis" required="required" checked="checked" />
+                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" checked="checked" />
                             <span>Saya menjamin makanan dalam kondisi higienis dan layak konsumsi.</span>
                         </label>
 
@@ -241,6 +241,6 @@
     <script type="text/javascript" src="assets/js/geolocation.js"></script>
     <script type="text/javascript" src="assets/js/image_preview.js"></script>
     <script type="text/javascript" src="assets/js/catalog.js?v=20261124_0335"></script>
-    <script type="text/javascript" src="assets/js/add_food.js"></script>
+    <script type="text/javascript" src="assets/js/add_food.js?v=2"></script>
 </body>
 </html>

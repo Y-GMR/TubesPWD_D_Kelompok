@@ -82,7 +82,7 @@
 
                 <div class="inventory-controls-row">
                     <div class="inv-controls-left">
-                        <input type="text" id="invSearchInput" class="inventory-search-input" placeholder="Cari nama makanan atau kategori..." />
+                        <input type="text" id="invSearchInput" class="inventory-search-input" />
                         <select id="invCategorySelect" class="inventory-category-select">
                             <option value="all">Semua Kategori</option>
                             <option value="Roti &amp; Kue">Roti &amp; Kue</option>
@@ -218,7 +218,7 @@
                 <p class="inv-modal-subtitle">Perbarui jumlah porsi siap ambil untuk donasi makanan ini.</p>
                 <div class="inv-modal-stepper">
                     <button type="button" class="btn-stepper" id="btnStepMinus">&#8722;</button>
-                    <input type="number" id="inputStockVal" class="inv-stepper-val" min="0" max="999" value="10" />
+                    <input type="text" id="inputStockVal" class="inv-stepper-val" value="10" />
                     <button type="button" class="btn-stepper" id="btnStepPlus">&#43;</button>
                 </div>
                 <div class="inv-modal-actions">
@@ -259,6 +259,6 @@
 
     </div>
 
-    <script type="text/javascript" src="assets/js/inventory.js?v=1"></script>
+    <script type="text/javascript" src="assets/js/inventory.js?v=2"></script>
 </body>
 </html>

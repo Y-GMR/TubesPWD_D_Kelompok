@@ -1,4 +1,21 @@
 document.addEventListener('DOMContentLoaded', function () {
+    var authPlaceholders = [
+        { id: 'loginUsername', text: 'Username' },
+        { id: 'loginEmail', text: 'Email' },
+        { id: 'loginPassword', text: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' },
+        { id: 'regFullname', text: 'Nama Lengkap' },
+        { id: 'regUsername', text: 'Username' },
+        { id: 'regEmail', text: 'nama@email.com' },
+        { id: 'regPassword', text: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' },
+        { id: 'regConfirmPassword', text: '\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022' }
+    ];
+    for (var phIdx = 0; phIdx < authPlaceholders.length; phIdx++) {
+        var phEl = document.getElementById(authPlaceholders[phIdx].id);
+        if (phEl && !phEl.placeholder) {
+            phEl.placeholder = authPlaceholders[phIdx].text;
+        }
+    }
+
     var btnRoleConsumer = document.getElementById('btnRoleConsumer');
     var btnRoleDonor = document.getElementById('btnRoleDonor');
 
@@ -7,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function setRole(role) {
         var regRole = document.getElementById('regRole');
+        var sktmUploadGroup = document.getElementById('sktmUploadGroup');
+        var regDocument = document.getElementById('regDocument');
+        var regDocumentName = document.getElementById('regDocumentName');
         if (role === 'donor' || role === 'produsen') {
             if (btnRoleDonor && btnRoleConsumer) {
                 btnRoleDonor.classList.add('active');
@@ -15,6 +35,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (regRole) {
                 regRole.value = 'produsen';
             }
+            if (sktmUploadGroup) {
+                sktmUploadGroup.style.display = 'none';
+            }
+            if (regDocument) {
+                regDocument.value = '';
+            }
+            if (regDocumentName) {
+                regDocumentName.textContent = 'Format: PDF, JPG, atau PNG (Maks. 2MB)';
+            }
         } else {
             if (btnRoleConsumer && btnRoleDonor) {
                 btnRoleConsumer.classList.add('active');
@@ -22,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             if (regRole) {
                 regRole.value = 'konsumen';
+            }
+            if (sktmUploadGroup) {
+                sktmUploadGroup.style.display = 'flex';
             }
         }
     }
@@ -227,6 +259,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var regDocumentInput = document.getElementById('regDocument');
+    var regDocumentNameEl = document.getElementById('regDocumentName');
+
+    function isValidDocumentFile(file) {
+        if (!file) return true;
+        var allowedExt = ['.pdf', '.jpg', '.jpeg', '.png'];
+        var lowerName = (file.name || '').toLowerCase();
+        var validExt = false;
+        for (var idx = 0; idx < allowedExt.length; idx++) {
+            if (lowerName.indexOf(allowedExt[idx], lowerName.length - allowedExt[idx].length) !== -1) {
+                validExt = true;
+                break;
+            }
+        }
+        if (!validExt) {
+            return 'Format dokumen kelayakan harus berupa PDF, JPG, atau PNG.';
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            return 'Ukuran dokumen kelayakan maksimal adalah 2MB.';
+        }
+        return true;
+    }
+
+    if (regDocumentInput) {
+        regDocumentInput.addEventListener('change', function () {
+            var docFile = regDocumentInput.files && regDocumentInput.files[0];
+            if (!docFile) {
+                if (regDocumentNameEl) {
+                    regDocumentNameEl.textContent = 'Format: PDF, JPG, atau PNG (Maks. 2MB)';
+                }
+                return;
+            }
+            var checkResult = isValidDocumentFile(docFile);
+            if (checkResult !== true) {
+                alert(checkResult);
+                regDocumentInput.value = '';
+                if (regDocumentNameEl) {
+                    regDocumentNameEl.textContent = 'Format: PDF, JPG, atau PNG (Maks. 2MB)';
+                }
+                return;
+            }
+            if (regDocumentNameEl) {
+                var sizeMb = (docFile.size / (1024 * 1024)).toFixed(2);
+                regDocumentNameEl.textContent = 'Berkas siap diunggah: ' + docFile.name + ' (' + sizeMb + ' MB)';
+            }
+        });
+    }
+
     var registerForm = document.getElementById('registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', function (e) {
@@ -235,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var emailInput = document.getElementById('regEmail');
             var passwordInput = document.getElementById('regPassword');
             var confirmPasswordInput = document.getElementById('regConfirmPassword');
+            var docFileInput = document.getElementById('regDocument');
 
             var valName = (fullnameInput && fullnameInput.value) ? fullnameInput.value.trim() : '';
             var valUser = (usernameInput && usernameInput.value) ? usernameInput.value.trim() : '';
@@ -268,6 +349,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (valPass !== valConfirm) {
                 sMsg += "\nKonfirmasi kata sandi tidak cocok.";
+            }
+
+            if (docFileInput && docFileInput.files && docFileInput.files[0]) {
+                var docCheck = isValidDocumentFile(docFileInput.files[0]);
+                if (docCheck !== true) {
+                    sMsg += "\n" + docCheck;
+                }
             }
 
             if (sMsg !== '') {

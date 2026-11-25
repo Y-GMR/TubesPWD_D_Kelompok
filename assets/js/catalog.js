@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var categoryPills = document.querySelectorAll('.category-pill');
     var merchantCards = document.querySelectorAll('.merchant-main-card');
     var searchInput = document.querySelector('.catalog-search-input');
+    if (searchInput && !searchInput.placeholder) {
+        searchInput.placeholder = 'Cari makanan, resto, atau lokasi pengambilan';
+    }
     var searchForm = document.querySelector('.catalog-search-form');
     var emptyState = document.getElementById('catalogEmptyState');
     var isViews = window.location.pathname.indexOf('/views/') !== -1;

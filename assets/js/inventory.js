@@ -59,6 +59,9 @@
 
     function initInventoryFilters() {
         var searchInput = document.getElementById("invSearchInput");
+        if (searchInput && !searchInput.placeholder) {
+            searchInput.placeholder = "Cari nama makanan atau kategori...";
+        }
         var categorySelect = document.getElementById("invCategorySelect");
         var filterPills = document.querySelectorAll(".inv-pill");
         var cards = document.querySelectorAll(".inventory-card");
@@ -147,15 +150,30 @@
 
         if (btnMinus && stockInput) {
             btnMinus.addEventListener("click", function () {
-                var val = parseInt(stockInput.value, 10) || 0;
+                var val = parseInt(stockInput.value, 10);
+                if (isNaN(val)) val = 0;
                 if (val > 0) stockInput.value = val - 1;
             });
         }
 
         if (btnPlus && stockInput) {
             btnPlus.addEventListener("click", function () {
-                var val = parseInt(stockInput.value, 10) || 0;
-                stockInput.value = val + 1;
+                var val = parseInt(stockInput.value, 10);
+                if (isNaN(val)) val = 0;
+                if (val < 999) stockInput.value = val + 1;
+            });
+        }
+
+        if (stockInput) {
+            stockInput.addEventListener("input", function () {
+                var cleanVal = this.value.replace(/[^0-9]/g, "");
+                if (cleanVal !== "") {
+                    var parsed = parseInt(cleanVal, 10);
+                    if (parsed > 999) cleanVal = "999";
+                }
+                if (this.value !== cleanVal) {
+                    this.value = cleanVal;
+                }
             });
         }
 
@@ -177,7 +195,13 @@
         if (btnSave) {
             btnSave.addEventListener("click", function () {
                 if (!currentActiveBtn || !stockInput) return;
-                var newStock = parseInt(stockInput.value, 10) || 0;
+                var rawStock = stockInput.value.trim();
+                var newStock = parseInt(rawStock, 10);
+                if (!/^\d+$/.test(rawStock) || isNaN(newStock) || newStock < 0 || newStock > 999) {
+                    alert("Jumlah stok harus berupa angka antara 0 sampai 999.");
+                    stockInput.focus();
+                    return;
+                }
                 currentActiveBtn.setAttribute("data-stock", newStock);
 
                 var card = currentActiveBtn.closest(".inventory-card");

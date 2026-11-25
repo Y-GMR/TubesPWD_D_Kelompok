@@ -147,6 +147,10 @@
     };
 
     function initFoodDetail() {
+        var searchInput = document.querySelector('.catalog-search-input');
+        if (searchInput && !searchInput.placeholder) {
+            searchInput.placeholder = 'Cari makanan, resto, atau lokasi pengambilan';
+        }
         var urlParams = new URLSearchParams(window.location.search);
         var itemKey = urlParams.get('item') || 'donat-glaze';
         var data = foodDatabase[itemKey] || foodDatabase['donat-glaze'];

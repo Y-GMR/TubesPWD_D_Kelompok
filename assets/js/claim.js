@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var filterPills = document.querySelectorAll('.claim-pill');
     var searchInput = document.getElementById('claimSearchInput');
+    if (searchInput && !searchInput.placeholder) {
+        searchInput.placeholder = 'Cari nomor klaim atau nama...';
+    }
     var tableBody = document.getElementById('claimsTableBody');
     var emptyRow = document.getElementById('claimEmptyRow');
 
@@ -36,6 +39,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var proofTime = document.getElementById('proofTime');
 
     var voucherCodeInput = document.getElementById('voucherCodeInput');
+    if (voucherCodeInput && !voucherCodeInput.placeholder) {
+        voucherCodeInput.placeholder = 'Masukkan kode voucher konsumen (contoh: #TRX-2026-104 atau TRX-8821)...';
+    }
     var btnVerifyVoucher = document.getElementById('btnVerifyVoucher');
 
     function updateMetrics() {

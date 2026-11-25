@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', function () {
     var catIdInput = document.getElementById('catIdInput');
     var catNameInput = document.getElementById('catNameInput');
     var catDescInput = document.getElementById('catDescInput');
+    if (catNameInput && !catNameInput.placeholder) {
+        catNameInput.placeholder = 'Contoh: Roti & Kue';
+    }
+    if (catDescInput && !catDescInput.placeholder) {
+        catDescInput.placeholder = 'Tuliskan deskripsi singkat kelompok makanan ini...';
+    }
     var btnSubmitCategory = document.getElementById('btnSubmitCategory');
     var btnCancelEdit = document.getElementById('btnCancelEdit');
     var categoriesTableBody = document.getElementById('categoriesTableBody');

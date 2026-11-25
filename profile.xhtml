@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pengaturan Profil - Pangkalan Pangan</title>
     <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=6" />
-    <link rel="stylesheet" type="text/css" href="assets/css/profile.css?v=6" />
+    <link rel="stylesheet" type="text/css" href="assets/css/profile.css?v=7" />
 </head>
 <body>
 
@@ -55,7 +55,7 @@
                                 </li>
                                 <li class="profile-status-item">
                                     <span class="status-item-label">Status Kelayakan SKTM</span>
-                                    <span class="status-item-val val-green">-</span>
+                                    <span class="status-item-val val-green" id="profileSktmStatusVal">-</span>
                                 </li>
                                 <li class="profile-status-item">
                                     <span class="status-item-label">Sisa Kuota Hari Ini</span>
@@ -83,33 +83,48 @@
                             <hr class="profile-divider" />
 
                             <form action="actions/auth_profile_update.php" method="post" enctype="multipart/form-data" class="profile-edit-form" id="profileEditForm">
-                                <input type="file" id="profilePhotoInput" name="foto_profil" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+                                <div>
+                                    <input type="file" id="profilePhotoInput" name="foto_profil" accept="image/jpeg,image/png,image/webp" style="display: none;" />
+                                </div>
                                 <div class="form-group-full">
                                     <label for="inputNamaLengkap" class="profile-form-label">Nama Lengkap</label>
-                                    <input type="text" id="inputNamaLengkap" name="nama_lengkap" class="profile-form-input" placeholder="Nama Lengkap" />
+                                    <input type="text" id="inputNamaLengkap" name="nama_lengkap" class="profile-form-input" />
                                 </div>
 
                                 <div class="form-row-2col">
                                     <div class="form-group-col">
                                         <label for="inputUsername" class="profile-form-label">Nama Pengguna (Username)</label>
-                                        <input type="text" id="inputUsername" name="username" class="profile-form-input" placeholder="Nama Pengguna (Username)" />
+                                        <input type="text" id="inputUsername" name="username" class="profile-form-input" />
                                         <span class="form-success-hint" id="usernameStatusHint" style="display: none;">&#10003; Username terverifikasi &amp; tersedia</span>
                                     </div>
                                     <div class="form-group-col">
                                         <label for="inputEmail" class="profile-form-label">Alamat Email</label>
-                                        <input type="email" id="inputEmail" name="email" class="profile-form-input" placeholder="Alamat Email" />
+                                        <input type="text" id="inputEmail" name="email" class="profile-form-input" />
                                     </div>
                                 </div>
 
                                 <div class="form-row-2col">
                                     <div class="form-group-col">
                                         <label for="inputPasswordBaru" class="profile-form-label">Kata Sandi Baru (Opsional)</label>
-                                        <input type="password" id="inputPasswordBaru" name="password_baru" class="profile-form-input" placeholder="Kosongkan jika tidak ingin mengubah sandi" />
+                                        <input type="password" id="inputPasswordBaru" name="password_baru" class="profile-form-input" />
                                     </div>
                                     <div class="form-group-col">
                                         <label for="inputKonfirmasiSandi" class="profile-form-label">Konfirmasi Kata Sandi Baru</label>
-                                        <input type="password" id="inputKonfirmasiSandi" name="konfirmasi_sandi" class="profile-form-input" placeholder="Ulangi kata sandi baru" />
+                                        <input type="password" id="inputKonfirmasiSandi" name="konfirmasi_sandi" class="profile-form-input" />
                                     </div>
+                                </div>
+
+                                <div class="form-group-full">
+                                    <label for="inputDokumenKelayakan" class="profile-form-label">Dokumen Kelayakan Penerima Manfaat (SKTM / KKS)</label>
+                                    <div class="profile-doc-upload-box">
+                                        <input type="file" id="inputDokumenKelayakan" name="dokumen_kelayakan" accept="application/pdf,image/jpeg,image/png" class="profile-doc-file-input" />
+                                        <span class="profile-doc-file-name" id="profileDocFileName">Belum ada berkas baru dipilih (PDF, JPG, atau PNG maks. 2MB)</span>
+                                        <div class="profile-doc-preview-wrap" id="profileDocPreviewWrap" style="display: none;">
+                                            <img src="assets/images/avatar_consumer.png" alt="Pratinjau Dokumen Kelayakan" class="profile-doc-preview-img" id="profileDocPreviewImg" style="display: none;" />
+                                            <span class="profile-doc-pdf-badge" id="profileDocPdfBadge" style="display: none;"></span>
+                                        </div>
+                                    </div>
+                                    <span class="profile-doc-hint">Unggah foto atau pindai dokumen SKTM/KKS untuk proses verifikasi kelayakan akun oleh admin.</span>
                                 </div>
 
                                 <div class="profile-form-bottom-bar">
@@ -159,5 +174,6 @@
     </div>
 
     <script type="text/javascript" src="assets/js/image_preview.js"></script>
+    <script type="text/javascript" src="assets/js/profile.js?v=1"></script>
 </body>
 </html>

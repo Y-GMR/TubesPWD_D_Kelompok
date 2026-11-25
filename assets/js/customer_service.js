@@ -84,16 +84,64 @@
         });
     }
 
+    function applyPlaceholders() {
+        var placeholderMap = [
+            { id: "emailInput", text: "nama@posko.id" },
+            { id: "nameInput", text: "Nama lengkap sesuai KTP / profil" },
+            { id: "phoneInput", text: "0812-xxxx-xxxx (dapat dihubungi jika butuh klarifikasi cepat)" },
+            { id: "trxCodeInput", text: "Contoh: #PP-20261122-001 (Kosongkan jika bukan mengenai klaim)" },
+            { id: "subjectInput", text: "Ringkasan kendala Anda dalam satu kalimat" },
+            { id: "messageTextarea", text: "Jelaskan kendala Anda secara rinci, termasuk waktu kejadian, nama posko donatur, dan bantuan yang diharapkan..." },
+            { id: "ticketSearchInput", text: "Cari nomor tiket atau kata kunci..." }
+        ];
+        for (var i = 0; i < placeholderMap.length; i++) {
+            var el = document.getElementById(placeholderMap[i].id);
+            if (el && !el.placeholder) {
+                el.placeholder = placeholderMap[i].text;
+            }
+        }
+    }
+
     function initTicketForm() {
         var form = document.getElementById("csTicketForm");
         if (!form) return;
 
         form.addEventListener("submit", function (e) {
+            var emailInput = document.getElementById("emailInput");
+            var nameInput = document.getElementById("nameInput");
             var subjectInput = document.getElementById("subjectInput");
             var topicSelect = document.getElementById("topicSelect");
             var msgArea = document.getElementById("messageTextarea");
 
             if (!subjectInput || !topicSelect || !msgArea) return;
+
+            var errors = [];
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (emailInput && !emailInput.readOnly) {
+                var emailVal = emailInput.value.trim();
+                if (!emailVal || !emailPattern.test(emailVal)) {
+                    errors.push("Alamat surel aktif wajib diisi dengan format yang valid.");
+                }
+            }
+            if (nameInput && !nameInput.readOnly && !nameInput.value.trim()) {
+                errors.push("Nama lengkap wajib diisi.");
+            }
+            if (!topicSelect.value.trim()) {
+                errors.push("Topik bantuan wajib dipilih.");
+            }
+            if (!subjectInput.value.trim()) {
+                errors.push("Judul atau subjek tiket wajib diisi.");
+            }
+            if (!msgArea.value.trim()) {
+                errors.push("Rincian masalah atau pesan pengaduan wajib diisi.");
+            }
+
+            if (errors.length > 0) {
+                alert(errors.join("\n"));
+                e.preventDefault();
+                return;
+            }
 
             var newTicket = {
                 id: "#CS-20261125-" + Math.floor(100 + Math.random() * 900),
@@ -166,6 +214,7 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         applyUserRole();
+        applyPlaceholders();
         initNavbarDropdown();
         initFileUpload();
         initTicketForm();
