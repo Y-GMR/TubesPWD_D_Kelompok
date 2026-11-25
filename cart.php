@@ -205,4 +205,13 @@ if ($conn && !empty($_SESSION['cart'])) {
         }
     }
 }
+
+// Periksa kelayakan tombol checkout
+$melebihi_kuota = ($sudah_diklaim_hari_ini + $total_porsi_keranjang > $kuota_harian_maks);
+$bisa_checkout = (!empty($daftar_item_keranjang) && !$stok_bermasalah && !$melebihi_kuota && $status_verifikasi === 'disetujui');
+
+$page_title = 'Keranjang Klaim Pangan - Pangkalan Pangan';
+$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+require_once 'includes/header.php';
+require_once 'includes/navbar.php';
 ?>
