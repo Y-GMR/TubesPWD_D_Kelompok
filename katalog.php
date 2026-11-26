@@ -107,9 +107,8 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan(array(), $map_error);
 
 $page_title = 'Pangkalan Pangan - Katalog Makanan';
-$body_attrs = 'data-auth="' . (is_logged_in() ? 'true' : 'false') . '"';
 $extra_css = array('components.css?v=6', 'catalog.css?v=6');
-$extra_js = array('crud1_navbar.js?v=1');
+$extra_js = array('crud1_navbar.js?v=1', 'crud1_catalog.js?v=1');
 
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -149,7 +148,7 @@ require_once 'includes/navbar.php';
                 <form action="katalog.php#katalog" method="get" class="catalog-search-form">
                     <div style="display: flex; align-items: center; width: 100%;">
                         <img src="assets/images/icon_search.svg" alt="Ikon Cari" class="search-icon-img" />
-                        <input type="text" id="inputSearch" name="q" class="catalog-search-input" placeholder="Cari makanan, resto, atau lokasi pengambilan" value="<?php echo escapeHtml($kata_kunci); ?>" />
+                        <input type="text" id="inputSearch" name="q" class="catalog-search-input" value="<?php echo escapeHtml($kata_kunci); ?>" />
                         <?php if ($kategori_id > 0): ?>
                             <input type="hidden" name="kategori_id" value="<?php echo escapeHtml((string) $kategori_id); ?>" />
                         <?php endif; ?>

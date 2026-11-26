@@ -168,7 +168,7 @@ function crud1ParseKedaluwarsa($input) {
 }
 
 /**
- * Memformat nilai DATETIME MySQL ke format input HTML datetime-local.
+ * Memformat nilai DATETIME MySQL ke format teks YYYY-MM-DD HH:MM.
  */
 function crud1FormatKedaluwarsaInput($datetime_str) {
     $teks = trim((string) $datetime_str);
@@ -179,7 +179,7 @@ function crud1FormatKedaluwarsaInput($datetime_str) {
     if ($ts === false) {
         return '';
     }
-    return date('Y-m-d\TH:i', $ts);
+    return date('Y-m-d H:i', $ts);
 }
 
 /**

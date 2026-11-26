@@ -38,7 +38,7 @@ $val_alamat = ($is_edit && isset($item_edit['alamat_ambil'])) ? (string) $item_e
 $val_lat = ($is_edit && $item_edit['latitude_ambil'] !== null) ? (string) $item_edit['latitude_ambil'] : '';
 $val_lng = ($is_edit && $item_edit['longitude_ambil'] !== null) ? (string) $item_edit['longitude_ambil'] : '';
 
-$default_kedaluwarsa = date('Y-m-d\TH:i', time() + 4 * 3600);
+$default_kedaluwarsa = date('Y-m-d H:i', time() + 4 * 3600);
 $val_kedaluwarsa = $is_edit
     ? crud1FormatKedaluwarsaInput($item_edit['kedaluwarsa_pada'])
     : $default_kedaluwarsa;
@@ -72,9 +72,8 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan(array(), $map_error);
 
 $page_title = ($is_edit ? 'Ubah Data Makanan' : 'Donasi Makanan Baru') . ' - Pangkalan Pangan';
-$body_attrs = 'data-auth="true"';
 $extra_css = array('components.css', 'catalog.css');
-$extra_js = array('geolocation.js', 'image_preview.js', 'crud1_navbar.js?v=1', 'crud1_add_food.js?v=1');
+$extra_js = array('geolocation.js', 'image_preview.js', 'crud1_navbar.js?v=1', 'crud1_add_food.js?v=2');
 
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -115,13 +114,13 @@ require_once 'includes/navbar.php';
 
                         <div class="form-group">
                             <label for="inputFoodName" class="form-label">Nama Makanan *</label>
-                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" placeholder="Contoh: Paket Nasi Ayam Crispy" required="required" value="<?php echo escapeHtml($val_nama); ?>" />
+                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" value="<?php echo escapeHtml($val_nama); ?>" />
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="selectCategory" class="form-label">Kategori *</label>
-                                <select id="selectCategory" name="kategori_id" class="form-control" required="required">
+                                <select id="selectCategory" name="kategori_id" class="form-control">
                                     <?php if (empty($daftar_kategori)): ?>
                                         <option value="0">Belum ada kategori</option>
                                     <?php else: ?>
@@ -136,24 +135,24 @@ require_once 'includes/navbar.php';
                             </div>
                             <div class="form-group">
                                 <label for="inputPortion" class="form-label">Jumlah Porsi *</label>
-                                <input type="number" id="inputPortion" name="stok" class="form-control" min="<?php echo $is_edit ? '0' : '1'; ?>" max="9999" placeholder="10" required="required" value="<?php echo escapeHtml($val_stok); ?>" />
+                                <input type="text" id="inputPortion" name="stok" class="form-control" value="<?php echo escapeHtml($val_stok); ?>" />
                             </div>
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="inputPrice" class="form-label">Harga per Porsi (Rp, 0 = Gratis) *</label>
-                                <input type="number" id="inputPrice" name="harga" class="form-control" min="0" max="100000000" step="500" placeholder="0" required="required" value="<?php echo escapeHtml($val_harga); ?>" />
+                                <input type="text" id="inputPrice" name="harga" class="form-control" value="<?php echo escapeHtml($val_harga); ?>" />
                             </div>
                             <div class="form-group">
-                                <label for="inputExpiryTime" class="form-label">Batas Kedaluwarsa / Pengambilan</label>
-                                <input type="datetime-local" id="inputExpiryTime" name="kedaluwarsa_pada" class="form-control" value="<?php echo escapeHtml($val_kedaluwarsa); ?>" />
+                                <label for="inputExpiryTime" class="form-label">Batas Kedaluwarsa (YYYY-MM-DD HH:MM)</label>
+                                <input type="text" id="inputExpiryTime" name="kedaluwarsa_pada" class="form-control" value="<?php echo escapeHtml($val_kedaluwarsa); ?>" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="textareaNotes" class="form-label">Catatan, Deskripsi &amp; Alergen</label>
-                            <textarea id="textareaNotes" name="deskripsi" class="form-control form-control-textarea" rows="4" cols="50" placeholder="Tuliskan komposisi makanan, alergen, atau catatan kemasan..."><?php echo escapeHtml($val_deskripsi); ?></textarea>
+                            <textarea id="textareaNotes" name="deskripsi" class="form-control form-control-textarea" rows="4" cols="50"><?php echo escapeHtml($val_deskripsi); ?></textarea>
                         </div>
                     </div>
 
@@ -165,7 +164,7 @@ require_once 'includes/navbar.php';
 
                         <div class="form-group">
                             <label for="inputAddress" class="form-label">Alamat Gerai *</label>
-                            <input type="text" id="inputAddress" name="alamat_ambil" class="form-control" placeholder="Contoh: Jl. Jend. Sudirman No. 54, Yogyakarta" required="required" value="<?php echo escapeHtml($val_alamat); ?>" />
+                            <input type="text" id="inputAddress" name="alamat_ambil" class="form-control" value="<?php echo escapeHtml($val_alamat); ?>" />
                         </div>
 
                         <button type="button" id="btnDetectLocation" class="btn-detect-gps-full btn-detect-gps">Perbarui Lokasi GPS</button>
@@ -203,7 +202,7 @@ require_once 'includes/navbar.php';
                             <div class="photo-dropzone-hint">JPG, PNG, atau WEBP (Maks. 2MB)</div>
                         </div>
 
-                        <input type="file" id="foodPhotoInput" name="foto_makanan" accept="image/jpeg,image/png,image/webp" class="image-preview-input form-file-hidden" data-preview-target="#foodImagePreview" />
+                        <input type="file" id="foodPhotoInput" name="foto_makanan" accept="image/jpeg,image/png,image/webp" class="form-file-hidden" />
 
                         <div class="photo-preview-wrap">
                             <div class="photo-preview-box">
@@ -244,7 +243,7 @@ require_once 'includes/navbar.php';
                         <hr class="summary-divider" />
 
                         <label class="summary-checkbox-wrap">
-                            <input type="checkbox" name="konfirmasi_higienis" required="required" checked="checked" />
+                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" checked="checked" />
                             <span>Saya menjamin makanan dalam kondisi higienis dan layak konsumsi.</span>
                         </label>
 

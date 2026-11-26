@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var btnCancelEdit = document.getElementById('btnCancelEdit');
     var categoriesTableBody = document.getElementById('categoriesTableBody');
 
+    if (catNameInput && !catNameInput.placeholder) {
+        catNameInput.placeholder = 'Contoh: Roti & Kue';
+    }
+    if (catDescInput && !catDescInput.placeholder) {
+        catDescInput.placeholder = 'Tuliskan deskripsi singkat kelompok makanan ini...';
+    }
+
     function resetForm() {
         if (catActionInput) catActionInput.value = 'create';
         if (catIdInput) catIdInput.value = '';
@@ -25,10 +32,18 @@ document.addEventListener('DOMContentLoaded', function () {
     if (categoryForm) {
         categoryForm.addEventListener('submit', function (e) {
             var name = catNameInput ? catNameInput.value.trim() : '';
-            if (name.length < 2) {
+            var desc = catDescInput ? catDescInput.value.trim() : '';
+
+            if (name.length < 2 || name.length > 100) {
                 e.preventDefault();
-                window.alert('Nama kategori wajib diisi minimal 2 karakter.');
+                window.alert('Nama kategori wajib diisi antara 2 hingga 100 karakter.');
                 if (catNameInput) catNameInput.focus();
+                return;
+            }
+            if (desc.length > 500) {
+                e.preventDefault();
+                window.alert('Deskripsi kategori maksimal 500 karakter.');
+                if (catDescInput) catDescInput.focus();
             }
         });
     }
@@ -44,9 +59,17 @@ document.addEventListener('DOMContentLoaded', function () {
             var target = e.target;
 
             if (target.classList.contains('btn-cat-edit')) {
-                var id = target.getAttribute('data-id') || '';
-                var name = target.getAttribute('data-name') || '';
-                var desc = target.getAttribute('data-desc') || '';
+                var row = target.closest('tr');
+                if (!row) return;
+
+                var idElem = row.querySelector('.col-cat-id');
+                var nameElem = row.querySelector('.col-cat-name');
+                var descElem = row.querySelector('.col-cat-desc');
+
+                var id = idElem ? idElem.textContent.replace('#', '').trim() : '';
+                var name = nameElem ? nameElem.textContent.trim() : '';
+                var desc = descElem ? descElem.textContent.trim() : '';
+                if (desc === '-') desc = '';
 
                 if (catActionInput) catActionInput.value = 'update';
                 if (catIdInput) catIdInput.value = id;
@@ -73,7 +96,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var deleteForms = categoriesTableBody.querySelectorAll('.form-cat-delete');
         deleteForms.forEach(function (form) {
             form.addEventListener('submit', function (e) {
-                var catName = form.getAttribute('data-name') || 'kategori ini';
+                var row = form.closest('tr');
+                var nameElem = row ? row.querySelector('.col-cat-name') : null;
+                var catName = nameElem ? nameElem.textContent.trim() : 'kategori ini';
                 var confirmed = window.confirm('Apakah Anda yakin ingin menghapus kategori "' + catName + '"?');
                 if (!confirmed) {
                     e.preventDefault();

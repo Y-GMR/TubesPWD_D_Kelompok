@@ -41,9 +41,8 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);
 
 $page_title = 'Kelola Kategori Makanan - Pangkalan Pangan';
-$body_attrs = 'data-auth="true"';
 $extra_css = array('components.css?v=9', 'manage_categories.css?v=1');
-$extra_js = array('crud1_navbar.js?v=1', 'crud1_categories.js?v=1');
+$extra_js = array('crud1_navbar.js?v=1', 'crud1_categories.js?v=2');
 
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -87,12 +86,12 @@ require_once 'includes/navbar.php';
 
                                 <div class="cat-form-group">
                                     <label for="catNameInput" class="cat-form-label">Nama Kategori *</label>
-                                    <input type="text" id="catNameInput" name="nama_kategori" class="cat-form-input" placeholder="Contoh: Roti &amp; Kue" required="required" value="<?php echo escapeHtml($form_name_val); ?>" />
+                                    <input type="text" id="catNameInput" name="nama_kategori" class="cat-form-input" value="<?php echo escapeHtml($form_name_val); ?>" />
                                 </div>
 
                                 <div class="cat-form-group">
                                     <label for="catDescInput" class="cat-form-label">Deskripsi Kategori</label>
-                                    <textarea id="catDescInput" name="deskripsi" class="cat-form-textarea" rows="4" cols="40" placeholder="Tuliskan deskripsi singkat kelompok makanan ini..."><?php echo escapeHtml($form_desc_val); ?></textarea>
+                                    <textarea id="catDescInput" name="deskripsi" class="cat-form-textarea" rows="4" cols="40"><?php echo escapeHtml($form_desc_val); ?></textarea>
                                 </div>
 
                                 <div class="cat-form-actions">
@@ -128,7 +127,7 @@ require_once 'includes/navbar.php';
                                             $desc_teks = (isset($kat['deskripsi']) && trim((string) $kat['deskripsi']) !== '') ? (string) $kat['deskripsi'] : '-';
                                             $desc_asli = isset($kat['deskripsi']) ? (string) $kat['deskripsi'] : '';
                                             ?>
-                                            <tr data-id="<?php echo escapeHtml((string) $kat_id); ?>" data-count="<?php echo escapeHtml((string) $jumlah_menu); ?>">
+                                            <tr>
                                                 <td class="col-cat-id">#<?php echo escapeHtml((string) $kat_id); ?></td>
                                                 <td class="col-cat-name"><?php echo escapeHtml($kat['nama_kategori']); ?></td>
                                                 <td class="col-cat-desc"><?php echo escapeHtml($desc_teks); ?></td>
@@ -141,16 +140,12 @@ require_once 'includes/navbar.php';
                                                 </td>
                                                 <td>
                                                     <div class="cat-actions-cell">
-                                                        <button type="button"
-                                                                class="btn-cat-edit"
-                                                                data-id="<?php echo escapeHtml((string) $kat_id); ?>"
-                                                                data-name="<?php echo escapeHtml($kat['nama_kategori']); ?>"
-                                                                data-desc="<?php echo escapeHtml($desc_asli); ?>">Ubah</button>
+                                                        <button type="button" class="btn-cat-edit">Ubah</button>
 
                                                         <?php if ($jumlah_menu > 0): ?>
                                                             <button type="button" class="btn-cat-delete-disabled" title="Kategori tidak dapat dihapus karena masih memiliki makanan">Hapus</button>
                                                         <?php else: ?>
-                                                            <form action="actions/crud1_category.php" method="post" class="form-cat-delete" data-name="<?php echo escapeHtml($kat['nama_kategori']); ?>">
+                                                            <form action="actions/crud1_category.php" method="post" class="form-cat-delete">
                                                                 <div>
                                                                     <input type="hidden" name="action" value="delete" />
                                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $kat_id); ?>" />

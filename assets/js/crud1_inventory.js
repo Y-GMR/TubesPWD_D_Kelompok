@@ -1,8 +1,26 @@
 (function () {
     'use strict';
 
+    function getCardStatus(card) {
+        if (card.classList.contains('inv-status-available')) return 'available';
+        if (card.classList.contains('inv-status-low')) return 'low';
+        if (card.classList.contains('inv-status-closed')) return 'closed';
+        return '';
+    }
+
+    function getPillFilter(pill) {
+        if (pill.classList.contains('inv-filter-available')) return 'available';
+        if (pill.classList.contains('inv-filter-low')) return 'low';
+        if (pill.classList.contains('inv-filter-closed')) return 'closed';
+        return 'all';
+    }
+
     function initInventoryFilters() {
         var searchInput = document.getElementById('invSearchInput');
+        if (searchInput && !searchInput.placeholder) {
+            searchInput.placeholder = 'Cari nama makanan atau kategori...';
+        }
+
         var categorySelect = document.getElementById('invCategorySelect');
         var filterPills = document.querySelectorAll('.inv-pill');
         var cards = document.querySelectorAll('.inventory-card');
@@ -22,8 +40,9 @@
 
             for (var i = 0; i < cards.length; i++) {
                 var card = cards[i];
-                var status = card.getAttribute('data-status') || '';
-                var cat = card.getAttribute('data-category') || '';
+                var status = getCardStatus(card);
+                var catEl = card.querySelector('.inv-cat-value');
+                var cat = catEl ? catEl.textContent.trim() : '';
                 var text = (card.textContent || '').toLowerCase();
 
                 var statusOk = (currentStatus === 'all' || status === currentStatus);
@@ -63,7 +82,7 @@
                     filterPills[j].classList.remove('active');
                 }
                 this.classList.add('active');
-                currentStatus = this.getAttribute('data-status-filter') || 'all';
+                currentStatus = getPillFilter(this);
                 runFilter();
             });
         }
@@ -71,6 +90,7 @@
 
     function initStockModal() {
         var overlay = document.getElementById('stockModalOverlay');
+        var modalForm = document.getElementById('stockModalForm');
         var modalTitle = document.getElementById('modalItemTitle');
         var itemIdInput = document.getElementById('modalItemIdInput');
         var stockInput = document.getElementById('inputStockVal');
@@ -81,9 +101,15 @@
         document.addEventListener('click', function (e) {
             var target = e.target;
             if (target && target.classList.contains('btn-open-stock-modal')) {
-                var id = target.getAttribute('data-id') || '';
-                var title = target.getAttribute('data-title') || 'Makanan';
-                var stock = parseInt(target.getAttribute('data-stock'), 10);
+                var card = target.closest('.inventory-card');
+                if (!card) return;
+
+                var id = card.id ? card.id.replace('inv-card-', '').trim() : '';
+                var titleEl = card.querySelector('.inv-item-title');
+                var stockEl = card.querySelector('.stock-badge-val');
+                var title = titleEl ? titleEl.textContent.trim() : 'Makanan';
+                var stockRaw = stockEl ? stockEl.textContent.replace(/[^0-9]/g, '') : '0';
+                var stock = parseInt(stockRaw, 10);
                 if (isNaN(stock) || stock < 0) stock = 0;
 
                 if (itemIdInput) itemIdInput.value = id;
@@ -93,17 +119,44 @@
             }
         });
 
+        if (stockInput) {
+            stockInput.addEventListener('input', function () {
+                var cleaned = this.value.replace(/[^0-9]/g, '');
+                if (cleaned !== '') {
+                    var parsed = parseInt(cleaned, 10);
+                    if (parsed > 9999) cleaned = '9999';
+                }
+                if (this.value !== cleaned) {
+                    this.value = cleaned;
+                }
+            });
+        }
+
         if (btnMinus && stockInput) {
             btnMinus.addEventListener('click', function () {
-                var val = parseInt(stockInput.value, 10) || 0;
+                var val = parseInt(stockInput.value, 10);
+                if (isNaN(val)) val = 0;
                 if (val > 0) stockInput.value = val - 1;
             });
         }
 
         if (btnPlus && stockInput) {
             btnPlus.addEventListener('click', function () {
-                var val = parseInt(stockInput.value, 10) || 0;
+                var val = parseInt(stockInput.value, 10);
+                if (isNaN(val)) val = 0;
                 if (val < 9999) stockInput.value = val + 1;
+            });
+        }
+
+        if (modalForm) {
+            modalForm.addEventListener('submit', function (e) {
+                var raw = stockInput ? stockInput.value.trim() : '';
+                var num = parseInt(raw, 10);
+                if (!/^\d+$/.test(raw) || isNaN(num) || num < 0 || num > 9999) {
+                    e.preventDefault();
+                    window.alert('Nilai stok harus berupa bilangan bulat antara 0 hingga 9999.');
+                    if (stockInput) stockInput.focus();
+                }
             });
         }
 
@@ -128,11 +181,17 @@
         });
     }
 
+    function getCardTitle(formEl) {
+        var card = formEl.closest('.inventory-card');
+        var titleEl = card ? card.querySelector('.inv-item-title') : null;
+        return titleEl ? titleEl.textContent.trim() : 'makanan ini';
+    }
+
     function initActionConfirmations() {
         var closeForms = document.querySelectorAll('.form-inv-close');
         closeForms.forEach(function (form) {
             form.addEventListener('submit', function (e) {
-                var title = form.getAttribute('data-title') || 'makanan ini';
+                var title = getCardTitle(form);
                 if (!window.confirm('Tutup donasi untuk "' + title + '" (stok akan disetel menjadi 0)?')) {
                     e.preventDefault();
                 }
@@ -142,7 +201,7 @@
         var deleteForms = document.querySelectorAll('.form-inv-delete');
         deleteForms.forEach(function (form) {
             form.addEventListener('submit', function (e) {
-                var title = form.getAttribute('data-title') || 'makanan ini';
+                var title = getCardTitle(form);
                 if (!window.confirm('Apakah Anda yakin ingin menghapus "' + title + '" secara permanen?')) {
                     e.preventDefault();
                 }

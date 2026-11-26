@@ -78,9 +78,8 @@ if (isset($_SESSION['cart'][$item_id]['jumlah'])) {
 $sisa_boleh_klaim = max(0, $stok_int - $qty_di_keranjang);
 
 $page_title = $item['nama_makanan'] . ' - Rincian Makanan';
-$body_attrs = 'data-auth="' . ($is_login ? 'true' : 'false') . '"';
 $extra_css = array('components.css?v=6', 'catalog.css?v=6');
-$extra_js = array('crud1_navbar.js?v=1');
+$extra_js = array('crud1_navbar.js?v=1', 'crud1_item_detail.js?v=1');
 
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -165,12 +164,13 @@ require_once 'includes/navbar.php';
                                 Anda sudah memiliki <?php echo escapeHtml((string) $qty_di_keranjang); ?> porsi item ini di keranjang. Maksimal tambahan: <?php echo escapeHtml((string) $sisa_boleh_klaim); ?> porsi.
                             </div>
                         <?php endif; ?>
-                        <form action="cart.php" method="post">
+                        <form action="cart.php" method="post" id="formClaimFood">
                             <div class="form-group">
                                 <input type="hidden" name="aksi" value="tambah" />
                                 <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $item_id); ?>" />
+                                <input type="hidden" id="maxClaimQty" value="<?php echo escapeHtml((string) $sisa_boleh_klaim); ?>" />
                                 <label for="inputClaimQty" class="form-label">Jumlah Porsi Diklaim (Maks. <?php echo escapeHtml((string) $sisa_boleh_klaim); ?>)</label>
-                                <input type="number" id="inputClaimQty" name="jumlah" class="form-control" min="1" max="<?php echo escapeHtml((string) $sisa_boleh_klaim); ?>" value="1" required="required" />
+                                <input type="text" id="inputClaimQty" name="jumlah" class="form-control" value="1" />
                             </div>
                             <div class="form-group" style="margin-bottom: 0;">
                                 <button type="submit" class="food-modal-claim-btn">Tambah ke Keranjang</button>

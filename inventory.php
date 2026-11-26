@@ -98,9 +98,8 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);
 
 $page_title = 'Manajemen Inventaris Pangan - Pangkalan Pangan';
-$body_attrs = 'data-auth="true"';
 $extra_css = array('components.css?v=8', 'inventory.css?v=1');
-$extra_js = array('crud1_navbar.js?v=1', 'crud1_inventory.js?v=1');
+$extra_js = array('crud1_navbar.js?v=1', 'crud1_inventory.js?v=2');
 
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -155,7 +154,7 @@ require_once 'includes/navbar.php';
 
                 <div class="inventory-controls-row">
                     <div class="inv-controls-left">
-                        <input type="text" id="invSearchInput" class="inventory-search-input" placeholder="Cari nama makanan atau kategori..." />
+                        <input type="text" id="invSearchInput" class="inventory-search-input" />
                         <select id="invCategorySelect" class="inventory-category-select">
                             <option value="all">Semua Kategori</option>
                             <?php foreach ($daftar_kategori as $kat): ?>
@@ -165,10 +164,10 @@ require_once 'includes/navbar.php';
                     </div>
 
                     <div class="inv-controls-right">
-                        <button type="button" class="inv-pill active" data-status-filter="all">Semua (<?php echo escapeHtml((string) $count_semua); ?>)</button>
-                        <button type="button" class="inv-pill" data-status-filter="available">Tersedia (<?php echo escapeHtml((string) $count_tersedia); ?>)</button>
-                        <button type="button" class="inv-pill" data-status-filter="low">Stok Menipis (<?php echo escapeHtml((string) $count_menipis); ?>)</button>
-                        <button type="button" class="inv-pill" data-status-filter="closed">Ditutup (<?php echo escapeHtml((string) $count_ditutup); ?>)</button>
+                        <button type="button" class="inv-pill active inv-filter-all">Semua (<?php echo escapeHtml((string) $count_semua); ?>)</button>
+                        <button type="button" class="inv-pill inv-filter-available">Tersedia (<?php echo escapeHtml((string) $count_tersedia); ?>)</button>
+                        <button type="button" class="inv-pill inv-filter-low">Stok Menipis (<?php echo escapeHtml((string) $count_menipis); ?>)</button>
+                        <button type="button" class="inv-pill inv-filter-closed">Ditutup (<?php echo escapeHtml((string) $count_ditutup); ?>)</button>
                     </div>
                 </div>
 
@@ -195,12 +194,10 @@ require_once 'includes/navbar.php';
                             } else {
                                 $status_kartu = 'available';
                             }
-                            $card_classes = 'inventory-card' . ($stok_int <= 0 ? ' is-closed' : '');
+                            $card_classes = 'inventory-card inv-status-' . $status_kartu . ($stok_int <= 0 ? ' is-closed' : '');
                             ?>
                             <div class="<?php echo escapeHtml($card_classes); ?>"
-                                 data-category="<?php echo escapeHtml($item['nama_kategori']); ?>"
-                                 data-status="<?php echo escapeHtml($status_kartu); ?>"
-                                 data-item-id="<?php echo escapeHtml((string) $item_id); ?>">
+                                 id="inv-card-<?php echo escapeHtml((string) $item_id); ?>">
                                 <div class="inv-card-banner bg-banner-<?php echo escapeHtml((string) $banner_idx); ?>">
                                     <img src="<?php echo escapeHtml($foto_src); ?>" alt="<?php echo escapeHtml($item['nama_makanan']); ?>" class="inv-banner-img" />
                                     <span class="inv-stock-badge<?php echo ($stok_int <= 8) ? ' warning' : ''; ?> stock-badge-val">Stok: <?php echo escapeHtml((string) $stok_int); ?></span>
@@ -211,6 +208,7 @@ require_once 'includes/navbar.php';
                                     <?php endif; ?>
                                 </div>
                                 <div class="inv-card-body">
+                                    <span class="inv-cat-value" style="display: none;"><?php echo escapeHtml($item['nama_kategori']); ?></span>
                                     <h2 class="inv-item-title"><?php echo escapeHtml($item['nama_makanan']); ?></h2>
                                     <p class="inv-item-meta">Kategori: <?php echo escapeHtml($item['nama_kategori']); ?> &#8226; <?php echo escapeHtml($nama_gerai); ?></p>
                                     <p class="inv-item-price"><?php echo escapeHtml(formatRupiah($harga_int)); ?></p>
@@ -218,16 +216,13 @@ require_once 'includes/navbar.php';
 
                                     <div class="inv-card-actions">
                                         <button type="button"
-                                                class="btn-inv-manage btn-open-stock-modal"
-                                                data-id="<?php echo escapeHtml((string) $item_id); ?>"
-                                                data-title="<?php echo escapeHtml($item['nama_makanan']); ?>"
-                                                data-stock="<?php echo escapeHtml((string) $stok_int); ?>">Kelola Stok</button>
+                                                class="btn-inv-manage btn-open-stock-modal">Kelola Stok</button>
                                         <a href="add_food.php?id=<?php echo escapeHtml((string) $item_id); ?>" class="btn-inv-manage">Ubah Detail</a>
                                     </div>
 
                                     <div class="inv-card-actions" style="margin-top: 8px;">
                                         <?php if ($stok_int > 0): ?>
-                                            <form action="actions/crud1_item.php" method="post" class="form-inv-close" data-title="<?php echo escapeHtml($item['nama_makanan']); ?>" style="flex: 1; display: flex;">
+                                            <form action="actions/crud1_item.php" method="post" class="form-inv-close" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
                                                     <input type="hidden" name="action" value="tutup_donasi" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
@@ -244,7 +239,7 @@ require_once 'includes/navbar.php';
                                                     title="Tidak dapat dihapus karena makanan sudah memiliki riwayat klaim"
                                                     style="flex: 1;">Terkunci (Klaim)</button>
                                         <?php else: ?>
-                                            <form action="actions/crud1_item.php" method="post" class="form-inv-delete" data-title="<?php echo escapeHtml($item['nama_makanan']); ?>" style="flex: 1; display: flex;">
+                                            <form action="actions/crud1_item.php" method="post" class="form-inv-delete" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
                                                     <input type="hidden" name="action" value="delete" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
@@ -277,7 +272,7 @@ require_once 'includes/navbar.php';
                     <p class="inv-modal-subtitle">Perbarui jumlah porsi siap ambil untuk donasi makanan ini (setel 0 untuk menutup sementara).</p>
                     <div class="inv-modal-stepper">
                         <button type="button" class="btn-stepper" id="btnStepMinus">&#8722;</button>
-                        <input type="number" name="stok" id="inputStockVal" class="inv-stepper-val" min="0" max="9999" value="0" required="required" />
+                        <input type="text" name="stok" id="inputStockVal" class="inv-stepper-val" value="0" />
                         <button type="button" class="btn-stepper" id="btnStepPlus">&#43;</button>
                     </div>
                     <div class="inv-modal-actions">
