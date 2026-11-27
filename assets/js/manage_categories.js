@@ -1,18 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
+    var profileDropdown = document.querySelector('.profile-consumer-dropdown');
     var profilePillBtn = document.getElementById('profilePillBtn');
-    var profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
-    if (profilePillBtn && profileDropdownMenu) {
+    if (profileDropdown && profilePillBtn) {
         profilePillBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            profileDropdownMenu.classList.toggle('show');
+            profileDropdown.classList.toggle('is-open');
         });
 
         document.addEventListener('click', function (e) {
-            if (!profileDropdownMenu.contains(e.target) && e.target !== profilePillBtn) {
-                profileDropdownMenu.classList.remove('show');
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('is-open');
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                profileDropdown.classList.remove('is-open');
             }
         });
     }
@@ -60,6 +67,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            var currentRows = categoriesTableBody.querySelectorAll('tr');
+            for (var dupIdx = 0; dupIdx < currentRows.length; dupIdx++) {
+                if (isEditing && editingRow === currentRows[dupIdx]) {
+                    continue;
+                }
+                var existingNameEl = currentRows[dupIdx].querySelector('.col-cat-name');
+                if (existingNameEl && existingNameEl.textContent.trim().toLowerCase() === name.toLowerCase()) {
+                    alert('Nama kategori "' + name + '" sudah terdaftar.');
+                    if (catNameInput) catNameInput.focus();
+                    return;
+                }
+            }
+
             if (isEditing && editingRow) {
                 var nameElem = editingRow.querySelector('.col-cat-name');
                 var descElem = editingRow.querySelector('.col-cat-desc');
@@ -76,8 +96,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 resetForm();
             } else {
-                var currentRows = categoriesTableBody.querySelectorAll('tr');
-                var nextIdNumber = currentRows.length + 1;
+                var maxIdNum = 0;
+                for (var rIdx = 0; rIdx < currentRows.length; rIdx++) {
+                    var rawIdAttr = currentRows[rIdx].getAttribute('data-id') || '';
+                    var parsedIdNum = parseInt(rawIdAttr.replace(/[^0-9]/g, ''), 10);
+                    if (!isNaN(parsedIdNum) && parsedIdNum > maxIdNum) {
+                        maxIdNum = parsedIdNum;
+                    }
+                }
+                var nextIdNumber = maxIdNum + 1;
                 var nextIdString = '#' + nextIdNumber;
 
                 var newRow = document.createElement('tr');

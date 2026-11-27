@@ -28,22 +28,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var codeEl = document.getElementById('ticketCodeText');
     if (codeEl) {
-        if (codeParam) {
-            codeEl.textContent = codeParam;
-        } else {
-            codeEl.textContent = 'TRX-8821';
-        }
+        codeEl.textContent = codeParam ? codeParam : '-';
     }
 
-    var merchantInfo = merchantsData[merchantParam] || merchantsData['dunkin'];
+    var merchantInfo = merchantParam ? (merchantsData[merchantParam] || null) : null;
 
     var placeEl = document.getElementById('ticketPlaceText');
     if (placeEl) {
-        placeEl.textContent = merchantInfo.name;
+        placeEl.textContent = merchantInfo ? merchantInfo.name : '-';
     }
 
     var deadlineEl = document.getElementById('ticketDeadlineText');
     if (deadlineEl) {
-        deadlineEl.textContent = merchantInfo.deadline;
+        deadlineEl.textContent = merchantInfo ? merchantInfo.deadline : '-';
     }
 });

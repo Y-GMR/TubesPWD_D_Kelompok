@@ -184,6 +184,26 @@
         if (modalFoodDeadline) modalFoodDeadline.textContent = data.deadline;
         if (modalFoodLocation) modalFoodLocation.textContent = data.location;
 
+        var profileDropdown = document.querySelector('.profile-consumer-dropdown');
+        var profilePillBtn = document.getElementById('profilePillBtn');
+        if (profileDropdown && profilePillBtn) {
+            profilePillBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                profileDropdown.classList.toggle('is-open');
+            });
+            document.addEventListener('click', function (e) {
+                if (!profileDropdown.contains(e.target)) {
+                    profileDropdown.classList.remove('is-open');
+                }
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' || e.keyCode === 27) {
+                    profileDropdown.classList.remove('is-open');
+                }
+            });
+        }
+
         var isGuest = (document.referrer.indexOf('index.xhtml') !== -1) ||
                       (window.location.search.indexOf('guest=true') !== -1) ||
                       (localStorage.getItem('is_authenticated') === 'false');

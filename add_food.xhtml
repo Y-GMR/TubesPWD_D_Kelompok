@@ -4,15 +4,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Donasi Makanan Baru - Pangkalan Pangan</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
     <link rel="stylesheet" type="text/css" href="assets/css/components.css" />
     <link rel="stylesheet" type="text/css" href="assets/css/catalog.css" />
 </head>
 <body data-auth="true">
     <div id="container">
 
-        <div class="header-container">
+        <div class="header-navigation">
             <div class="nav-container">
                 <a href="food_catalogue.xhtml?role=produsen" class="nav-logo-link" title="Pangkalan Pangan">
                     <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
@@ -68,14 +69,15 @@
 
                         <div class="form-group">
                             <label for="inputFoodName" class="form-label">Nama Makanan *</label>
-                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" value="Paket Super Besar 1 (Ayam Crispy + Nasi)" />
+                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" />
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="selectCategory" class="form-label">Kategori *</label>
                                 <select id="selectCategory" name="kategori" class="form-control">
-                                    <option value="ayam_daging" selected="selected">Ayam &amp; Daging Olahan</option>
+                                    <option value="" selected="selected">-- Pilih Kategori --</option>
+                                    <option value="ayam_daging">Ayam &amp; Daging Olahan</option>
                                     <option value="makanan_berat">Makanan Berat / Nasi</option>
                                     <option value="roti_kue">Roti &amp; Kue</option>
                                     <option value="sayur_buah">Sayur &amp; Buah</option>
@@ -85,24 +87,24 @@
                             </div>
                             <div class="form-group">
                                 <label for="inputPortion" class="form-label">Jumlah Porsi *</label>
-                                <input type="text" id="inputPortion" name="jumlah_porsi" class="form-control" value="10" />
+                                <input type="text" id="inputPortion" name="jumlah_porsi" class="form-control" />
                             </div>
                         </div>
 
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="inputReadyTime" class="form-label">Waktu Siap Diambil *</label>
-                                <input type="text" id="inputReadyTime" name="waktu_siap" class="form-control" value="Hari ini &#8226; 11:30 WIB" />
+                                <input type="text" id="inputReadyTime" name="waktu_siap" class="form-control" />
                             </div>
                             <div class="form-group">
                                 <label for="inputExpiryTime" class="form-label">Batas Pengambilan *</label>
-                                <input type="text" id="inputExpiryTime" name="batas_ambil" class="form-control" value="Hari ini &#8226; 15:30 WIB" />
+                                <input type="text" id="inputExpiryTime" name="batas_ambil" class="form-control" />
                             </div>
                         </div>
 
                         <div class="form-group">
                             <label for="textareaNotes" class="form-label">Catatan &amp; Alergen</label>
-                            <textarea id="textareaNotes" name="catatan" class="form-control form-control-textarea" rows="4" cols="50">Ayam goreng krispi dengan nasi putih hangat. Mengandung gluten dan rempah. Harap segera dikonsumsi sebelum batas waktu berakhir.</textarea>
+                            <textarea id="textareaNotes" name="catatan" class="form-control form-control-textarea" rows="4" cols="50"></textarea>
                         </div>
                     </div>
 
@@ -114,7 +116,7 @@
 
                         <div class="form-group">
                             <label for="inputAddress" class="form-label">Alamat Gerai *</label>
-                            <input type="text" id="inputAddress" name="alamat_gerai" class="form-control" value="KFC Sudirman, Jl. Jend. Sudirman No. 54, Yogyakarta" />
+                            <input type="text" id="inputAddress" name="alamat_gerai" class="form-control" />
                         </div>
 
                         <button type="button" id="btnDetectLocation" class="btn-detect-gps-full btn-detect-gps">Perbarui Lokasi GPS</button>
@@ -122,16 +124,16 @@
                         <div class="form-row-2col">
                             <div class="form-group">
                                 <label for="inputLatitude" class="form-label">Latitude</label>
-                                <input type="text" id="inputLatitude" name="latitude" class="form-control" readonly="readonly" value="-7.782871" />
+                                <input type="text" id="inputLatitude" name="latitude" class="form-control" readonly="readonly" />
                             </div>
                             <div class="form-group">
                                 <label for="inputLongitude" class="form-label">Longitude</label>
-                                <input type="text" id="inputLongitude" name="longitude" class="form-control" readonly="readonly" value="110.367093" />
+                                <input type="text" id="inputLongitude" name="longitude" class="form-control" readonly="readonly" />
                             </div>
                         </div>
 
                         <div class="geo-status-box">
-                            <span id="geoStatusText">Lokasi GPS berhasil terdeteksi</span>
+                            <span id="geoStatusText">Lokasi GPS belum dideteksi</span>
                         </div>
                         <div id="geoCoordinatesPreview" class="geo-preview-text" style="display: none;"></div>
                     </div>
@@ -154,9 +156,9 @@
 
                         <input type="file" id="foodPhotoInput" name="foto_makanan" accept="image/jpeg,image/png,image/webp" class="image-preview-input form-file-hidden" data-preview-target="#foodImagePreview" />
 
-                        <div class="photo-preview-wrap">
+                        <div class="photo-preview-wrap" id="foodPhotoPreviewWrap" style="display: none;">
                             <div class="photo-preview-box">
-                                <img src="assets/images/menu_ayam_crispy.png" alt="Pratinjau Foto Makanan" class="photo-preview-img" id="foodImagePreview" />
+                                <img src="assets/images/logo_sprout.svg" alt="Pratinjau Foto Makanan" class="photo-preview-img" id="foodImagePreview" />
                             </div>
                             <div class="photo-preview-footer">
                                 <span class="photo-preview-badge">Pratinjau Foto Aktif</span>
@@ -174,11 +176,11 @@
                         <div class="summary-list">
                             <div class="summary-item">
                                 <span class="summary-label">Gerai</span>
-                                <span class="summary-val" id="summaryStore">KFC Sudirman</span>
+                                <span class="summary-val" id="summaryStore">-</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Jumlah Porsi</span>
-                                <span class="summary-val" id="summaryPortion">10 Porsi</span>
+                                <span class="summary-val" id="summaryPortion">0 Porsi</span>
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Biaya</span>
@@ -186,14 +188,14 @@
                             </div>
                             <div class="summary-item">
                                 <span class="summary-label">Waktu Pengambilan</span>
-                                <span class="summary-val" id="summaryTime">11:30 - 15:30 WIB</span>
+                                <span class="summary-val" id="summaryTime">-</span>
                             </div>
                         </div>
 
                         <hr class="summary-divider" />
 
                         <label class="summary-checkbox-wrap">
-                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" checked="checked" />
+                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" />
                             <span>Saya menjamin makanan dalam kondisi higienis dan layak konsumsi.</span>
                         </label>
 
@@ -240,7 +242,7 @@
 
     <script type="text/javascript" src="assets/js/geolocation.js"></script>
     <script type="text/javascript" src="assets/js/image_preview.js"></script>
-    <script type="text/javascript" src="assets/js/catalog.js?v=20261124_0335"></script>
-    <script type="text/javascript" src="assets/js/add_food.js?v=2"></script>
+    <script type="text/javascript" src="assets/js/catalog.js?v=20261127_1945"></script>
+    <script type="text/javascript" src="assets/js/add_food.js?v=3"></script>
 </body>
 </html>

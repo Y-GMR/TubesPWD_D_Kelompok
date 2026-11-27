@@ -20,16 +20,22 @@
         var docNameEl = document.getElementById('profileDocFileName');
         var docPreviewWrap = document.getElementById('profileDocPreviewWrap');
         var docPreviewImg = document.getElementById('profileDocPreviewImg');
-        var docBadgeEl = document.getElementById('profileDocPdfBadge');
         var sktmBox = document.querySelector('.profile-sktm-verified-box');
         var sktmStatusVal = document.getElementById('profileSktmStatusVal');
+
+        function resetDocPreview() {
+            if (docNameEl) docNameEl.textContent = 'Belum ada berkas baru dipilih (PDF, JPG, atau PNG maks. 2MB)';
+            if (docPreviewWrap) docPreviewWrap.style.display = 'none';
+            if (docPreviewImg) docPreviewImg.style.display = 'none';
+            if (sktmStatusVal) sktmStatusVal.textContent = '-';
+            if (sktmBox) sktmBox.textContent = 'Status verifikasi dokumen SKTM akan tampil di sini.';
+        }
 
         if (docInput) {
             docInput.addEventListener('change', function () {
                 var file = docInput.files && docInput.files[0];
                 if (!file) {
-                    if (docNameEl) docNameEl.textContent = 'Belum ada berkas baru dipilih (PDF, JPG, atau PNG maks. 2MB)';
-                    if (docPreviewWrap) docPreviewWrap.style.display = 'none';
+                    resetDocPreview();
                     return;
                 }
 
@@ -46,12 +52,14 @@
                 if (!validExt) {
                     alert('Format dokumen kelayakan harus berupa PDF, JPG, atau PNG.');
                     docInput.value = '';
+                    resetDocPreview();
                     return;
                 }
 
                 if (file.size > 2 * 1024 * 1024) {
                     alert('Ukuran dokumen kelayakan maksimal adalah 2MB.');
                     docInput.value = '';
+                    resetDocPreview();
                     return;
                 }
 
@@ -61,17 +69,11 @@
                 }
 
                 var isPdf = lowerName.indexOf('.pdf', lowerName.length - 4) !== -1;
-                if (docPreviewWrap) {
-                    docPreviewWrap.style.display = 'flex';
-                }
                 if (isPdf) {
+                    if (docPreviewWrap) docPreviewWrap.style.display = 'none';
                     if (docPreviewImg) docPreviewImg.style.display = 'none';
-                    if (docBadgeEl) {
-                        docBadgeEl.textContent = 'Dokumen PDF siap diunggah: ' + file.name;
-                        docBadgeEl.style.display = 'inline-block';
-                    }
                 } else {
-                    if (docBadgeEl) docBadgeEl.style.display = 'none';
+                    if (docPreviewWrap) docPreviewWrap.style.display = 'flex';
                     if (docPreviewImg && window.FileReader) {
                         var reader = new FileReader();
                         reader.onload = function (ev) {

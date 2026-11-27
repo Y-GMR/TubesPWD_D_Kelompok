@@ -206,9 +206,9 @@ document.addEventListener('DOMContentLoaded', function () {
         cart.merchant = paramMerchant;
     }
 
-    var currentMerchantKey = cart.merchant || paramMerchant || 'pizzahut';
-    if (!merchantsData[currentMerchantKey]) {
-        currentMerchantKey = 'pizzahut';
+    var currentMerchantKey = cart.merchant || paramMerchant || '';
+    if (currentMerchantKey && !merchantsData[currentMerchantKey]) {
+        currentMerchantKey = '';
     }
     cart.merchant = currentMerchantKey;
 
@@ -220,36 +220,39 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    if (!hasItems) {
-        var defItems = merchantsData[currentMerchantKey].defaultItems;
-        for (var i = 0; i < defItems.length; i++) {
-            cart.items[defItems[i]] = 1;
-        }
-        saveCart(cart);
-    }
-
-    var merchantInfo = merchantsData[currentMerchantKey];
+    var merchantInfo = currentMerchantKey ? merchantsData[currentMerchantKey] : null;
 
     var logoEl = document.getElementById('merchantLogoImg');
     var mNameEl = document.getElementById('checkoutMerchantName');
     var mPoskoEl = document.getElementById('checkoutMerchantPosko');
     var mDeadlineEl = document.getElementById('checkoutDeadlineTime');
 
-    if (logoEl) {
-        var logoPath = (isViews ? '../' : '') + merchantInfo.logo;
-        logoEl.setAttribute('src', logoPath);
-        logoEl.src = logoPath;
+    if (merchantInfo) {
+        if (logoEl) {
+            var logoPath = (isViews ? '../' : '') + merchantInfo.logo;
+            logoEl.setAttribute('src', logoPath);
+            logoEl.src = logoPath;
+        }
+        if (mNameEl) mNameEl.textContent = merchantInfo.name;
+        if (mPoskoEl) mPoskoEl.textContent = merchantInfo.storeName + ' \u2022 ' + merchantInfo.distance;
+        if (mDeadlineEl) mDeadlineEl.textContent = merchantInfo.deadline;
+    } else {
+        if (logoEl) {
+            var emptyLogo = (isViews ? '../' : '') + 'assets/images/logo_sprout.svg';
+            logoEl.setAttribute('src', emptyLogo);
+            logoEl.src = emptyLogo;
+        }
+        if (mNameEl) mNameEl.textContent = '-';
+        if (mPoskoEl) mPoskoEl.textContent = '-';
+        if (mDeadlineEl) mDeadlineEl.textContent = '-';
     }
-    if (mNameEl) mNameEl.textContent = merchantInfo.name;
-    if (mPoskoEl) mPoskoEl.textContent = merchantInfo.storeName + ' \u2022 ' + merchantInfo.distance;
-    if (mDeadlineEl) mDeadlineEl.textContent = merchantInfo.deadline;
 
     var pNameEl = document.getElementById('poskoNameText');
     var pAddrEl = document.getElementById('poskoAddressText');
     var pMetaEl = document.getElementById('poskoMetaText');
 
-    if (pNameEl) pNameEl.textContent = merchantInfo.storeName;
-    if (pAddrEl) pAddrEl.textContent = merchantInfo.poskoAddr;
+    if (pNameEl) pNameEl.textContent = merchantInfo ? merchantInfo.storeName : '-';
+    if (pAddrEl) pAddrEl.textContent = merchantInfo ? merchantInfo.poskoAddr : '-';
     if (pMetaEl) {
         while (pMetaEl.firstChild) {
             pMetaEl.removeChild(pMetaEl.firstChild);
@@ -257,12 +260,12 @@ document.addEventListener('DOMContentLoaded', function () {
         pMetaEl.appendChild(document.createTextNode('Jarak: '));
         var spanDist = document.createElement('span');
         spanDist.className = 'posko-meta-orange';
-        spanDist.textContent = merchantInfo.distance;
+        spanDist.textContent = merchantInfo ? merchantInfo.distance : '-';
         pMetaEl.appendChild(spanDist);
         pMetaEl.appendChild(document.createTextNode(' dari lokasi Anda \u2022 Koordinat GPS: '));
         var spanGps = document.createElement('span');
         spanGps.className = 'posko-meta-orange';
-        spanGps.textContent = merchantInfo.gps;
+        spanGps.textContent = merchantInfo ? merchantInfo.gps : '-';
         pMetaEl.appendChild(spanGps);
     }
 
@@ -375,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
             summaryItemsEl.textContent = totalItemsCount + ' Menu Pangan (' + totalPortionsCount + ' porsi)';
         }
         if (summaryQuotaEl) {
-            summaryQuotaEl.textContent = '1 dari 2 porsi';
+            summaryQuotaEl.textContent = totalPortionsCount > 0 ? (totalPortionsCount + ' dari 5 porsi') : '-';
         }
 
         bindStepperEvents();
@@ -429,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert(successMsg);
             cart.items = {};
             saveCart(cart);
-            window.location.href = isViews ? 'food_catalogue.xhtml' : 'food_catalogue.xhtml';
+            window.location.href = 'claim_history.xhtml?code=' + encodeURIComponent(ticketCode) + '&merchant=' + encodeURIComponent(currentMerchantKey);
         });
     }
 });

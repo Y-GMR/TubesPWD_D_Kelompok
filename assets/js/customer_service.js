@@ -2,6 +2,9 @@
     "use strict";
 
     function applyUserRole() {
+        if (window.location.pathname.indexOf('.php') !== -1) {
+            return;
+        }
         var params = new URLSearchParams(window.location.search);
         var role = params.get("role");
         if (!role) {
@@ -52,17 +55,26 @@
     }
 
     function initNavbarDropdown() {
+        var dropdown = document.querySelector(".profile-consumer-dropdown");
         var btn = document.getElementById("profilePillBtn");
-        var menu = document.getElementById("profileDropdownMenu");
-        if (!btn || !menu) return;
+        if (!dropdown || !btn) return;
 
         btn.addEventListener("click", function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            menu.classList.toggle("show");
+            dropdown.classList.toggle("is-open");
         });
 
-        document.addEventListener("click", function () {
-            menu.classList.remove("show");
+        document.addEventListener("click", function (e) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove("is-open");
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" || e.keyCode === 27) {
+                dropdown.classList.remove("is-open");
+            }
         });
     }
 
@@ -143,19 +155,117 @@
                 return;
             }
 
+            var trxCodeInput = document.getElementById("trxCodeInput");
+            var trxCodeVal = trxCodeInput ? trxCodeInput.value.trim() : "";
+
             var newTicket = {
                 id: "#CS-20261125-" + Math.floor(100 + Math.random() * 900),
                 topic: topicSelect.value,
-                subject: subjectInput.value,
-                message: msgArea.value,
-                date: "25 November 2026, baru saja",
+                trxCode: trxCodeVal,
+                subject: subjectInput.value.trim(),
+                message: msgArea.value.trim(),
+                date: "Baru saja",
                 status: "pending"
             };
 
             try {
                 sessionStorage.setItem("latest_submitted_ticket", JSON.stringify(newTicket));
             } catch (err) {}
+
+            var actionUrl = form.getAttribute("action") || "";
+            if (actionUrl.indexOf(".xhtml") !== -1) {
+                e.preventDefault();
+                window.location.href = actionUrl;
+            }
         });
+    }
+
+    function renderSubmittedTicket() {
+        var listContainer = document.getElementById("ticketListContainer");
+        if (!listContainer || window.location.pathname.indexOf(".php") !== -1) return;
+
+        var rawTicket = null;
+        try {
+            rawTicket = sessionStorage.getItem("latest_submitted_ticket");
+        } catch (err) {}
+        if (!rawTicket) return;
+
+        var data = null;
+        try {
+            data = JSON.parse(rawTicket);
+        } catch (err) {}
+        if (!data || !data.id || document.querySelector('.ticket-item-card[data-ticket-id="' + data.id + '"]')) {
+            return;
+        }
+
+        var card = document.createElement("div");
+        card.className = "ticket-item-card";
+        card.setAttribute("data-status", "pending");
+        card.setAttribute("data-ticket-id", data.id);
+
+        var topLine = document.createElement("div");
+        topLine.className = "ticket-top-line";
+        var metaLeft = document.createElement("div");
+        metaLeft.className = "ticket-meta-left";
+        var idSpan = document.createElement("span");
+        idSpan.className = "ticket-id";
+        idSpan.textContent = data.id;
+        var dateSpan = document.createElement("span");
+        dateSpan.className = "ticket-date";
+        dateSpan.textContent = " \u2022 Diajukan pada: " + (data.date || "Baru saja");
+        metaLeft.appendChild(idSpan);
+        metaLeft.appendChild(dateSpan);
+
+        var badge = document.createElement("span");
+        badge.className = "ticket-badge ticket-badge-pending";
+        badge.textContent = "Menunggu Balasan";
+        topLine.appendChild(metaLeft);
+        topLine.appendChild(badge);
+
+        var topicDiv = document.createElement("div");
+        topicDiv.className = "ticket-topic";
+        topicDiv.textContent = "Topik: " + (data.topic || "-") + (data.trxCode ? " | Terkait: " + data.trxCode : "");
+
+        var subjectDiv = document.createElement("div");
+        subjectDiv.className = "ticket-subject";
+        subjectDiv.textContent = "Subjek: " + (data.subject || "-");
+
+        var msgBox = document.createElement("div");
+        msgBox.className = "ticket-msg-box";
+        var msgLabel = document.createElement("div");
+        msgLabel.className = "ticket-msg-label";
+        msgLabel.textContent = "Pesan Anda:";
+        var msgText = document.createElement("p");
+        msgText.className = "ticket-msg-text";
+        msgText.textContent = '"' + (data.message || "") + '"';
+        msgBox.appendChild(msgLabel);
+        msgBox.appendChild(msgText);
+
+        var noticeBox = document.createElement("div");
+        noticeBox.className = "ticket-notice-box";
+        var noticeText = document.createElement("p");
+        noticeText.className = "ticket-notice-text";
+        noticeText.textContent = "Status: Tiket baru Anda telah diterima dan masuk antrean petugas.";
+        noticeBox.appendChild(noticeText);
+
+        card.appendChild(topLine);
+        card.appendChild(topicDiv);
+        card.appendChild(subjectDiv);
+        card.appendChild(msgBox);
+        card.appendChild(noticeBox);
+
+        listContainer.insertBefore(card, listContainer.firstChild);
+
+        var allCards = listContainer.querySelectorAll(".ticket-item-card");
+        var pendingCards = listContainer.querySelectorAll('.ticket-item-card[data-status="pending"]');
+        var doneCards = listContainer.querySelectorAll('.ticket-item-card[data-status="done"]');
+        var pills = document.querySelectorAll(".ticket-filter-pill");
+        for (var p = 0; p < pills.length; p++) {
+            var df = pills[p].getAttribute("data-filter");
+            if (df === "all") pills[p].textContent = "Semua Tiket (" + allCards.length + ")";
+            if (df === "pending") pills[p].textContent = "Menunggu Balasan (" + pendingCards.length + ")";
+            if (df === "done") pills[p].textContent = "Sudah Selesai (" + doneCards.length + ")";
+        }
     }
 
     function initTicketFiltering() {
@@ -217,6 +327,7 @@
         applyPlaceholders();
         initNavbarDropdown();
         initFileUpload();
+        renderSubmittedTicket();
         initTicketForm();
         initTicketFiltering();
     });

@@ -14,19 +14,27 @@
     var selectCategory = document.getElementById('selectCategory');
     var inputPortion = document.getElementById('inputPortion');
     var summaryPortion = document.getElementById('summaryPortion');
+    var summaryStore = document.getElementById('summaryStore');
     var inputReadyTime = document.getElementById('inputReadyTime');
     var inputExpiryTime = document.getElementById('inputExpiryTime');
+    var textareaNotes = document.getElementById('textareaNotes');
     var inputAddress = document.getElementById('inputAddress');
+    var inputLatitude = document.getElementById('inputLatitude');
+    var inputLongitude = document.getElementById('inputLongitude');
+    var previewWrap = document.getElementById('foodPhotoPreviewWrap');
     var chkConfirmHygienic = document.getElementById('chkConfirmHygienic') || document.querySelector('input[name="konfirmasi_higienis"]');
     var summaryTime = document.getElementById('summaryTime');
     var form = document.getElementById('formAddFood');
 
     var addFoodPlaceholders = [
-        { el: inputFoodName, text: 'Paket Super Besar 1 (Ayam Crispy + Nasi)' },
+        { el: inputFoodName, text: 'Contoh: Paket Roti & Kue Layak Konsumsi' },
         { el: inputPortion, text: '10' },
         { el: inputReadyTime, text: 'Hari ini \u2022 11:30 WIB' },
         { el: inputExpiryTime, text: 'Hari ini \u2022 15:30 WIB' },
-        { el: inputAddress, text: 'KFC Sudirman, Jl. Jend. Sudirman No. 54, Yogyakarta' }
+        { el: textareaNotes, text: 'Tambahkan catatan bahan makanan, alergen, atau saran penyajian...' },
+        { el: inputAddress, text: 'Contoh: Jl. Jend. Sudirman No. 54, Yogyakarta' },
+        { el: inputLatitude, text: '-' },
+        { el: inputLongitude, text: '-' }
     ];
     for (var p = 0; p < addFoodPlaceholders.length; p++) {
         if (addFoodPlaceholders[p].el && !addFoodPlaceholders[p].el.placeholder) {
@@ -75,6 +83,31 @@
         btnChange.addEventListener('click', triggerFileInput);
     }
 
+    if (fileInput && previewWrap) {
+        fileInput.addEventListener('change', function () {
+            var file = fileInput.files && fileInput.files[0];
+            if (!file) {
+                previewWrap.style.display = 'none';
+                return;
+            }
+            var allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            var lowerName = (file.name || '').toLowerCase();
+            var extOk = /\.(jpg|jpeg|png|webp)$/.test(lowerName);
+            if ((allowedTypes.indexOf(file.type) !== -1 || extOk) && file.size <= 2 * 1024 * 1024) {
+                previewWrap.style.display = 'block';
+            } else {
+                previewWrap.style.display = 'none';
+            }
+        });
+    }
+
+    if (inputAddress && summaryStore) {
+        inputAddress.addEventListener('input', function () {
+            var addrVal = inputAddress.value.trim();
+            summaryStore.textContent = addrVal ? addrVal.split(',')[0].trim() : '-';
+        });
+    }
+
     if (inputPortion && summaryPortion) {
         inputPortion.addEventListener('input', function () {
             var cleaned = inputPortion.value.replace(/[^0-9]/g, '');
@@ -91,9 +124,11 @@
         var readyVal = inputReadyTime ? inputReadyTime.value.trim() : '';
         var expVal = inputExpiryTime ? inputExpiryTime.value.trim() : '';
         if (readyVal && expVal) {
-            var readyShort = readyVal.replace('Hari ini • ', '').replace(' WIB', '');
-            var expShort = expVal.replace('Hari ini • ', '');
+            var readyShort = readyVal.replace('Hari ini \u2022 ', '').replace('Hari ini • ', '').replace(' WIB', '');
+            var expShort = expVal.replace('Hari ini \u2022 ', '').replace('Hari ini • ', '');
             summaryTime.textContent = readyShort + ' - ' + expShort;
+        } else {
+            summaryTime.textContent = '-';
         }
     }
 
