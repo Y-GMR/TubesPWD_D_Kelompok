@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kelola Kategori Makanan - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=9" />
+    <link rel="stylesheet" type="text/css" href="assets/css/manage_categories.css?v=1" />
+</head>
+<body data-auth="true">
+
+    <div class="page-wrapper">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="views/admin/dashboard.php" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+                <ul class="nav-menu-list">
+                    <li><a href="#about">Tentang kami</a></li>
+                    <li><a href="profile.xhtml">Pengaturan</a></li>
+                    <li><a href="customer_service.xhtml">Bantuan</a></li>
+                </ul>
+                <div class="nav-cta-wrap">
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Administrator">
+                            <img src="assets/images/producer/avatar_produsen.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">Admin Posko</span>
+                                <span class="profile-consumer-role" style="color: #a7f3d0; font-size: 10.5px;">Administrator</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="views/admin/dashboard.php" class="profile-dropdown-item">Dashboard Admin</a>
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="manage_categories.xhtml" class="profile-dropdown-item">Kelola Kategori</a>
+                            <a href="views/admin/manage_users.php" class="profile-dropdown-item">Kelola Pengguna</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="category-page-wrap">
+            <div class="category-container">
+
+                <div class="category-top-nav">
+                    <a href="views/admin/dashboard.php" class="category-back-link">&#8592; Kembali ke Dashboard Admin</a>
+                </div>
+
+                <div class="category-header-center">
+                    <h1 class="category-page-title">Kelola Kategori<br />Makanan</h1>
+                </div>
+
+                <div class="category-grid-layout">
+
+                    <div class="category-form-card">
+                        <div class="category-card-header">
+                            <h2 class="category-card-title" id="formCardTitle">Tambah Kategori Baru</h2>
+                        </div>
+                        <div class="category-form-body">
+                            <form id="categoryForm" action="manage_categories.xhtml" method="post">
+                                <input type="hidden" id="catIdInput" value="" />
+
+                                <div class="cat-form-group">
+                                    <label for="catNameInput" class="cat-form-label">Nama Kategori *</label>
+                                    <input type="text" id="catNameInput" class="cat-form-input" />
+                                </div>
+
+                                <div class="cat-form-group">
+                                    <label for="catDescInput" class="cat-form-label">Deskripsi Kategori</label>
+                                    <textarea id="catDescInput" class="cat-form-textarea" rows="4" cols="40"></textarea>
+                                </div>
+
+                                <div class="cat-form-actions">
+                                    <button type="submit" class="btn-submit-category" id="btnSubmitCategory">Simpan Kategori</button>
+                                    <button type="button" class="btn-cancel-edit" id="btnCancelEdit">Batal Ubah</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="category-table-card">
+                        <div class="category-table-responsive">
+                            <table class="category-data-table" id="categoriesTable">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 50px;">ID</th>
+                                        <th style="width: 200px;">NAMA KATEGORI</th>
+                                        <th>DESKRIPSI</th>
+                                        <th style="width: 130px;">JUMLAH MENU</th>
+                                        <th style="width: 140px;">AKSI</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="categoriesTableBody">
+                                    <tr data-id="#1" data-count="12">
+                                        <td class="col-cat-id">#1</td>
+                                        <td class="col-cat-name">Roti &amp; Kue</td>
+                                        <td class="col-cat-desc">Roti tawar, donat, dan kue basah</td>
+                                        <td><span class="badge-menu-count badge-has-menu">12 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-disabled" title="Kategori tidak dapat dihapus karena masih memiliki makanan">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-id="#2" data-count="14">
+                                        <td class="col-cat-id">#2</td>
+                                        <td class="col-cat-name">Makanan Siap Santap</td>
+                                        <td class="col-cat-desc">Nasi kotak dan lauk siap santap</td>
+                                        <td><span class="badge-menu-count badge-has-menu">14 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-disabled" title="Kategori tidak dapat dihapus karena masih memiliki makanan">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-id="#3" data-count="8">
+                                        <td class="col-cat-id">#3</td>
+                                        <td class="col-cat-name">Lauk &amp; Sayuran</td>
+                                        <td class="col-cat-desc">Sayur matang, olahan tahu &amp; tempe</td>
+                                        <td><span class="badge-menu-count badge-has-menu">8 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-disabled" title="Kategori tidak dapat dihapus karena masih memiliki makanan">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-id="#4" data-count="0">
+                                        <td class="col-cat-id">#4</td>
+                                        <td class="col-cat-name">Bahan Pokok &amp; Sembako</td>
+                                        <td class="col-cat-desc">Beras, minyak, mi, dan sembako</td>
+                                        <td><span class="badge-menu-count badge-zero-menu">0 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-active">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-id="#5" data-count="6">
+                                        <td class="col-cat-id">#5</td>
+                                        <td class="col-cat-name">Minuman &amp; Sarapan</td>
+                                        <td class="col-cat-desc">Susu, teh, kopi, dan aneka sereal</td>
+                                        <td><span class="badge-menu-count badge-has-menu">6 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-disabled" title="Kategori tidak dapat dihapus karena masih memiliki makanan">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-id="#6" data-count="0">
+                                        <td class="col-cat-id">#6</td>
+                                        <td class="col-cat-name">Buah &amp; Sayur Segar</td>
+                                        <td class="col-cat-desc">Pisang, apel, jeruk, dan sayur organik</td>
+                                        <td><span class="badge-menu-count badge-zero-menu">0 Menu</span></td>
+                                        <td>
+                                            <div class="cat-actions-cell">
+                                                <button type="button" class="btn-cat-edit">Ubah</button>
+                                                <button type="button" class="btn-cat-delete-active">Hapus</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @pangkalanpangan</div>
+                        <div class="footer-contact-p">Surel: info@pangkalanpangan.id</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/manage_categories.js?v=3"></script>
+</body>
+</html>

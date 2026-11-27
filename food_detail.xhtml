@@ -1,0 +1,192 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rincian Makanan - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="assets/css/catalog.css?v=6" />
+</head>
+<body data-auth="true">
+
+    <div class="page-wrapper">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="food_catalogue.xhtml" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+                <ul class="nav-menu-list">
+                    <li><a href="food_catalogue.xhtml#about">Tentang kami</a></li>
+                    <li><a href="profile.xhtml">Pengaturan</a></li>
+                    <li><a href="customer_service.xhtml">Bantuan</a></li>
+                </ul>
+                <div class="nav-cta-wrap">
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Konsumen - Iwang Petra">
+                            <img src="assets/images/avatar_consumer.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">Iwang Petra</span>
+                                <span class="profile-consumer-role">Konsumen</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="claim_history.xhtml" class="profile-dropdown-item">Riwayat Klaim</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="hero-section">
+            <div class="hero-left-content">
+                <img src="assets/images/pangkalan_pangan_title.svg" alt="Pangkalan Pangan" class="hero-title-svg" />
+                <p class="hero-subtitle">Menghubungkan pangan dengan mereka yang membutuhkan. Bersama, kita hadirkan lebih banyak senyum.</p>
+                <div class="hero-cta-btn-wrap">
+                    <a href="food_catalogue.xhtml#katalog" class="btn-hero-claim">Mulai klaim pangan</a>
+                </div>
+            </div>
+            <div class="hero-right-photo">
+                <img src="assets/images/hero_volunteer_photo.png" alt="Relawan Berbagi Pangan" class="hero-volunteer-img" />
+            </div>
+        </div>
+
+        <div class="catalog-section" id="katalog">
+            <div class="catalog-mascot-block">
+                <img src="assets/images/katalog_curved_text.svg" alt="Katalog" class="katalog-curved-img" />
+                <img src="assets/images/database_mascot.svg" alt="Maskot Database Pangkalan Pangan" class="database-mascot-img" />
+            </div>
+
+            <div class="catalog-search-wrap">
+                <form action="food_catalogue.xhtml" method="get" class="catalog-search-form">
+                    <img src="assets/images/icon_search.svg" alt="Ikon Cari" class="search-icon-img" />
+                    <input type="text" name="q" class="catalog-search-input" />
+                </form>
+            </div>
+
+            <div class="category-filter-wrap">
+                <ul class="category-filter-list">
+                    <li><a href="food_catalogue.xhtml?cat=all" class="category-pill active">Semua Makanan</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=roti-kue" class="category-pill">Roti &amp; Kue</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=makanan-berat" class="category-pill">Makanan Berat</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=cepat-saji" class="category-pill">Cepat Saji</a></li>
+                    <li><a href="food_catalogue.xhtml?cat=minuman" class="category-pill">Minuman</a></li>
+                </ul>
+            </div>
+
+            <div class="merchant-cards-grid">
+                <div class="merchant-main-card" data-category="roti-kue" data-merchant="dunkin">
+                    <div class="merchant-header-block">
+                        <div class="merchant-thumb-wrap">
+                            <img src="assets/images/merchant_dunkin.png" alt="Dunkin Donuts" class="merchant-thumb-img" />
+                        </div>
+                        <div class="merchant-meta-block">
+                            <div class="merchant-heading-row">
+                                <h2 class="merchant-name-title">Dunkin Donuts</h2>
+                            </div>
+                            <div class="merchant-location-stock-row">
+                                <div class="location-meta-wrap">
+                                    <img src="assets/images/icon_gps.svg" alt="Lokasi" class="pin-icon" />
+                                    <span>Gerai Sudirman</span>
+                                    <span class="bullet-dot">&#8226;</span>
+                                    <span>1,2 km</span>
+                                </div>
+                                <span class="stock-tag-pill">Stok: 12</span>
+                            </div>
+                            <div class="merchant-price-category-row">
+                                <img src="assets/images/icon_price.svg" alt="Harga" class="price-tag-icon" />
+                                <span class="price-val-text">Rp0</span>
+                                <span class="price-unit-text">/paket</span>
+                                <span class="bullet-dot">&#8226;</span>
+                                <span class="category-label">Roti &amp; Kue</span>
+                            </div>
+                            <a href="checkout.xhtml?merchant=dunkin" class="btn-merchant-claim">Klaim Pangan</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <hr class="footer-divider-line" />
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="food-modal-backdrop is-active" id="foodDetailModalBackdrop">
+        <div class="food-modal-card" id="foodDetailModalCard">
+            <div class="food-modal-header">
+                <div class="food-modal-merchant">
+                    <img src="assets/images/merchant_dunkin.png" alt="Merchant" class="food-modal-merchant-logo" id="modalMerchantLogo" />
+                    <div>
+                        <div class="food-modal-merchant-name" id="modalMerchantName">Dunkin' Donuts Sudirman</div>
+                        <div class="food-modal-merchant-sub" id="modalMerchantSub">Gerai Resmi Donatur &#8226; 1,2 km dari Anda</div>
+                    </div>
+                </div>
+                <a href="food_catalogue.xhtml" class="food-modal-close-btn" id="modalCloseBtn" title="Tutup">&#215;</a>
+            </div>
+
+            <div class="food-modal-img-wrap">
+                <img src="assets/images/menu_donat_glaze.png" alt="Makanan" class="food-modal-img" id="modalFoodImg" />
+            </div>
+
+            <div class="food-modal-info-body">
+                <div class="food-modal-title-row">
+                    <h3 class="food-modal-title" id="modalFoodTitle">Donat Glaze (Paket 3 Pcs)</h3>
+                    <div class="food-modal-price" id="modalFoodPrice">Rp 0 (Gratis)</div>
+                </div>
+
+                <div class="food-modal-meta-row" id="modalFoodMetaRow">
+                    <span id="modalFoodCat">Roti &amp; Kue</span>
+                    <span class="meta-dot">&#8226;</span>
+                    <span id="modalFoodStock">Stok: 5</span>
+                </div>
+
+                <div class="food-modal-quick-info">
+                    <div class="food-modal-info-col">
+                        <span class="food-modal-info-label">Batas Pengambilan di Gerai:</span>
+                        <span class="food-modal-info-val amber" id="modalFoodDeadline">Hari ini, 21:00 WIB</span>
+                    </div>
+                    <div class="food-modal-info-col">
+                        <span class="food-modal-info-label">Lokasi Toko Produsen:</span>
+                        <span class="food-modal-info-val" id="modalFoodLocation">Gerai Dunkin Donut's Sudirman (1,2 km)</span>
+                    </div>
+                </div>
+
+                <button type="button" class="food-modal-claim-btn" id="modalAddToCartBtn">Tambah ke Keranjang</button>
+                <a href="food_catalogue.xhtml" class="food-modal-cancel-link" id="modalCancelLink">Tutup Rincian</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="assets/js/food_detail.js?v=8"></script>
+</body>
+</html>

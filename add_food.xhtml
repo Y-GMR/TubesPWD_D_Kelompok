@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donasi Makanan Baru - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/catalog.css" />
+</head>
+<body data-auth="true">
+    <div id="container">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="food_catalogue.xhtml?role=produsen" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+
+                <ul class="nav-menu-list">
+                    <li><a href="food_catalogue.xhtml?role=produsen#about">Tentang kami</a></li>
+                    <li><a href="food_catalogue.xhtml?role=produsen">Katalog Pangan</a></li>
+                    <li><a href="customer_service.xhtml">Bantuan</a></li>
+                </ul>
+
+                <div class="nav-cta-wrap">
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Produsen">
+                            <img src="assets/images/producer/avatar_produsen.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">KFC Sudirman</span>
+                                <span class="profile-consumer-role">Produsen</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="producer_dashboard.xhtml" class="profile-dropdown-item">Dashboard Produsen</a>
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="claim.xhtml" class="profile-dropdown-item">Kelola Klaim</a>
+                            <a href="inventory.xhtml" class="profile-dropdown-item">Kelola Inventaris</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="back-link-wrap">
+                <a href="producer_dashboard.xhtml" class="back-link-btn">&#8592; Kembali ke Dashboard</a>
+            </div>
+
+            <h1 class="page-title-main">Donasi Makanan Baru</h1>
+            <p class="page-subtitle-main">Daftarkan makanan untuk disalurkan kepada mereka yang membutuhkan.</p>
+
+            <form action="inventory.xhtml" method="post" enctype="multipart/form-data" id="formAddFood" class="add-food-grid">
+
+                <div class="add-food-col-left">
+
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <span class="card-accent-bar"></span>
+                            <h2 class="card-title-text">Detail Makanan</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputFoodName" class="form-label">Nama Makanan *</label>
+                            <input type="text" id="inputFoodName" name="nama_makanan" class="form-control" />
+                        </div>
+
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label for="selectCategory" class="form-label">Kategori *</label>
+                                <select id="selectCategory" name="kategori" class="form-control">
+                                    <option value="" selected="selected">-- Pilih Kategori --</option>
+                                    <option value="ayam_daging">Ayam &amp; Daging Olahan</option>
+                                    <option value="makanan_berat">Makanan Berat / Nasi</option>
+                                    <option value="roti_kue">Roti &amp; Kue</option>
+                                    <option value="sayur_buah">Sayur &amp; Buah</option>
+                                    <option value="camilan">Makanan Ringan</option>
+                                    <option value="minuman">Minuman</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputPortion" class="form-label">Jumlah Porsi *</label>
+                                <input type="text" id="inputPortion" name="jumlah_porsi" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label for="inputReadyTime" class="form-label">Waktu Siap Diambil *</label>
+                                <input type="text" id="inputReadyTime" name="waktu_siap" class="form-control" />
+                            </div>
+                            <div class="form-group">
+                                <label for="inputExpiryTime" class="form-label">Batas Pengambilan *</label>
+                                <input type="text" id="inputExpiryTime" name="batas_ambil" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="textareaNotes" class="form-label">Catatan &amp; Alergen</label>
+                            <textarea id="textareaNotes" name="catatan" class="form-control form-control-textarea" rows="4" cols="50"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <span class="card-accent-bar"></span>
+                            <h2 class="card-title-text">Lokasi Pengambilan</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputAddress" class="form-label">Alamat Gerai *</label>
+                            <input type="text" id="inputAddress" name="alamat_gerai" class="form-control" />
+                        </div>
+
+                        <button type="button" id="btnDetectLocation" class="btn-detect-gps-full btn-detect-gps">Perbarui Lokasi GPS</button>
+
+                        <div class="form-row-2col">
+                            <div class="form-group">
+                                <label for="inputLatitude" class="form-label">Latitude</label>
+                                <input type="text" id="inputLatitude" name="latitude" class="form-control" readonly="readonly" />
+                            </div>
+                            <div class="form-group">
+                                <label for="inputLongitude" class="form-label">Longitude</label>
+                                <input type="text" id="inputLongitude" name="longitude" class="form-control" readonly="readonly" />
+                            </div>
+                        </div>
+
+                        <div class="geo-status-box">
+                            <span id="geoStatusText">Lokasi GPS belum dideteksi</span>
+                        </div>
+                        <div id="geoCoordinatesPreview" class="geo-preview-text" style="display: none;"></div>
+                    </div>
+
+                </div>
+
+                <div class="add-food-col-right">
+
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <span class="card-accent-bar"></span>
+                            <h2 class="card-title-text">Foto Makanan</h2>
+                        </div>
+
+                        <div class="photo-dropzone" id="dropzoneUpload">
+                            <div class="photo-dropzone-title">Pilih atau seret foto ke sini</div>
+                            <button type="button" class="btn-browse-photo" id="btnBrowsePhoto">Pilih Foto</button>
+                            <div class="photo-dropzone-hint">JPG, PNG, atau WEBP (Maks. 2MB)</div>
+                        </div>
+
+                        <input type="file" id="foodPhotoInput" name="foto_makanan" accept="image/jpeg,image/png,image/webp" class="image-preview-input form-file-hidden" data-preview-target="#foodImagePreview" />
+
+                        <div class="photo-preview-wrap" id="foodPhotoPreviewWrap" style="display: none;">
+                            <div class="photo-preview-box">
+                                <img src="assets/images/logo_sprout.svg" alt="Pratinjau Foto Makanan" class="photo-preview-img" id="foodImagePreview" />
+                            </div>
+                            <div class="photo-preview-footer">
+                                <span class="photo-preview-badge">Pratinjau Foto Aktif</span>
+                                <button type="button" class="btn-change-photo" id="btnChangePhoto">Ganti Foto</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-card">
+                        <div class="form-card-header">
+                            <span class="card-accent-bar"></span>
+                            <h2 class="card-title-text">Ringkasan Donasi</h2>
+                        </div>
+
+                        <div class="summary-list">
+                            <div class="summary-item">
+                                <span class="summary-label">Gerai</span>
+                                <span class="summary-val" id="summaryStore">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Jumlah Porsi</span>
+                                <span class="summary-val" id="summaryPortion">0 Porsi</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Biaya</span>
+                                <span class="summary-val-free">Gratis (Rp 0)</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="summary-label">Waktu Pengambilan</span>
+                                <span class="summary-val" id="summaryTime">-</span>
+                            </div>
+                        </div>
+
+                        <hr class="summary-divider" />
+
+                        <label class="summary-checkbox-wrap">
+                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" />
+                            <span>Saya menjamin makanan dalam kondisi higienis dan layak konsumsi.</span>
+                        </label>
+
+                        <button type="submit" class="btn-submit-donation" id="btnSubmitDonation">Donasikan Makanan</button>
+                        <a href="producer_dashboard.xhtml" class="btn-cancel-donation">&#8592; Kembali ke Dashboard</a>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/geolocation.js"></script>
+    <script type="text/javascript" src="assets/js/image_preview.js"></script>
+    <script type="text/javascript" src="assets/js/catalog.js?v=20261127_1945"></script>
+    <script type="text/javascript" src="assets/js/add_food.js?v=3"></script>
+</body>
+</html>

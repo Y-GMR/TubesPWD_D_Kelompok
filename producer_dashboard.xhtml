@@ -1,0 +1,291 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Produsen - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css" />
+    <link rel="stylesheet" type="text/css" href="assets/css/catalog.css" />
+</head>
+<body data-auth="true">
+    <div id="container">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="food_catalogue.xhtml?role=produsen" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+
+                <ul class="nav-menu-list">
+                    <li><a href="food_catalogue.xhtml?role=produsen#about">Tentang kami</a></li>
+                    <li><a href="food_catalogue.xhtml?role=produsen">Katalog Pangan</a></li>
+                    <li><a href="customer_service.xhtml">Bantuan</a></li>
+                </ul>
+
+                <div class="nav-cta-wrap">
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Produsen">
+                            <img src="assets/images/producer/avatar_produsen.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">KFC Sudirman</span>
+                                <span class="profile-consumer-role">Produsen</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="producer_dashboard.xhtml" class="profile-dropdown-item">Dashboard Produsen</a>
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="claim.xhtml" class="profile-dropdown-item">Kelola Klaim</a>
+                            <a href="inventory.xhtml" class="profile-dropdown-item">Kelola Inventaris</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+
+            <div class="producer-welcome-card">
+                <div class="welcome-text-group">
+                    <h1 class="welcome-title">Selamat Datang, KFC Sudirman!</h1>
+                    <p class="welcome-subtitle">Kelola ketersediaan makanan berlebih, pantau klaim masuk dari konsumen, dan pastikan pangan tersalurkan tepat waktu.</p>
+                </div>
+                <div class="welcome-actions">
+                    <a href="add_food.xhtml" class="btn btn-primary">+ Donasi Makanan Baru</a>
+                    <a href="inventory.xhtml" class="btn btn-secondary">Kelola Inventaris</a>
+                </div>
+            </div>
+
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-inner-wrap">
+                        <span class="metric-accent-bar metric-accent-teal"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">SIAP AMBIL</span>
+                            <span class="metric-value metric-value-teal">38 Porsi</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-inner-wrap">
+                        <span class="metric-accent-bar metric-accent-orange"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">KLAIM MASUK</span>
+                            <span class="metric-value metric-value-orange">5 Pesanan</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-inner-wrap">
+                        <span class="metric-accent-bar metric-accent-red"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">TOTAL PANGAN TERSALURKAN</span>
+                            <span class="metric-value metric-value-red">412 Porsi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-header">
+                <h2>Perlu Diproses</h2>
+                <a href="claim.xhtml" class="section-link">Lihat Semua Riwayat Klaim &#8594;</a>
+            </div>
+
+            <div class="table-scroll-wrapper">
+                <table class="table-modern table-striped">
+                    <thead>
+                        <tr class="table-header">
+                            <th class="table-col-code">KODE KLAIM</th>
+                            <th class="table-col-user">PENERIMA / KONSUMEN</th>
+                            <th class="table-col-menu">MENU MAKANAN</th>
+                            <th class="table-col-portion">PORSI</th>
+                            <th class="table-col-time">WAKTU PENGAMBILAN</th>
+                            <th class="table-col-status">STATUS</th>
+                            <th class="table-col-action">AKSI PESANAN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="table-col-code"><span class="table-claim-code">#TRX-2026-104</span></td>
+                            <td class="table-col-user">
+                                <div class="table-user-name">Siti Rahmawati</div>
+                                <div class="table-user-sub">Konsumen Terverifikasi</div>
+                            </td>
+                            <td class="table-col-menu"><span class="table-menu-name">Paket Super Besar 1 (Ayam Crispy + Nasi)</span></td>
+                            <td class="table-col-portion"><span class="table-portion">3 Porsi</span></td>
+                            <td class="table-col-time"><span class="table-time">Hari ini &#8226; 11:30 WIB</span></td>
+                            <td class="table-col-status"><span class="badge badge-waiting">Menunggu</span></td>
+                            <td class="table-col-action">
+                                <button type="button" class="btn-table-action btn-action-teal">Siapkan Porsi</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-col-code"><span class="table-claim-code">#TRX-2026-102</span></td>
+                            <td class="table-col-user">
+                                <div class="table-user-name">Budi Prakoso</div>
+                                <div class="table-user-sub">Konsumen Mandiri</div>
+                            </td>
+                            <td class="table-col-menu"><span class="table-menu-name">KFC Bento Chicken BBQ &amp; Perkedel</span></td>
+                            <td class="table-col-portion"><span class="table-portion">2 Porsi</span></td>
+                            <td class="table-col-time"><span class="table-time">Hari ini &#8226; 12:00 WIB</span></td>
+                            <td class="table-col-status"><span class="badge badge-ready">Siap Diambil</span></td>
+                            <td class="table-col-action">
+                                <button type="button" class="btn-table-action btn-action-orange">Tandai Selesai</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-col-code"><span class="table-claim-code">#TRX-2026-098</span></td>
+                            <td class="table-col-user">
+                                <div class="table-user-name">Panti Asuhan Kasih</div>
+                                <div class="table-user-sub">Mitra Penyaluran Resmi</div>
+                            </td>
+                            <td class="table-col-menu"><span class="table-menu-name">Paket 8 Pcs Crispy Chicken Bucket</span></td>
+                            <td class="table-col-portion"><span class="table-portion">8 Porsi</span></td>
+                            <td class="table-col-time"><span class="table-time">Hari ini &#8226; 09:15 WIB</span></td>
+                            <td class="table-col-status"><span class="badge badge-done">Selesai</span></td>
+                            <td class="table-col-action">
+                                <button type="button" class="btn-table-action btn-action-gray">Lihat Bukti</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-col-code"><span class="table-claim-code">#TRX-2026-095</span></td>
+                            <td class="table-col-user">
+                                <div class="table-user-name">Hendra Wijaya</div>
+                                <div class="table-user-sub">Konsumen Terverifikasi</div>
+                            </td>
+                            <td class="table-col-menu"><span class="table-menu-name">KFC Winger Combo &amp; Nasi Hangat</span></td>
+                            <td class="table-col-portion"><span class="table-portion">3 Porsi</span></td>
+                            <td class="table-col-time"><span class="table-time">Hari ini &#8226; 08:30 WIB</span></td>
+                            <td class="table-col-status"><span class="badge badge-waiting">Menunggu</span></td>
+                            <td class="table-col-action">
+                                <button type="button" class="btn-table-action btn-action-teal">Siapkan Porsi</button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="table-col-code"><span class="table-claim-code">#TRX-2026-091</span></td>
+                            <td class="table-col-user">
+                                <div class="table-user-name">Ratna Sari</div>
+                                <div class="table-user-sub">Konsumen Mandiri</div>
+                            </td>
+                            <td class="table-col-menu"><span class="table-menu-name">Original Recipe Chicken &amp; Soup</span></td>
+                            <td class="table-col-portion"><span class="table-portion">4 Porsi</span></td>
+                            <td class="table-col-time"><span class="table-time">Kemarin &#8226; 19:00 WIB</span></td>
+                            <td class="table-col-status"><span class="badge badge-done">Selesai</span></td>
+                            <td class="table-col-action">
+                                <button type="button" class="btn-table-action btn-action-gray">Lihat Bukti</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section-header">
+                <h2>Inventaris Makanan Aktif</h2>
+            </div>
+
+            <div class="inventory-scroll-container">
+                <div class="food-card">
+                    <div class="food-card-thumb-wrap">
+                        <img src="assets/images/menu_ayam_crispy.png" alt="Ayam Crispy KFC" class="food-card-img" />
+                        <span class="food-card-stock-badge">Stok: 12</span>
+                    </div>
+                    <div class="food-card-body">
+                        <h3 class="food-card-title">Paket Ayam Crispy &amp; Nasi Hangat</h3>
+                        <p class="food-card-category">Kategori: Ayam Goreng &#8226; KFC Sudirman</p>
+                        <p class="food-card-price">Gratis (Rp0)</p>
+                        <p class="food-card-time">Batas Ambil: Hari ini s.d. 21:00 WIB</p>
+                        <div class="food-card-actions">
+                            <a href="inventory.xhtml" class="btn btn-sm btn-secondary">Kelola Stok</a>
+                            <button type="button" class="btn btn-sm btn-danger">Tutup Donasi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="food-card">
+                    <div class="food-card-thumb-wrap">
+                        <img src="assets/images/menu_ayam_original.png" alt="KFC Bento Chicken" class="food-card-img" />
+                        <span class="food-card-stock-badge">Stok: 8</span>
+                    </div>
+                    <div class="food-card-body">
+                        <h3 class="food-card-title">KFC Bento Chicken BBQ Komplit</h3>
+                        <p class="food-card-category">Kategori: Rice Box &#8226; KFC Sudirman</p>
+                        <p class="food-card-price">Rp5.000 / porsi</p>
+                        <p class="food-card-time">Batas Ambil: Hari ini s.d. 20:00 WIB</p>
+                        <div class="food-card-actions">
+                            <a href="inventory.xhtml" class="btn btn-sm btn-secondary">Kelola Stok</a>
+                            <button type="button" class="btn btn-sm btn-danger">Tutup Donasi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="food-card">
+                    <div class="food-card-thumb-wrap">
+                        <img src="assets/images/menu_perkedel.png" alt="Original Chicken dan Perkedel" class="food-card-img" />
+                        <span class="food-card-stock-badge">Stok: 18</span>
+                    </div>
+                    <div class="food-card-body">
+                        <h3 class="food-card-title">Paket Original Chicken &amp; Perkedel</h3>
+                        <p class="food-card-category">Kategori: Ayam &amp; Side Dish &#8226; KFC Sudirman</p>
+                        <p class="food-card-price">Gratis (Rp0)</p>
+                        <p class="food-card-time">Batas Ambil: Hari ini s.d. 22:00 WIB</p>
+                        <div class="food-card-actions">
+                            <a href="inventory.xhtml" class="btn btn-sm btn-secondary">Kelola Stok</a>
+                            <button type="button" class="btn btn-sm btn-danger">Tutup Donasi</button>
+                        </div>
+                    </div>
+                </div>
+
+                <a href="add_food.xhtml" class="add-food-card-box" title="Tambah Donasi Makanan Baru">
+                    <span class="add-food-card-icon">+</span>
+                    <span class="add-food-card-text">Tambah Makanan Baru</span>
+                </a>
+            </div>
+
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/catalog.js?v=20261127_1945"></script>
+    <script type="text/javascript">
+    (function () {
+        try {
+            localStorage.setItem('tubespwd_role', 'produsen');
+            sessionStorage.setItem('tubespwd_role', 'produsen');
+        } catch (e) {}
+    })();
+    </script>
+</body>
+</html>

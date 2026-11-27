@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registrasi Akun - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=4" />
+    <link rel="stylesheet" type="text/css" href="assets/css/auth.css?v=7" />
+</head>
+<body>
+
+    <div class="auth-page-wrapper">
+
+        <div class="auth-nav-bar">
+            <a href="food_catalogue.xhtml" class="auth-nav-left" title="Pangkalan Pangan">
+                <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="auth-nav-logo-sprout" />
+                <img src="assets/images/pangkalan_pangan_title.svg" alt="Pangkalan Pangan" class="auth-nav-logo-text" />
+            </a>
+            <ul class="auth-nav-menu">
+                <li><a href="food_catalogue.xhtml#about">Tentang kami</a></li>
+                <li><a href="food_catalogue.xhtml">Katalog Pangan</a></li>
+                <li><a href="customer_service.xhtml">Bantuan</a></li>
+            </ul>
+            <a href="food_catalogue.xhtml" class="btn-nav-back">Kembali ke Beranda</a>
+        </div>
+
+        <div class="auth-main-section">
+            <div class="auth-card">
+                <h1 class="auth-card-title">Registrasi Akun</h1>
+
+                <div class="auth-role-toggle">
+                    <button type="button" class="btn-role-tab active" id="btnRoleConsumer">Penerima Manfaat (Konsumen)</button>
+                    <button type="button" class="btn-role-tab" id="btnRoleDonor">Donatur Pangan (Produsen)</button>
+                </div>
+
+                <form action="actions/auth_register.php" method="post" enctype="multipart/form-data" class="auth-form" id="registerForm">
+                    <div>
+                        <input type="hidden" name="role" id="regRole" value="konsumen" />
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="regFullname" class="auth-label">Nama Lengkap</label>
+                        <input type="text" id="regFullname" name="fullname" class="auth-input" />
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="regUsername" class="auth-label">Username</label>
+                        <input type="text" id="regUsername" name="username" class="auth-input" />
+                        <span class="auth-helper-text" id="usernameFeedback" style="display: none;">Username tersedia</span>
+                    </div>
+
+                    <div class="auth-form-group">
+                        <label for="regEmail" class="auth-label">Alamat Email</label>
+                        <input type="text" id="regEmail" name="email" class="auth-input" />
+                        <span class="auth-helper-text" id="emailFeedback" style="display: none;">Email tersedia</span>
+                    </div>
+
+                    <div class="auth-input-row">
+                        <div class="auth-form-group">
+                            <label for="regPassword" class="auth-label">Kata Sandi</label>
+                            <input type="password" id="regPassword" name="password" class="auth-input" />
+                        </div>
+                        <div class="auth-form-group">
+                            <label for="regConfirmPassword" class="auth-label">Konfirmasi Sandi</label>
+                            <input type="password" id="regConfirmPassword" name="confirm_password" class="auth-input" />
+                        </div>
+                    </div>
+
+                    <div class="auth-form-group" id="sktmUploadGroup">
+                        <label for="regDocument" class="auth-label">Dokumen Kelayakan SKTM / KKS (Opsional)</label>
+                        <div class="auth-file-box">
+                            <input type="file" id="regDocument" name="dokumen_kelayakan" accept="application/pdf,image/jpeg,image/png" class="auth-file-input" />
+                            <span class="auth-file-name" id="regDocumentName">Format: PDF, JPG, atau PNG (Maks. 2MB)</span>
+                        </div>
+                        <span class="auth-doc-note">Khusus penerima manfaat untuk mempercepat verifikasi oleh admin.</span>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn-auth-submit btn-auth-teal">Daftar Akun Baru &#8594;</button>
+                    </div>
+                </form>
+
+                <div class="auth-switch-footer">
+                    Sudah memiliki akun? <a href="login.xhtml" class="auth-switch-link link-terracotta">Masuk</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Email: PangkalanPangan@gmail.com</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/auth.js?v=2"></script>
+    <script type="text/javascript" src="assets/js/ajax_validator.js"></script>
+</body>
+</html>

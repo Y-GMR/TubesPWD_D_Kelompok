@@ -16,4 +16,5 @@ Thumbs.db
 
 # Uploads
 assets/uploads/*
-!assets/uploads/.gitkeep
+!assets/uploads/*/
+!assets/uploads/**/.gitkeep

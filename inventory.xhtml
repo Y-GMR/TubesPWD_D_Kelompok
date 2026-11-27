@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manajemen Inventaris Pangan - Pangkalan Pangan</title>
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=10" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=8" />
+    <link rel="stylesheet" type="text/css" href="assets/css/inventory.css?v=1" />
+</head>
+<body data-auth="true">
+
+    <div class="page-wrapper">
+
+        <div class="header-navigation">
+            <div class="nav-container">
+                <a href="food_catalogue.xhtml?role=produsen" class="nav-logo-link" title="Pangkalan Pangan">
+                    <img src="assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
+                </a>
+                <ul class="nav-menu-list">
+                    <li><a href="food_catalogue.xhtml?role=produsen#about">Tentang kami</a></li>
+                    <li><a href="profile.xhtml">Pengaturan</a></li>
+                    <li><a href="customer_service.xhtml">Bantuan</a></li>
+                </ul>
+                <div class="nav-cta-wrap">
+                    <div class="profile-consumer-dropdown">
+                        <button type="button" class="profile-consumer-pill" id="profilePillBtn" title="Profil Produsen">
+                            <img src="assets/images/producer/avatar_produsen.png" alt="Avatar Profil" class="profile-consumer-avatar" />
+                            <span class="profile-consumer-info">
+                                <span class="profile-consumer-name">Dapur Lestari</span>
+                                <span class="profile-consumer-role">Produsen</span>
+                            </span>
+                            <span class="profile-consumer-caret">&#9662;</span>
+                        </button>
+                        <div class="profile-dropdown-content" id="profileDropdownMenu">
+                            <a href="producer_dashboard.xhtml" class="profile-dropdown-item">Dashboard Produsen</a>
+                            <a href="profile.xhtml" class="profile-dropdown-item">Pengaturan Profil</a>
+                            <a href="claim.xhtml" class="profile-dropdown-item">Kelola Klaim</a>
+                            <a href="inventory.xhtml" class="profile-dropdown-item">Kelola Inventaris</a>
+                            <a href="add_food.xhtml" class="profile-dropdown-item">Donasi Makanan Baru</a>
+                            <div class="profile-dropdown-divider"></div>
+                            <a href="login.xhtml" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="inventory-page-wrap">
+            <div class="inventory-container">
+
+                <div class="inventory-top-bar">
+                    <a href="producer_dashboard.xhtml" class="inventory-back-link">&#8592; Kembali ke Dashboard</a>
+                    <h1 class="inventory-title">Inventaris Produk</h1>
+                    <a href="add_food.xhtml" class="btn-add-food-top">+ Donasi Makanan Baru</a>
+                </div>
+
+                <div class="inventory-metrics-grid">
+                    <div class="inventory-metric-card">
+                        <span class="metric-accent-bar accent-teal"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">MAKANAN SIAP DIAMBIL</span>
+                            <span class="metric-val val-teal" id="metricReadyVal">38 Porsi</span>
+                        </div>
+                    </div>
+
+                    <div class="inventory-metric-card">
+                        <span class="metric-accent-bar accent-orange"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">STOK MENIPIS</span>
+                            <span class="metric-val val-orange" id="metricLowVal">2 Menu</span>
+                        </div>
+                    </div>
+
+                    <div class="inventory-metric-card">
+                        <span class="metric-accent-bar accent-red"></span>
+                        <div class="metric-text-group">
+                            <span class="metric-label">TOTAL PANGAN TERSALURKAN</span>
+                            <span class="metric-val val-red">412 Porsi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-controls-row">
+                    <div class="inv-controls-left">
+                        <input type="text" id="invSearchInput" class="inventory-search-input" />
+                        <select id="invCategorySelect" class="inventory-category-select">
+                            <option value="all">Semua Kategori</option>
+                            <option value="Roti &amp; Kue">Roti &amp; Kue</option>
+                            <option value="Makanan Siap Santap">Makanan Siap Santap</option>
+                        </select>
+                    </div>
+
+                    <div class="inv-controls-right">
+                        <button type="button" class="inv-pill active" data-status-filter="all">Semua (6)</button>
+                        <button type="button" class="inv-pill" data-status-filter="available">Tersedia (4)</button>
+                        <button type="button" class="inv-pill" data-status-filter="low">Stok Menipis (2)</button>
+                    </div>
+                </div>
+
+                <div class="inventory-grid" id="inventoryGrid">
+
+                    <div class="inventory-card" data-category="Roti &amp; Kue" data-status="available" data-item-id="1">
+                        <div class="inv-card-banner bg-banner-1">
+                            <img src="assets/images/menu_choco_bun.png" alt="Choco Bun Lembut" class="inv-banner-img" />
+                            <span class="inv-stock-badge stock-badge-val">Stok: 12</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Choco Bun Lembut</h2>
+                            <p class="inv-item-meta">Kategori: Roti &amp; Kue &#8226; Dapur Sudirman</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 21:00 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="1" data-title="Choco Bun Lembut" data-stock="12">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="1">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card" data-category="Makanan Siap Santap" data-status="low" data-item-id="2">
+                        <div class="inv-card-banner bg-banner-2">
+                            <img src="assets/images/menu_ayam_original.png" alt="Ayam Original Gurih" class="inv-banner-img" />
+                            <span class="inv-stock-badge warning stock-badge-val">Stok: 8</span>
+                            <span class="inv-low-stock-badge">Stok Menipis</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Ayam Original Gurih</h2>
+                            <p class="inv-item-meta">Kategori: Makanan Siap Santap &#8226; Gerai Barat</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 20:00 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="2" data-title="Ayam Original Gurih" data-stock="8">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="2">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card" data-category="Roti &amp; Kue" data-status="available" data-item-id="3">
+                        <div class="inv-card-banner bg-banner-3">
+                            <img src="assets/images/menu_garlic_bread.png" alt="Garlic Bread Panggang" class="inv-banner-img" />
+                            <span class="inv-stock-badge stock-badge-val">Stok: 18</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Garlic Bread Panggang</h2>
+                            <p class="inv-item-meta">Kategori: Roti &amp; Kue &#8226; Dapur Utama</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 22:00 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="3" data-title="Garlic Bread Panggang" data-stock="18">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="3">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card" data-category="Makanan Siap Santap" data-status="available" data-item-id="4">
+                        <div class="inv-card-banner bg-banner-4">
+                            <img src="assets/images/menu_cheese_slice.png" alt="Pizza Cheese Slice Jumbo" class="inv-banner-img" />
+                            <span class="inv-stock-badge stock-badge-val">Stok: 24</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Pizza Cheese Slice Jumbo</h2>
+                            <p class="inv-item-meta">Kategori: Makanan Siap Santap &#8226; Posko Timur</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 19:30 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="4" data-title="Pizza Cheese Slice Jumbo" data-stock="24">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="4">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card" data-category="Roti &amp; Kue" data-status="available" data-item-id="5">
+                        <div class="inv-card-banner bg-banner-5">
+                            <img src="assets/images/menu_donat_cokelat.png" alt="Donat Cokelat Tabur Gula" class="inv-banner-img" />
+                            <span class="inv-stock-badge stock-badge-val">Stok: 15</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Donat Cokelat Tabur Gula</h2>
+                            <p class="inv-item-meta">Kategori: Roti &amp; Kue &#8226; Dapur Sudirman</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 21:00 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="5" data-title="Donat Cokelat Tabur Gula" data-stock="15">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="5">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-card" data-category="Makanan Siap Santap" data-status="low" data-item-id="6">
+                        <div class="inv-card-banner bg-banner-6">
+                            <img src="assets/images/menu_ayam_crispy.png" alt="Ayam Crispy Renyah" class="inv-banner-img" />
+                            <span class="inv-stock-badge warning stock-badge-val">Stok: 5</span>
+                            <span class="inv-low-stock-badge">Stok Menipis</span>
+                        </div>
+                        <div class="inv-card-body">
+                            <h2 class="inv-item-title">Ayam Crispy Renyah</h2>
+                            <p class="inv-item-meta">Kategori: Makanan Siap Santap &#8226; Gerai Timur</p>
+                            <p class="inv-item-price">Gratis (Rp0)</p>
+                            <p class="inv-item-limit">Batas Ambil: Hari ini s.d. 20:30 WIB</p>
+                            <div class="inv-card-actions">
+                                <button type="button" class="btn-inv-manage" data-id="6" data-title="Ayam Crispy Renyah" data-stock="5">Kelola Stok</button>
+                                <button type="button" class="btn-inv-close" data-id="6">Tutup Donasi</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-empty-state" id="invEmptyState">
+                        Tidak ada makanan dalam inventaris yang sesuai dengan filter atau pencarian Anda.
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div class="inv-modal-overlay" id="stockModalOverlay">
+            <div class="inv-modal">
+                <h2 class="inv-modal-title" id="modalItemTitle">Kelola Stok Makanan</h2>
+                <p class="inv-modal-subtitle">Perbarui jumlah porsi siap ambil untuk donasi makanan ini.</p>
+                <div class="inv-modal-stepper">
+                    <button type="button" class="btn-stepper" id="btnStepMinus">&#8722;</button>
+                    <input type="text" id="inputStockVal" class="inv-stepper-val" value="10" />
+                    <button type="button" class="btn-stepper" id="btnStepPlus">&#43;</button>
+                </div>
+                <div class="inv-modal-actions">
+                    <button type="button" class="btn-modal-cancel" id="btnCancelModal">Batal</button>
+                    <button type="button" class="btn-modal-save" id="btnSaveStock">Simpan Perubahan</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="site-footer" id="about">
+            <div class="footer-inner">
+                <div class="footer-top-columns">
+                    <div class="footer-col-left" id="help">
+                        <div class="footer-heading">Tetap Terhubung</div>
+                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
+                        <div class="footer-contact-p">Instagram: @pangkalanpangan</div>
+                        <div class="footer-contact-p">Surel: info@pangkalanpangan.id</div>
+                    </div>
+                    <div class="footer-col-center">
+                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
+                    </div>
+                    <div class="footer-col-right">
+                        <div class="footer-heading">Ambil peran</div>
+                        <ul class="footer-link-list">
+                            <li><a href="register.xhtml?role=donor">Donatur pangan</a></li>
+                            <li><a href="register.xhtml?role=donor">Mitra penyaluran</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="footer-divider-line" />
+
+                <div class="footer-bottom-copy">
+                    <img src="assets/images/footer_copyright.svg" alt="&#169; Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript" src="assets/js/inventory.js?v=3"></script>
+</body>
+</html>
