@@ -107,6 +107,23 @@ if ($aksi === 'batal' || $status_tujuan === 'dibatalkan') {
     mysqli_begin_transaction($conn);
 
     try {
+        // Kunci status dengan transisi atomik 'menunggu' -> 'dibatalkan' agar tidak terjadi double-refund stok
+        $sql_update = "UPDATE transaksi SET status = 'dibatalkan' WHERE id = ? AND status = 'menunggu'";
+        $stmt_update = mysqli_prepare($conn, $sql_update);
+        if (!$stmt_update) {
+            throw new Exception("Gagal memperbarui status transaksi.");
+        }
+        mysqli_stmt_bind_param($stmt_update, "i", $transaksi_id);
+        if (!mysqli_stmt_execute($stmt_update)) {
+            throw new Exception("Gagal mengeksekusi pembatalan transaksi.");
+        }
+        $affected = mysqli_stmt_affected_rows($stmt_update);
+        mysqli_stmt_close($stmt_update);
+
+        if ($affected !== 1) {
+            throw new Exception("Transaksi sudah diproses atau dibatalkan sebelumnya.");
+        }
+
         // Ambil semua rincian makanan yang ada di transaksi ini
         $sql_items = "SELECT makanan_id, jumlah FROM detail_transaksi WHERE transaksi_id = ?";
         $stmt_items = mysqli_prepare($conn, $sql_items);
@@ -140,18 +157,6 @@ if ($aksi === 'batal' || $status_tujuan === 'dibatalkan') {
         }
         mysqli_stmt_close($stmt_restore);
 
-        // Ubah status transaksi menjadi 'dibatalkan'
-        $sql_update = "UPDATE transaksi SET status = 'dibatalkan' WHERE id = ?";
-        $stmt_update = mysqli_prepare($conn, $sql_update);
-        if (!$stmt_update) {
-            throw new Exception("Gagal memperbarui status transaksi.");
-        }
-        mysqli_stmt_bind_param($stmt_update, "i", $transaksi_id);
-        if (!mysqli_stmt_execute($stmt_update)) {
-            throw new Exception("Gagal mengeksekusi pembatalan transaksi.");
-        }
-        mysqli_stmt_close($stmt_update);
-
         mysqli_commit($conn);
 
         $_SESSION['flash_success'] = 'Klaim pangan (' . htmlspecialchars($trx['kode_transaksi'], ENT_QUOTES, 'UTF-8') . ') berhasil dibatalkan. Kuota harian Anda telah dikembalikan.';
@@ -184,7 +189,28 @@ if (!$is_produsen && !$is_admin) {
     exit();
 }
 
-$sql_update_status = "UPDATE transaksi SET status = ? WHERE id = ?";
+if ($status_sekarang === 'dibatalkan' || $status_sekarang === 'selesai') {
+    $_SESSION['flash_error'] = 'Status transaksi yang sudah selesai atau dibatalkan tidak dapat diubah kembali.';
+    header('Location: ../transactions.php');
+    exit();
+}
+
+if ($status_tujuan === 'siap_diambil' && $status_sekarang !== 'menunggu') {
+    $_SESSION['flash_error'] = 'Hanya transaksi berstatus menunggu yang dapat ditandai siap diambil.';
+    header('Location: ../transactions.php');
+    exit();
+}
+
+if ($status_tujuan === 'selesai' && $status_sekarang !== 'menunggu' && $status_sekarang !== 'siap_diambil') {
+    $_SESSION['flash_error'] = 'Status transaksi saat ini tidak dapat langsung diselesaikan.';
+    header('Location: ../transactions.php');
+    exit();
+}
+
+$sql_update_status = ($status_tujuan === 'siap_diambil')
+    ? "UPDATE transaksi SET status = ? WHERE id = ? AND status = 'menunggu'"
+    : "UPDATE transaksi SET status = ? WHERE id = ? AND status IN ('menunggu', 'siap_diambil')";
+
 $stmt_update_status = mysqli_prepare($conn, $sql_update_status);
 if (!$stmt_update_status) {
     $_SESSION['flash_error'] = 'Gagal mempersiapkan kueri pembaruan status.';
@@ -194,15 +220,23 @@ if (!$stmt_update_status) {
 
 mysqli_stmt_bind_param($stmt_update_status, "si", $status_tujuan, $transaksi_id);
 if (mysqli_stmt_execute($stmt_update_status)) {
+    $affected_rows = mysqli_stmt_affected_rows($stmt_update_status);
     mysqli_stmt_close($stmt_update_status);
+
+    if ($affected_rows !== 1) {
+        $_SESSION['flash_error'] = 'Status transaksi telah berubah oleh proses lain. Silakan muat ulang halaman.';
+        header('Location: ../transactions.php');
+        exit();
+    }
 
     $label_status = ($status_tujuan === 'siap_diambil') ? 'Siap Diambil' : 'Selesai';
     $_SESSION['flash_success'] = "Status transaksi {$trx['kode_transaksi']} berhasil diperbarui menjadi: {$label_status}.";
 
-    if ($user_role === 'produsen') {
-        header('Location: ../producer_dashboard.xhtml?status=updated');
+    $redirect_to = isset($_POST['redirect_to']) ? trim($_POST['redirect_to']) : '';
+    if ($user_role === 'produsen' && $redirect_to === 'producer_dashboard') {
+        header('Location: ../producer_dashboard.php?status=updated');
     } else {
-        header('Location: ../transactions.php?status=updated');
+        header('Location: ../transactions.php?status=updated&code=' . urlencode($trx['kode_transaksi']));
     }
     exit();
 } else {

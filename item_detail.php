@@ -166,6 +166,7 @@ require_once 'includes/navbar.php';
                         <?php endif; ?>
                         <form action="cart.php" method="post" id="formClaimFood">
                             <div class="form-group">
+                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                 <input type="hidden" name="aksi" value="tambah" />
                                 <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                 <input type="hidden" id="maxClaimQty" value="<?php echo escapeHtml((string) $sisa_boleh_klaim); ?>" />

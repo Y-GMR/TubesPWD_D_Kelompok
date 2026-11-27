@@ -143,6 +143,11 @@
                 }
                 if (expiryRaw !== '' && !/^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?$/.test(expiryRaw)) {
                     errors.push('Format batas kedaluwarsa harus YYYY-MM-DD HH:MM.');
+                } else if (expiryRaw !== '') {
+                    var parsedExpiry = new Date(expiryRaw.replace(' ', 'T'));
+                    if (isNaN(parsedExpiry.getTime()) || parsedExpiry.getTime() <= Date.now()) {
+                        errors.push('Batas waktu kedaluwarsa harus lebih besar dari waktu saat ini.');
+                    }
                 }
                 if (alamat.length < 3 || alamat.length > 500) {
                     errors.push('Alamat gerai wajib diisi antara 3 hingga 500 karakter.');

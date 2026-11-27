@@ -11,6 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+// Verifikasi CSRF token
+$csrf_dikirim = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+if (!hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ../inventory.php?error=csrf_tidak_valid');
+    exit();
+}
+
 if (!$conn) {
     header('Location: ../inventory.php?error=koneksi_gagal');
     exit();
@@ -19,6 +26,13 @@ if (!$conn) {
 $produsen_id = (int) $_SESSION['user_id'];
 $action = isset($_POST['action']) ? bersihkanInput($_POST['action']) : '';
 $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+
+// Pastikan produsen sudah diverifikasi admin sebelum boleh mengubah data makanan
+$data_produsen_cek = ambilPenggunaById($conn, $produsen_id);
+if (!$data_produsen_cek || $data_produsen_cek['status_verifikasi'] !== 'disetujui') {
+    header('Location: ../producer_dashboard.php?error=belum_diverifikasi');
+    exit();
+}
 
 /**
  * Memvalidasi seluruh masukan formulir item makanan untuk operasi create/update.

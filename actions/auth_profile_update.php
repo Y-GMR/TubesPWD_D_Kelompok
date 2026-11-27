@@ -5,10 +5,17 @@ require_once '../includes/functions.php';
 
 require_login();
 
-$target_kembali = file_exists('../profile.php') ? '../profile.php' : '../profile.xhtml';
+$target_kembali = '../profile.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ' . $target_kembali);
+    exit();
+}
+
+// Verifikasi CSRF token
+$csrf_dikirim = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+if (!hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ' . $target_kembali . '?error=csrf_tidak_valid');
     exit();
 }
 
@@ -24,6 +31,12 @@ if ($nama_lengkap === '' || $username === '' || $email === '') {
     exit();
 }
 
+$panjang_nama = function_exists('mb_strlen') ? mb_strlen($nama_lengkap, 'UTF-8') : strlen($nama_lengkap);
+if ($panjang_nama < 2 || $panjang_nama > 100) {
+    header('Location: ' . $target_kembali . '?error=nama_tidak_valid');
+    exit();
+}
+
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     header('Location: ' . $target_kembali . '?error=email_tidak_valid');
     exit();
@@ -34,8 +47,19 @@ if (strlen($username) < 4 || strlen($username) > 30) {
     exit();
 }
 
+if (!preg_match('/^[a-zA-Z0-9_]{4,30}$/', $username)) {
+    header('Location: ' . $target_kembali . '?error=username_karakter_tidak_valid');
+    exit();
+}
+
 if (!$conn) {
     header('Location: ' . $target_kembali . '?error=koneksi_gagal');
+    exit();
+}
+
+$pengguna_lama = ambilPenggunaById($conn, $user_id);
+if (!$pengguna_lama) {
+    header('Location: ../login.php?error=login_required');
     exit();
 }
 
@@ -61,25 +85,43 @@ if ($duplikat) {
 }
 
 $foto_profil_baru = null;
-if (isset($_FILES['foto_profil']) && $_FILES['foto_profil']['error'] === UPLOAD_ERR_OK) {
-    $file_tmp  = $_FILES['foto_profil']['tmp_name'];
-    $file_name = $_FILES['foto_profil']['name'];
-    $file_size = $_FILES['foto_profil']['size'];
-    $file_ext  = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+if (isset($_FILES['foto_profil'])) {
+    $upload_foto = prosesUploadFotoProfil($_FILES['foto_profil'], '../');
+    if (!$upload_foto['ok']) {
+        $peta_err_foto = array(
+            'format_ditolak' => 'foto_format_ditolak',
+            'ukuran_terlalu_besar' => 'foto_terlalu_besar',
+            'mime_ditolak' => 'foto_mime_ditolak',
+            'upload_gagal' => 'foto_upload_gagal'
+        );
+        $kode_err = isset($peta_err_foto[$upload_foto['error']]) ? $peta_err_foto[$upload_foto['error']] : 'foto_upload_gagal';
+        header('Location: ' . $target_kembali . '?error=' . $kode_err);
+        exit();
+    }
+    if ($upload_foto['uploaded']) {
+        $foto_profil_baru = $upload_foto['path'];
+    }
+}
 
-    $ekstensi_diizinkan = array('jpg', 'jpeg', 'png');
-
-    if (in_array($file_ext, $ekstensi_diizinkan, true) && $file_size <= 2097152) {
-        $nama_file_acak = 'avatar_' . $user_id . '_' . time() . '.' . $file_ext;
-        $target_direktori = '../assets/uploads/avatars/';
-
-        if (!is_dir($target_direktori)) {
-            mkdir($target_direktori, 0777, true);
+$dokumen_baru = null;
+if ($pengguna_lama['peran'] === 'konsumen' && isset($_FILES['dokumen_kelayakan'])) {
+    $upload_doc = prosesUploadDokumenKelayakan($_FILES['dokumen_kelayakan'], '../');
+    if (!$upload_doc['ok']) {
+        if ($foto_profil_baru !== null) {
+            hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
         }
-
-        if (move_uploaded_file($file_tmp, $target_direktori . $nama_file_acak)) {
-            $foto_profil_baru = 'assets/uploads/avatars/' . $nama_file_acak;
-        }
+        $peta_err_doc = array(
+            'format_ditolak' => 'dokumen_format_ditolak',
+            'ukuran_terlalu_besar' => 'dokumen_terlalu_besar',
+            'mime_ditolak' => 'dokumen_mime_ditolak',
+            'upload_gagal' => 'dokumen_upload_gagal'
+        );
+        $kode_err = isset($peta_err_doc[$upload_doc['error']]) ? $peta_err_doc[$upload_doc['error']] : 'dokumen_upload_gagal';
+        header('Location: ' . $target_kembali . '?error=' . $kode_err);
+        exit();
+    }
+    if ($upload_doc['uploaded']) {
+        $dokumen_baru = $upload_doc['path'];
     }
 }
 
@@ -87,14 +129,20 @@ $ada_ganti_password = false;
 $kata_sandi_hash = '';
 if ($password_baru !== '') {
     if (strlen($password_baru) < 8) {
+        if ($foto_profil_baru !== null) hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
+        if ($dokumen_baru !== null) hapusBerkasAman($dokumen_baru, 'assets/uploads/documents/', '../');
         header('Location: ' . $target_kembali . '?error=password_terlalu_pendek');
         exit();
     }
     if (!preg_match('/[a-zA-Z]/', $password_baru) || !preg_match('/[0-9]/', $password_baru)) {
+        if ($foto_profil_baru !== null) hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
+        if ($dokumen_baru !== null) hapusBerkasAman($dokumen_baru, 'assets/uploads/documents/', '../');
         header('Location: ' . $target_kembali . '?error=password_tidak_memenuhi_syarat');
         exit();
     }
     if ($password_baru !== $konfirmasi_sandi) {
+        if ($foto_profil_baru !== null) hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
+        if ($dokumen_baru !== null) hapusBerkasAman($dokumen_baru, 'assets/uploads/documents/', '../');
         header('Location: ' . $target_kembali . '?error=password_tidak_cocok');
         exit();
     }
@@ -102,27 +150,51 @@ if ($password_baru !== '') {
     $ada_ganti_password = true;
 }
 
-if ($foto_profil_baru !== null && $ada_ganti_password) {
-    $stmt_update = mysqli_prepare($conn, "UPDATE pengguna SET nama_lengkap = ?, username = ?, email = ?, kata_sandi_hash = ?, foto_profil = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_update, "sssssi", $nama_lengkap, $username, $email, $kata_sandi_hash, $foto_profil_baru, $user_id);
-} elseif ($foto_profil_baru !== null) {
-    $stmt_update = mysqli_prepare($conn, "UPDATE pengguna SET nama_lengkap = ?, username = ?, email = ?, foto_profil = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_update, "ssssi", $nama_lengkap, $username, $email, $foto_profil_baru, $user_id);
-} elseif ($ada_ganti_password) {
-    $stmt_update = mysqli_prepare($conn, "UPDATE pengguna SET nama_lengkap = ?, username = ?, email = ?, kata_sandi_hash = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_update, "ssssi", $nama_lengkap, $username, $email, $kata_sandi_hash, $user_id);
-} else {
-    $stmt_update = mysqli_prepare($conn, "UPDATE pengguna SET nama_lengkap = ?, username = ?, email = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt_update, "sssi", $nama_lengkap, $username, $email, $user_id);
+$set_clauses = array("nama_lengkap = ?", "username = ?", "email = ?");
+$bind_types = "sss";
+$bind_params = array($nama_lengkap, $username, $email);
+
+if ($ada_ganti_password) {
+    $set_clauses[] = "kata_sandi_hash = ?";
+    $bind_types .= "s";
+    $bind_params[] = $kata_sandi_hash;
+}
+if ($foto_profil_baru !== null) {
+    $set_clauses[] = "foto_profil = ?";
+    $bind_types .= "s";
+    $bind_params[] = $foto_profil_baru;
+}
+if ($dokumen_baru !== null) {
+    $set_clauses[] = "dokumen_kelayakan = ?";
+    $bind_types .= "s";
+    $bind_params[] = $dokumen_baru;
+    $set_clauses[] = "status_verifikasi = 'menunggu'";
 }
 
+$bind_types .= "i";
+$bind_params[] = $user_id;
+
+$sql_update = "UPDATE pengguna SET " . implode(", ", $set_clauses) . " WHERE id = ?";
+$stmt_update = mysqli_prepare($conn, $sql_update);
+
 if (!$stmt_update) {
+    if ($foto_profil_baru !== null) hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
+    if ($dokumen_baru !== null) hapusBerkasAman($dokumen_baru, 'assets/uploads/documents/', '../');
     header('Location: ' . $target_kembali . '?error=sistem_gagal');
     exit();
 }
 
+mysqli_stmt_bind_param($stmt_update, $bind_types, ...$bind_params);
+
 if (mysqli_stmt_execute($stmt_update)) {
     mysqli_stmt_close($stmt_update);
+
+    if ($foto_profil_baru !== null && !empty($pengguna_lama['foto_profil'])) {
+        hapusBerkasAman($pengguna_lama['foto_profil'], 'assets/uploads/avatars/', '../');
+    }
+    if ($dokumen_baru !== null && !empty($pengguna_lama['dokumen_kelayakan'])) {
+        hapusBerkasAman($pengguna_lama['dokumen_kelayakan'], 'assets/uploads/documents/', '../');
+    }
 
     $_SESSION['full_name'] = $nama_lengkap;
     $_SESSION['username']  = $username;
@@ -134,6 +206,8 @@ if (mysqli_stmt_execute($stmt_update)) {
     exit();
 } else {
     mysqli_stmt_close($stmt_update);
+    if ($foto_profil_baru !== null) hapusBerkasAman($foto_profil_baru, 'assets/uploads/avatars/', '../');
+    if ($dokumen_baru !== null) hapusBerkasAman($dokumen_baru, 'assets/uploads/documents/', '../');
     header('Location: ' . $target_kembali . '?error=gagal_memperbarui');
     exit();
 }

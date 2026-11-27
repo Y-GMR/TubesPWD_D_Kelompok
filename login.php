@@ -19,6 +19,8 @@ if (isset($_GET['error'])) {
         $pesan_error = 'Anda tidak memiliki hak akses untuk halaman tersebut.';
     } elseif ($err === 'koneksi_gagal') {
         $pesan_error = 'Gagal terhubung ke basis data. Pastikan server MySQL berjalan.';
+    } elseif ($err === 'sistem_gagal') {
+        $pesan_error = 'Terjadi gangguan kueri pada server. Silakan coba lagi.';
     } else {
         $pesan_error = 'Terjadi kesalahan sistem. Silakan coba kembali.';
     }
@@ -36,7 +38,7 @@ if (isset($_GET['pesan'])) {
 $page_title = 'Login Akun - Pangkalan Pangan';
 $page_wrapper_class = 'auth-page-wrapper';
 $extra_css = array('auth.css?v=6');
-$extra_js = array('auth.js');
+$extra_js = array('auth.js?v=3');
 
 require_once 'includes/header.php';
 ?>
@@ -49,7 +51,7 @@ require_once 'includes/header.php';
             <ul class="auth-nav-menu">
                 <li><a href="katalog.php#about">Tentang kami</a></li>
                 <li><a href="katalog.php">Katalog Pangan</a></li>
-                <li><a href="customer_service.xhtml">Bantuan</a></li>
+                <li><a href="#help">Bantuan</a></li>
             </ul>
             <a href="katalog.php" class="btn-nav-back">Kembali ke Beranda</a>
         </div>
@@ -75,18 +77,18 @@ require_once 'includes/header.php';
                 <form action="actions/auth_login.php" method="post" class="auth-form" id="loginForm">
                     <div class="auth-form-group">
                         <label for="loginUsername" class="auth-label">Username</label>
-                        <input type="text" id="loginUsername" name="username" class="auth-input" placeholder="Username" />
+                        <input type="text" id="loginUsername" name="username" class="auth-input" />
                     </div>
 
                     <div class="auth-form-group">
                         <label for="loginEmail" class="auth-label">Alamat Email</label>
-                        <input type="text" id="loginEmail" name="email" class="auth-input" placeholder="Email" />
+                        <input type="text" id="loginEmail" name="email" class="auth-input" />
                     </div>
 
                     <div class="auth-form-group">
                         <label for="loginPassword" class="auth-label">Kata Sandi</label>
                         <div class="auth-password-wrap">
-                            <input type="password" id="loginPassword" name="password" class="auth-input" placeholder="Kata Sandi" />
+                            <input type="password" id="loginPassword" name="password" class="auth-input" />
                             <button type="button" class="btn-toggle-eye" id="btnTogglePassword" title="Lihat kata sandi">
                                 <img src="assets/images/icon_eye.svg" alt="Lihat kata sandi" />
                             </button>
@@ -95,13 +97,15 @@ require_once 'includes/header.php';
 
                     <div class="auth-options-row">
                         <label class="auth-checkbox-label">
-                            <input type="checkbox" name="remember" />
+                            <input type="checkbox" name="remember" value="1" />
                             <span>Ingat saya di perangkat ini</span>
                         </label>
-                        <a href="customer_service.xhtml" class="auth-forgot-link">Lupa kata sandi?</a>
+                        <a href="#help" class="auth-forgot-link">Lupa kata sandi?</a>
                     </div>
 
-                    <button type="submit" class="btn-auth-submit btn-auth-terracotta">Masuk Sekarang &#8594;</button>
+                    <div>
+                        <button type="submit" class="btn-auth-submit btn-auth-terracotta">Masuk Sekarang &#8594;</button>
+                    </div>
                 </form>
 
                 <div class="auth-switch-footer">

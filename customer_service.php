@@ -7,7 +7,7 @@ $pengguna_id = (int) $_SESSION['user_id'];
 $email_user = '';
 $nama_user = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : '';
 
-$stmt = mysqli_prepare($conn, "SELECT email, nama_lengkap FROM pengguna WHERE id = ?");
+$stmt = $conn ? mysqli_prepare($conn, "SELECT email, nama_lengkap FROM pengguna WHERE id = ?") : false;
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "i", $pengguna_id);
     mysqli_stmt_execute($stmt);
@@ -23,6 +23,12 @@ $pesan_error = '';
 if (isset($_GET['error'])) {
     if ($_GET['error'] === 'empty_fields') {
         $pesan_error = 'Topik, subjek, dan rincian pesan wajib diisi.';
+    } elseif ($_GET['error'] === 'trx_code_too_long') {
+        $pesan_error = 'Kode transaksi maksimal 32 karakter.';
+    } elseif ($_GET['error'] === 'csrf_invalid') {
+        $pesan_error = 'Sesi formulir tidak valid. Silakan muat ulang halaman dan coba lagi.';
+    } elseif ($_GET['error'] === 'db_error') {
+        $pesan_error = 'Terjadi gangguan pada basis data. Silakan coba beberapa saat lagi.';
     } else {
         $pesan_error = 'Terjadi kesalahan saat menyimpan tiket bantuan. Silakan coba lagi.';
     }
@@ -59,6 +65,9 @@ if (isset($_GET['error'])) {
                 <?php endif; ?>
 
                 <form action="actions/cs_ticket_create.php" method="post" id="csTicketForm">
+                    <div>
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : '', ENT_QUOTES, 'UTF-8'); ?>" />
+                    </div>
                     <h2 class="cs-section-title">Informasi Kontak Pengadu</h2>
                     <div class="cs-form-row">
                         <div class="cs-form-col">
@@ -74,7 +83,7 @@ if (isset($_GET['error'])) {
                     <div class="cs-form-row">
                         <div class="cs-form-col">
                             <label for="trxCodeInput" class="cs-label">Kode Transaksi Terkait (Opsional)</label>
-                            <input type="text" id="trxCodeInput" name="trx_code" class="cs-input" placeholder="Contoh: #PP-20261122-001 (Kosongkan jika bukan mengenai klaim)" />
+                            <input type="text" id="trxCodeInput" name="trx_code" class="cs-input" maxlength="32" />
                         </div>
                     </div>
 
@@ -101,14 +110,14 @@ if (isset($_GET['error'])) {
                     <div class="cs-form-row">
                         <div class="cs-form-col">
                             <label for="subjectInput" class="cs-label">Judul / Subjek Tiket *</label>
-                            <input type="text" id="subjectInput" name="subject" class="cs-input" placeholder="Ringkasan kendala Anda dalam satu kalimat" />
+                            <input type="text" id="subjectInput" name="subject" class="cs-input" />
                         </div>
                     </div>
 
                     <div class="cs-form-row">
                         <div class="cs-form-col">
                             <label for="messageTextarea" class="cs-label">Rincian Masalah / Pesan Pengaduan *</label>
-                            <textarea id="messageTextarea" name="message" class="cs-textarea" rows="4" cols="50" placeholder="Jelaskan kendala Anda secara rinci..."></textarea>
+                            <textarea id="messageTextarea" name="message" class="cs-textarea" rows="4" cols="50"></textarea>
                         </div>
                     </div>
 
@@ -127,8 +136,8 @@ if (isset($_GET['error'])) {
                     <div class="footer-col-left" id="help">
                         <div class="footer-heading">Tetap Terhubung</div>
                         <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
-                        <div class="footer-contact-p">Instagram: @pangkalanpangan</div>
-                        <div class="footer-contact-p">Surel: info@pangkalanpangan.id</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Surel: PangkalanPangan@gmail.com</div>
                     </div>
                     <div class="footer-col-center">
                         <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />

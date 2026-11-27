@@ -22,13 +22,16 @@
         var docPreviewImg = document.getElementById('profileDocPreviewImg');
         var sktmBox = document.querySelector('.profile-sktm-verified-box');
         var sktmStatusVal = document.getElementById('profileSktmStatusVal');
+        var initialDocHtml = docNameEl ? docNameEl.innerHTML : '';
+        var initialSktmStatusText = sktmStatusVal ? sktmStatusVal.textContent : '';
+        var initialSktmBoxText = sktmBox ? sktmBox.textContent : '';
 
         function resetDocPreview() {
-            if (docNameEl) docNameEl.textContent = 'Belum ada berkas baru dipilih (PDF, JPG, atau PNG maks. 2MB)';
+            if (docNameEl) docNameEl.innerHTML = initialDocHtml || 'Belum ada berkas baru dipilih (PDF, JPG, atau PNG maks. 2MB)';
             if (docPreviewWrap) docPreviewWrap.style.display = 'none';
             if (docPreviewImg) docPreviewImg.style.display = 'none';
-            if (sktmStatusVal) sktmStatusVal.textContent = '-';
-            if (sktmBox) sktmBox.textContent = 'Status verifikasi dokumen SKTM akan tampil di sini.';
+            if (sktmStatusVal) sktmStatusVal.textContent = initialSktmStatusText || '-';
+            if (sktmBox) sktmBox.textContent = initialSktmBoxText || 'Status verifikasi dokumen SKTM akan tampil di sini.';
         }
 
         if (docInput) {

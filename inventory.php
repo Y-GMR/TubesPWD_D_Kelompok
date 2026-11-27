@@ -8,7 +8,15 @@ require_role('produsen');
 
 $produsen_id = (int) $_SESSION['user_id'];
 $produsen = ambilPenggunaById($conn, $produsen_id);
-$nama_gerai = ($produsen && trim((string) $produsen['nama_lengkap']) !== '')
+
+// Blokir produsen yang belum diverifikasi admin
+if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
+    $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola inventaris.';
+    header('Location: producer_dashboard.php?error=belum_diverifikasi');
+    exit();
+}
+
+$nama_gerai = trim((string) $produsen['nama_lengkap']) !== ''
     ? $produsen['nama_lengkap']
     : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Mitra Produsen');
 
@@ -89,6 +97,7 @@ $map_error = array(
     'aksi_tidak_valid'           => 'Permintaan aksi inventaris tidak dikenali.',
     'id_tidak_valid'             => 'ID makanan tidak valid.',
     'akses_ditolak'              => 'Akses ditolak: Anda hanya dapat mengelola makanan milik gerai Anda sendiri.',
+    'unauthorized'               => 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.',
     'stok_tidak_valid'           => 'Nilai stok harus berupa bilangan bulat antara 0 hingga 9999.',
     'makanan_memiliki_transaksi' => 'Produk tidak dapat dihapus karena tercatat dalam riwayat klaim transaksi. Gunakan tombol Tutup Donasi untuk menonaktifkan.',
     'gagal_simpan'               => 'Gagal menyimpan perubahan data inventaris.',
@@ -96,6 +105,18 @@ $map_error = array(
 );
 
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);
+if (isset($_SESSION['flash_error'])) {
+    if ($flash['error'] === '') {
+        $flash['error'] = trim((string) $_SESSION['flash_error']);
+    }
+    unset($_SESSION['flash_error']);
+}
+if (isset($_SESSION['flash_success'])) {
+    if ($flash['sukses'] === '') {
+        $flash['sukses'] = trim((string) $_SESSION['flash_success']);
+    }
+    unset($_SESSION['flash_success']);
+}
 
 $page_title = 'Manajemen Inventaris Pangan - Pangkalan Pangan';
 $extra_css = array('components.css?v=8', 'inventory.css?v=1');
@@ -186,6 +207,7 @@ require_once 'includes/navbar.php';
                             $banner_idx = ($index % 6) + 1;
                             $foto_src = crud1FormatFotoUrl($item['foto_makanan']);
                             $batas_tampil = crud1FormatKedaluwarsaTampil($item['kedaluwarsa_pada']);
+                            $sudah_kedaluwarsa = (!empty($item['kedaluwarsa_pada']) && strtotime($item['kedaluwarsa_pada']) <= time());
 
                             if ($stok_int <= 0) {
                                 $status_kartu = 'closed';
@@ -201,7 +223,9 @@ require_once 'includes/navbar.php';
                                 <div class="inv-card-banner bg-banner-<?php echo escapeHtml((string) $banner_idx); ?>">
                                     <img src="<?php echo escapeHtml($foto_src); ?>" alt="<?php echo escapeHtml($item['nama_makanan']); ?>" class="inv-banner-img" />
                                     <span class="inv-stock-badge<?php echo ($stok_int <= 8) ? ' warning' : ''; ?> stock-badge-val">Stok: <?php echo escapeHtml((string) $stok_int); ?></span>
-                                    <?php if ($stok_int > 0 && $stok_int <= 8): ?>
+                                    <?php if ($stok_int > 0 && $sudah_kedaluwarsa): ?>
+                                        <span class="inv-low-stock-badge">Kedaluwarsa</span>
+                                    <?php elseif ($stok_int > 0 && $stok_int <= 8): ?>
                                         <span class="inv-low-stock-badge">Stok Menipis</span>
                                     <?php elseif ($stok_int <= 0): ?>
                                         <span class="inv-low-stock-badge">Donasi Ditutup</span>
@@ -212,7 +236,7 @@ require_once 'includes/navbar.php';
                                     <h2 class="inv-item-title"><?php echo escapeHtml($item['nama_makanan']); ?></h2>
                                     <p class="inv-item-meta">Kategori: <?php echo escapeHtml($item['nama_kategori']); ?> &#8226; <?php echo escapeHtml($nama_gerai); ?></p>
                                     <p class="inv-item-price"><?php echo escapeHtml(formatRupiah($harga_int)); ?></p>
-                                    <p class="inv-item-limit">Batas Ambil: <?php echo escapeHtml($batas_tampil); ?></p>
+                                    <p class="inv-item-limit">Batas Ambil: <?php echo escapeHtml($batas_tampil); ?><?php echo ($stok_int > 0 && $sudah_kedaluwarsa) ? ' (Lewat - Perbarui agar tampil di katalog)' : ''; ?></p>
 
                                     <div class="inv-card-actions">
                                         <button type="button"
@@ -224,6 +248,7 @@ require_once 'includes/navbar.php';
                                         <?php if ($stok_int > 0): ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-close" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="tutup_donasi" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Tutup Donasi</button>
@@ -241,6 +266,7 @@ require_once 'includes/navbar.php';
                                         <?php else: ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-delete" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="delete" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Hapus</button>
@@ -265,6 +291,7 @@ require_once 'includes/navbar.php';
             <div class="inv-modal">
                 <form action="actions/crud1_item.php" method="post" id="stockModalForm">
                     <div>
+                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                         <input type="hidden" name="action" value="update_stok" />
                         <input type="hidden" name="id" id="modalItemIdInput" value="" />
                     </div>

@@ -1,6 +1,10 @@
 <?php
 header('Content-Type: application/json; charset=UTF-8');
 
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $field = isset($_GET['field']) ? trim($_GET['field']) : '';
 $value = isset($_GET['value']) ? trim($_GET['value']) : '';
 
@@ -38,15 +42,29 @@ if (file_exists('../config/database.php')) {
     require_once 'config/database.php';
 }
 
+$current_user_id = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : 0;
+
 if ($conn && $conn instanceof mysqli) {
     if ($field === 'username') {
-        $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE username = ? LIMIT 1");
+        if ($current_user_id > 0) {
+            $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE username = ? AND id != ? LIMIT 1");
+        } else {
+            $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE username = ? LIMIT 1");
+        }
     } else {
-        $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE email = ? LIMIT 1");
+        if ($current_user_id > 0) {
+            $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE email = ? AND id != ? LIMIT 1");
+        } else {
+            $stmt = mysqli_prepare($conn, "SELECT id FROM pengguna WHERE email = ? LIMIT 1");
+        }
     }
 
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "s", $value);
+        if ($current_user_id > 0) {
+            mysqli_stmt_bind_param($stmt, "si", $value, $current_user_id);
+        } else {
+            mysqli_stmt_bind_param($stmt, "s", $value);
+        }
         mysqli_stmt_execute($stmt);
         mysqli_stmt_store_result($stmt);
         $num_rows = mysqli_stmt_num_rows($stmt);

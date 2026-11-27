@@ -8,7 +8,15 @@ require_role('produsen');
 
 $produsen_id = (int) $_SESSION['user_id'];
 $produsen = ambilPenggunaById($conn, $produsen_id);
-$nama_gerai = ($produsen && trim((string) $produsen['nama_lengkap']) !== '')
+
+// Blokir produsen yang belum diverifikasi admin
+if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
+    $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola makanan.';
+    header('Location: producer_dashboard.php?error=belum_diverifikasi');
+    exit();
+}
+
+$nama_gerai = trim((string) $produsen['nama_lengkap']) !== ''
     ? $produsen['nama_lengkap']
     : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Mitra Produsen');
 
@@ -98,6 +106,7 @@ require_once 'includes/navbar.php';
 
             <form action="actions/crud1_item.php" method="post" enctype="multipart/form-data" id="formAddFood" class="add-food-grid">
                 <div>
+                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                     <input type="hidden" name="action" value="<?php echo escapeHtml($val_action); ?>" />
                     <?php if ($is_edit): ?>
                         <input type="hidden" name="id" value="<?php echo escapeHtml($val_id); ?>" />

@@ -22,8 +22,29 @@ if (file_exists('../../config/database.php')) {
 
 $pesan_sukses = '';
 $pesan_error = '';
+if (isset($_SESSION['flash_success'])) {
+    $pesan_sukses = $_SESSION['flash_success'];
+    unset($_SESSION['flash_success']);
+}
+if (isset($_SESSION['flash_error'])) {
+    $pesan_error = $_SESSION['flash_error'];
+    unset($_SESSION['flash_error']);
+} elseif (isset($_GET['error']) && $_GET['error'] === 'unauthorized') {
+    $pesan_error = 'Anda tidak memiliki izin untuk mengakses halaman tersebut.';
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
+    $token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (!hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
+        $_SESSION['flash_error'] = 'Sesi formulir tidak sah (CSRF token invalid). Silakan coba lagi.';
+        header('Location: manage_users.php');
+        exit();
+    }
+
     $aksi = isset($_POST['aksi']) ? $_POST['aksi'] : '';
 
     if ($aksi === 'verifikasi_pengguna') {
@@ -31,19 +52,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
         $status_baru = isset($_POST['status_verifikasi']) ? $_POST['status_verifikasi'] : '';
         $catatan = isset($_POST['catatan_verifikasi']) ? trim($_POST['catatan_verifikasi']) : '';
 
-        if ($pengguna_id > 0 && ($status_baru === 'disetujui' || $status_baru === 'ditolak')) {
+        if ($pengguna_id === (int) $_SESSION['user_id']) {
+            $_SESSION['flash_error'] = 'Anda tidak dapat mengubah status verifikasi akun Anda sendiri.';
+        } elseif ($pengguna_id > 0 && ($status_baru === 'disetujui' || $status_baru === 'ditolak' || $status_baru === 'menunggu')) {
             $stmt = mysqli_prepare($conn, "UPDATE pengguna SET status_verifikasi = ?, catatan_verifikasi = ? WHERE id = ?");
             if ($stmt) {
                 mysqli_stmt_bind_param($stmt, "ssi", $status_baru, $catatan, $pengguna_id);
                 if (mysqli_stmt_execute($stmt)) {
-                    $pesan_sukses = 'Status verifikasi pengguna berhasil diperbarui.';
+                    $_SESSION['flash_success'] = 'Status verifikasi pengguna berhasil diperbarui.';
                 } else {
-                    $pesan_error = 'Gagal memperbarui status verifikasi.';
+                    $_SESSION['flash_error'] = 'Gagal memperbarui status verifikasi.';
                 }
                 mysqli_stmt_close($stmt);
             }
         } else {
-            $pesan_error = 'Data verifikasi tidak valid.';
+            $_SESSION['flash_error'] = 'Data verifikasi tidak valid.';
         }
     } elseif ($aksi === 'balas_tiket') {
         $tiket_id = isset($_POST['tiket_id']) ? (int) $_POST['tiket_id'] : 0;
@@ -55,16 +78,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
             if ($stmt) {
                 mysqli_stmt_bind_param($stmt, "ssi", $balasan, $status_selesai, $tiket_id);
                 if (mysqli_stmt_execute($stmt)) {
-                    $pesan_sukses = 'Balasan tiket bantuan berhasil disimpan.';
+                    $_SESSION['flash_success'] = 'Balasan tiket bantuan berhasil disimpan.';
                 } else {
-                    $pesan_error = 'Gagal menyimpan balasan tiket.';
+                    $_SESSION['flash_error'] = 'Gagal menyimpan balasan tiket.';
                 }
                 mysqli_stmt_close($stmt);
             }
         } else {
-            $pesan_error = 'Balasan tiket tidak boleh kosong.';
+            $_SESSION['flash_error'] = 'Balasan tiket tidak boleh kosong.';
         }
+    } else {
+        $_SESSION['flash_error'] = 'Aksi tidak dikenali.';
     }
+
+    header('Location: manage_users.php');
+    exit();
 }
 
 $daftar_pengguna = array();
@@ -112,6 +140,11 @@ if ($conn) {
             <ul class="sidebar-menu">
                 <li><a href="dashboard.php">Dashboard</a></li>
                 <li><a href="manage_users.php" class="active">Verifikasi &amp; CS</a></li>
+                <li><a href="../../manage_categories.php">Kelola Kategori</a></li>
+                <li><a href="../../transactions.php">Kelola Transaksi</a></li>
+                <li><a href="../../katalog.php">Lihat Katalog</a></li>
+                <li><a href="../../profile.php">Profil Saya</a></li>
+                <li><a href="../../actions/auth_logout.php">Keluar</a></li>
             </ul>
         </div>
 
@@ -123,7 +156,7 @@ if ($conn) {
 
             <?php if (!$conn): ?>
                 <div class="alert alert-warning">
-                    Koneksi database belum aktif (menunggu config/database.php dari Role 1). Menampilkan struktur tabel placeholder.
+                    Koneksi database belum aktif. Menampilkan tabel kosong.
                 </div>
             <?php endif; ?>
 
@@ -137,6 +170,7 @@ if ($conn) {
 
             <div class="section-box">
                 <h2>Daftar Pengguna &amp; Verifikasi Dokumen Kelayakan</h2>
+                <div style="overflow-x: auto;">
                 <table class="table-modern table-striped">
                     <thead>
                         <tr class="table-header">
@@ -155,43 +189,59 @@ if ($conn) {
                             </tr>
                         <?php else: ?>
                             <?php foreach ($daftar_pengguna as $user): ?>
+                                <?php
+                                $doc_val = trim((string) $user['dokumen_kelayakan']);
+                                $doc_href = '';
+                                if ($doc_val !== '') {
+                                    $doc_href = (strpos($doc_val, 'assets/') === 0) ? ('../../' . $doc_val) : ('../../assets/uploads/documents/' . $doc_val);
+                                }
+                                $st_ver = isset($user['status_verifikasi']) ? $user['status_verifikasi'] : 'menunggu';
+                                ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars($user['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars($user['peran'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td>
-                                        <?php if (!empty($user['dokumen_kelayakan'])): ?>
-                                            <a href="../../assets/uploads/documents/<?php echo htmlspecialchars($user['dokumen_kelayakan'], ENT_QUOTES, 'UTF-8'); ?>">Lihat Dokumen</a>
+                                        <?php if ($doc_href !== ''): ?>
+                                            <a href="<?php echo htmlspecialchars($doc_href, ENT_QUOTES, 'UTF-8'); ?>">Lihat Dokumen</a>
                                         <?php else: ?>
                                             <span>Belum ada</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="badge"><?php echo htmlspecialchars($user['status_verifikasi'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <span class="badge"><?php echo htmlspecialchars($st_ver, ENT_QUOTES, 'UTF-8'); ?></span>
                                     </td>
                                     <td>
+                                        <?php if ((int) $user['id'] === (int) $_SESSION['user_id']): ?>
+                                            <span>Akun Admin Aktif</span>
+                                        <?php else: ?>
                                         <form method="post" action="manage_users.php" class="inline-form">
                                             <div>
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="hidden" name="aksi" value="verifikasi_pengguna" />
                                                 <input type="hidden" name="pengguna_id" value="<?php echo htmlspecialchars((string) $user['id'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="text" name="catatan_verifikasi" class="form-control" value="<?php echo htmlspecialchars((string) $user['catatan_verifikasi'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <select name="status_verifikasi" class="form-control">
-                                                    <option value="disetujui">Setujui</option>
-                                                    <option value="ditolak">Tolak</option>
+                                                    <option value="menunggu"<?php if ($st_ver === 'menunggu') echo ' selected="selected"'; ?>>Menunggu</option>
+                                                    <option value="disetujui"<?php if ($st_ver === 'disetujui') echo ' selected="selected"'; ?>>Setujui</option>
+                                                    <option value="ditolak"<?php if ($st_ver === 'ditolak') echo ' selected="selected"'; ?>>Tolak</option>
                                                 </select>
                                                 <button type="submit" class="btn btn-primary">Simpan</button>
                                             </div>
                                         </form>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
 
             <div class="section-box">
                 <h2>Antrean Tiket Bantuan (Customer Service)</h2>
+                <div style="overflow-x: auto;">
                 <table class="table-modern table-striped">
                     <thead>
                         <tr class="table-header">
@@ -221,6 +271,7 @@ if ($conn) {
                                     <td>
                                         <form method="post" action="manage_users.php" class="inline-form">
                                             <div>
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="hidden" name="aksi" value="balas_tiket" />
                                                 <input type="hidden" name="tiket_id" value="<?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="text" name="balasan_admin" class="form-control" value="<?php echo htmlspecialchars((string) $tiket['balasan_admin'], ENT_QUOTES, 'UTF-8'); ?>" />
@@ -233,6 +284,7 @@ if ($conn) {
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

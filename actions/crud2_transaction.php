@@ -162,7 +162,7 @@ $makanan_db = array();
 $placeholders = implode(',', array_fill(0, count($item_ids), '?'));
 $types = str_repeat('i', count($item_ids));
 
-$sql_makanan = "SELECT id, produsen_id, nama_makanan, harga, stok FROM makanan WHERE id IN ($placeholders)";
+$sql_makanan = "SELECT id, produsen_id, nama_makanan, harga, stok, kedaluwarsa_pada FROM makanan WHERE id IN ($placeholders)";
 $stmt_makanan = mysqli_prepare($conn, $sql_makanan);
 if (!$stmt_makanan) {
     $_SESSION['flash_error'] = 'Gagal memverifikasi stok inventaris.';
@@ -178,7 +178,7 @@ while ($row = mysqli_fetch_assoc($res_makanan)) {
 }
 mysqli_stmt_close($stmt_makanan);
 
-// Periksa kelengkapan dan kecukupan stok
+// Periksa kelengkapan, kedaluwarsa, dan kecukupan stok
 foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
     $m_id = (int) $makanan_id;
     $qty_diminta = (int) $c_item['jumlah'];
@@ -186,6 +186,14 @@ foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
 
     if (!isset($makanan_db[$m_id])) {
         $_SESSION['flash_error'] = "Salah satu menu makanan tidak ditemukan di basis data.";
+        header('Location: ../cart.php');
+        exit();
+    }
+
+    $kedaluwarsa_raw = isset($makanan_db[$m_id]['kedaluwarsa_pada']) ? $makanan_db[$m_id]['kedaluwarsa_pada'] : null;
+    if ($kedaluwarsa_raw !== null && trim((string) $kedaluwarsa_raw) !== '' && strtotime($kedaluwarsa_raw) <= time()) {
+        $nama_m = $makanan_db[$m_id]['nama_makanan'];
+        $_SESSION['flash_error'] = "Menu '{$nama_m}' telah melewati batas kedaluwarsa.";
         header('Location: ../cart.php');
         exit();
     }
@@ -228,6 +236,13 @@ foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
     $pesanan_per_produsen[$produsen_id]['total_harga'] += $subtotal;
 }
 
+if ($sudah_checkout + count($pesanan_per_produsen) > $maks_checkout_harian) {
+    $sisa_trx = max(0, $maks_checkout_harian - $sudah_checkout);
+    $_SESSION['flash_error'] = "Batas checkout harian terlampaui. Sisa kuota transaksi Anda hari ini: {$sisa_trx} kali (keranjang menghasilkan " . count($pesanan_per_produsen) . " transaksi).";
+    header('Location: ../cart.php');
+    exit();
+}
+
 // 8. Eksekusi Transaksi Atomik MySQLi (ACID Transaction)
 mysqli_begin_transaction($conn);
 
@@ -248,15 +263,15 @@ try {
         throw new Exception("Gagal mempersiapkan kueri rincian transaksi: " . mysqli_error($conn));
     }
 
-    $sql_potong_stok = "UPDATE makanan SET stok = stok - ? WHERE id = ? AND stok >= ?";
+    $sql_potong_stok = "UPDATE makanan SET stok = stok - ? WHERE id = ? AND stok >= ? AND (kedaluwarsa_pada IS NULL OR kedaluwarsa_pada > NOW())";
     $stmt_potong_stok = mysqli_prepare($conn, $sql_potong_stok);
     if (!$stmt_potong_stok) {
         throw new Exception("Gagal mempersiapkan kueri pembaruan stok: " . mysqli_error($conn));
     }
 
     foreach ($pesanan_per_produsen as $prod_id => $data_trx) {
-        // Hasilkan Kode Transaksi Unik: PP-YYYYMMDD-XXXX
-        $acak = strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+        // Hasilkan Kode Transaksi Unik: PP-YYYYMMDD-XXXXXX
+        $acak = strtoupper(bin2hex(random_bytes(3)));
         $kode_trx = 'PP-' . date('Ymd') . '-' . $acak;
 
         $total_harga = (int) $data_trx['total_harga'];

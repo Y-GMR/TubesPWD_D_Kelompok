@@ -1,32 +1,20 @@
 <?php
-if (file_exists('includes/session.php')) {
-    require_once 'includes/session.php';
-}
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-$conn = null;
-if (file_exists('config/database.php')) {
-    require_once 'config/database.php';
-}
-
-if (file_exists('includes/functions.php')) {
-    require_once 'includes/functions.php';
-}
+require_once 'includes/session.php';
+require_once 'config/database.php';
+require_once 'includes/functions.php';
+require_once 'includes/crud1_helpers.php';
 
 // 1. Session Guard: Wajib Login
-if (!function_exists('is_logged_in') || !is_logged_in()) {
-    header("Location: login.php?error=login_required");
-    exit();
-}
+require_login();
 
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
+
+if ($user_role === 'produsen') {
+    $_SESSION['flash_error'] = 'Akun produsen tidak dapat melakukan klaim pangan konsumen.';
+    header("Location: producer_dashboard.php?error=unauthorized");
+    exit();
+}
 
 // Inisialisasi keranjang jika belum ada
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
@@ -155,6 +143,8 @@ $produsen_groups = array();
 $total_porsi = 0;
 $total_harga = 0;
 $stok_habis = false;
+$ada_kedaluwarsa = false;
+$ditemukan_ids = array();
 
 if ($conn && !empty($ids)) {
     $placeholders = implode(',', array_fill(0, count($ids), '?'));
@@ -177,28 +167,39 @@ if ($conn && !empty($ids)) {
 
         while ($row = mysqli_fetch_assoc($res_items)) {
             $item_id = (int) $row['id'];
+            $ditemukan_ids[$item_id] = true;
             $qty = isset($_SESSION['cart'][$item_id]['jumlah']) ? (int) $_SESSION['cart'][$item_id]['jumlah'] : 1;
             $harga = (int) $row['harga'];
             $subtotal = $harga * $qty;
             $stok = (int) $row['stok'];
+            $ked_raw = isset($row['kedaluwarsa_pada']) ? $row['kedaluwarsa_pada'] : null;
 
             if ($qty > $stok) {
                 $stok_habis = true;
+            }
+            if ($ked_raw !== null && trim((string) $ked_raw) !== '' && strtotime($ked_raw) <= time()) {
+                $ada_kedaluwarsa = true;
             }
 
             $prod_id = (int) $row['produsen_id'];
             if (!isset($produsen_groups[$prod_id])) {
                 $produsen_groups[$prod_id] = array(
-                    'produsen_id'    => $prod_id,
-                    'nama_produsen'  => $row['nama_produsen'],
-                    'logo_produsen'  => $row['logo_produsen'],
-                    'alamat_ambil'   => $row['alamat_ambil'],
-                    'latitude_ambil' => $row['latitude_ambil'],
-                    'longitude_ambil'=> $row['longitude_ambil'],
-                    'items'          => array(),
-                    'subtotal_grup'  => 0,
-                    'porsi_grup'     => 0
+                    'produsen_id'       => $prod_id,
+                    'nama_produsen'     => $row['nama_produsen'],
+                    'logo_produsen'     => $row['logo_produsen'],
+                    'alamat_ambil'      => $row['alamat_ambil'],
+                    'latitude_ambil'    => $row['latitude_ambil'],
+                    'longitude_ambil'   => $row['longitude_ambil'],
+                    'earliest_expiry'   => $ked_raw,
+                    'items'             => array(),
+                    'subtotal_grup'     => 0,
+                    'porsi_grup'        => 0
                 );
+            } elseif ($ked_raw !== null && trim((string) $ked_raw) !== '') {
+                $cur_exp = $produsen_groups[$prod_id]['earliest_expiry'];
+                if ($cur_exp === null || trim((string) $cur_exp) === '' || strtotime($ked_raw) < strtotime($cur_exp)) {
+                    $produsen_groups[$prod_id]['earliest_expiry'] = $ked_raw;
+                }
             }
 
             $row['jumlah'] = $qty;
@@ -212,6 +213,30 @@ if ($conn && !empty($ids)) {
         }
         mysqli_stmt_close($stmt_items);
     }
+}
+
+foreach ($ids as $id_cek) {
+    if (!isset($ditemukan_ids[$id_cek])) {
+        unset($_SESSION['cart'][$id_cek]);
+    }
+}
+
+if (empty($produsen_groups) || $total_porsi <= 0) {
+    $_SESSION['flash_error'] = 'Item pada keranjang Anda sudah tidak tersedia. Silakan pilih menu lain.';
+    header("Location: cart.php");
+    exit();
+}
+
+if ($ada_kedaluwarsa) {
+    $_SESSION['flash_error'] = 'Sebagian item pada keranjang sudah melewati batas waktu pengambilan / kedaluwarsa. Silakan sesuaikan keranjang Anda.';
+    header("Location: cart.php");
+    exit();
+}
+
+if ($sudah_checkout_hari_ini + count($produsen_groups) > $maks_checkout_harian) {
+    $_SESSION['flash_error'] = "Batas transaksi harian terlampaui (maksimal {$maks_checkout_harian} transaksi per hari; pesanan lintas " . count($produsen_groups) . " produsen melebihi sisa kuota checkout Anda).";
+    header("Location: cart.php");
+    exit();
 }
 
 // Validasi batas item porsi per keranjang
@@ -235,7 +260,8 @@ if ($stok_habis) {
 }
 
 $page_title = 'Konfirmasi Klaim Pangan - Pangkalan Pangan';
-$extra_css = array('checkout.css?v=6');
+$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+$extra_js = array('crud1_navbar.js?v=1');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
 ?>
@@ -255,14 +281,8 @@ require_once 'includes/navbar.php';
             <div class="checkout-left-col">
                 <?php foreach ($produsen_groups as $prod_id => $group): ?>
                     <?php
-                    $logo_file = $group['logo_produsen'];
-                    if (empty($logo_file)) {
-                        $logo_src = 'assets/images/logo_sprout.svg';
-                    } elseif (strpos($logo_file, '/') === false) {
-                        $logo_src = 'assets/images/' . $logo_file;
-                    } else {
-                        $logo_src = $logo_file;
-                    }
+                    $logo_src = crud1FormatFotoProdusenUrl($group['logo_produsen']);
+                    $batas_ambil_grup = crud1FormatKedaluwarsaTampil($group['earliest_expiry']);
                     ?>
                     <div class="checkout-card food-detail-card" style="margin-bottom: 24px;">
                         <div class="checkout-merchant-header">
@@ -274,8 +294,8 @@ require_once 'includes/navbar.php';
                                 </div>
                             </div>
                             <div class="food-deadline-wrap">
-                                <div class="food-deadline-label">Batas Ambil Hari Ini:</div>
-                                <div class="food-deadline-time">21:00 WIB</div>
+                                <div class="food-deadline-label">Batas Ambil:</div>
+                                <div class="food-deadline-time"><?php echo escapeHtml($batas_ambil_grup); ?></div>
                             </div>
                         </div>
 
@@ -284,10 +304,7 @@ require_once 'includes/navbar.php';
                         <div class="checkout-items-list">
                             <?php foreach ($group['items'] as $item): ?>
                                 <?php
-                                $foto_src = $item['foto_makanan'];
-                                if (strpos($foto_src, '/') === false) {
-                                    $foto_src = 'assets/uploads/' . $foto_src;
-                                }
+                                $foto_src = crud1FormatFotoUrl($item['foto_makanan']);
                                 ?>
                                 <div class="checkout-item-row">
                                     <div class="checkout-item-thumb">
@@ -346,7 +363,7 @@ require_once 'includes/navbar.php';
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Peran Akun</span>
-                            <span class="summary-item-val val-dark">Konsumen</span>
+                            <span class="summary-item-val val-dark"><?php echo escapeHtml(ucfirst($user_role)); ?></span>
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Status Kelayakan SKTM</span>
@@ -354,7 +371,7 @@ require_once 'includes/navbar.php';
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Porsi di Keranjang</span>
-                            <span class="summary-item-val val-dark"><?php echo count($ids); ?> Menu (<?php echo (int) $total_porsi; ?> dari <?php echo (int) $maks_porsi_per_keranjang; ?> porsi maks)</span>
+                            <span class="summary-item-val val-dark"><?php echo count($ditemukan_ids); ?> Menu (<?php echo (int) $total_porsi; ?> dari <?php echo (int) $maks_porsi_per_keranjang; ?> porsi maks)</span>
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Total Porsi Hari Ini</span>
@@ -380,13 +397,15 @@ require_once 'includes/navbar.php';
 
                     <!-- Formulir POST ke Backend Transaksi CRUD 2 -->
                     <form action="actions/crud2_transaction.php" method="post" style="margin: 0;">
-                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                        <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; text-align: center;">Konfirmasi Klaim Sekarang</button>
+                        <div>
+                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                            <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; text-align: center;">Konfirmasi Klaim Sekarang</button>
+                        </div>
                     </form>
 
                     <a href="cart.php" class="btn-cancel-checkout" style="display: block; text-align: center; text-decoration: none; margin-top: 10px;">Kembali ke Keranjang</a>
 
-                    <p class="checkout-trouble-note">Mengalami kendala klaim? <a href="katalog.php#help" class="checkout-trouble-link">Bantuan</a></p>
+                    <p class="checkout-trouble-note">Mengalami kendala klaim? <a href="customer_service.php" class="checkout-trouble-link">Bantuan</a></p>
                 </div>
             </div>
         </div>

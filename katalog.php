@@ -17,7 +17,7 @@ if ($conn) {
                  . "FROM makanan m "
                  . "INNER JOIN kategori k ON m.kategori_id = k.id "
                  . "INNER JOIN pengguna p ON m.produsen_id = p.id "
-                 . "WHERE m.stok > 0 AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW())";
+                 . "WHERE m.stok > 0 AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.status_verifikasi = 'disetujui'";
 
     $bind_types = "";
     $bind_params = array();
@@ -102,9 +102,27 @@ if ($conn && is_logged_in() && isset($_SESSION['role']) && $_SESSION['role'] ===
 $map_error = array(
     'item_tidak_valid'     => 'Parameter makanan yang Anda pilih tidak valid.',
     'item_tidak_tersedia'  => 'Makanan sudah habis, kedaluwarsa, atau tidak lagi tersedia.',
+    'unauthorized'         => 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.',
     'koneksi_gagal'        => 'Gagal terhubung ke basis data.'
 );
 $flash = crud1AmbilFlashPesan(array(), $map_error);
+
+$session_flash_error = '';
+if (isset($_SESSION['flash_error'])) {
+    $session_flash_error = trim((string) $_SESSION['flash_error']);
+    unset($_SESSION['flash_error']);
+}
+$session_flash_success = '';
+if (isset($_SESSION['flash_success'])) {
+    $session_flash_success = trim((string) $_SESSION['flash_success']);
+    unset($_SESSION['flash_success']);
+}
+if ($flash['error'] === '' && $session_flash_error !== '') {
+    $flash['error'] = $session_flash_error;
+}
+if ($flash['sukses'] === '' && $session_flash_success !== '') {
+    $flash['sukses'] = $session_flash_success;
+}
 
 $page_title = 'Pangkalan Pangan - Katalog Makanan';
 $extra_css = array('components.css?v=6', 'catalog.css?v=6');
@@ -142,6 +160,10 @@ require_once 'includes/navbar.php';
 
             <?php if ($flash['error'] !== ''): ?>
                 <div class="alert alert-error"><?php echo escapeHtml($flash['error']); ?></div>
+            <?php endif; ?>
+
+            <?php if ($flash['sukses'] !== ''): ?>
+                <div class="alert alert-success"><?php echo escapeHtml($flash['sukses']); ?></div>
             <?php endif; ?>
 
             <div class="catalog-search-wrap">
@@ -254,6 +276,7 @@ require_once 'includes/navbar.php';
                                                 <?php if ($konsumen_terverifikasi): ?>
                                                     <form action="cart.php" method="post" style="display: inline; margin: 0; padding: 0;">
                                                         <div style="display: inline;">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                             <input type="hidden" name="aksi" value="tambah" />
                                                             <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $mid); ?>" />
                                                             <input type="hidden" name="jumlah" value="1" />

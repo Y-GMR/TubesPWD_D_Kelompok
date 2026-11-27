@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Jakarta');
+
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.use_strict_mode', '1');
     session_set_cookie_params(array(
@@ -6,6 +8,10 @@ if (session_status() === PHP_SESSION_NONE) {
         'samesite' => 'Lax'
     ));
     session_start();
+}
+
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 function cariPathRoot($target_file) {
@@ -19,6 +25,16 @@ function cariPathRoot($target_file) {
         return '../../' . $target_file;
     }
     return $target_file;
+}
+
+function urlBerandaPeran($peran) {
+    if ($peran === 'admin') {
+        return cariPathRoot('views/admin/dashboard.php');
+    }
+    if ($peran === 'produsen') {
+        return cariPathRoot('producer_dashboard.php');
+    }
+    return cariPathRoot('katalog.php');
 }
 
 function is_logged_in() {
@@ -46,9 +62,9 @@ function require_role($peran_diizinkan) {
     }
 
     if (!$cocok) {
-        header('HTTP/1.1 403 Forbidden');
-        $jalur_login = cariPathRoot('login.php');
-        header('Location: ' . $jalur_login . '?error=unauthorized');
+        $_SESSION['flash_error'] = 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.';
+        $tujuan = urlBerandaPeran($peran_pengguna);
+        header('Location: ' . $tujuan . '?error=unauthorized');
         exit();
     }
 }
@@ -59,11 +75,7 @@ function redirect_if_logged_in() {
     }
 
     $peran_pengguna = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
-    if ($peran_pengguna === 'admin') {
-        $tujuan = cariPathRoot('views/admin/dashboard.php');
-    } else {
-        $tujuan = cariPathRoot('katalog.php');
-    }
+    $tujuan = urlBerandaPeran($peran_pengguna);
 
     header('Location: ' . $tujuan);
     exit();

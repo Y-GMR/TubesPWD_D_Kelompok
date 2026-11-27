@@ -111,6 +111,11 @@ if ($conn) {
             <ul class="sidebar-menu">
                 <li><a href="dashboard.php" class="active">Dashboard</a></li>
                 <li><a href="manage_users.php">Verifikasi &amp; CS</a></li>
+                <li><a href="../../manage_categories.php">Kelola Kategori</a></li>
+                <li><a href="../../transactions.php">Kelola Transaksi</a></li>
+                <li><a href="../../katalog.php">Lihat Katalog</a></li>
+                <li><a href="../../profile.php">Profil Saya</a></li>
+                <li><a href="../../actions/auth_logout.php">Keluar</a></li>
             </ul>
         </div>
 
@@ -120,9 +125,22 @@ if ($conn) {
                 <p class="page-subtitle">Ringkasan data pengguna, verifikasi dokumen, tiket bantuan, dan stok makanan.</p>
             </div>
 
+            <?php
+            $pesan_error_admin = '';
+            if (isset($_SESSION['flash_error'])) {
+                $pesan_error_admin = $_SESSION['flash_error'];
+                unset($_SESSION['flash_error']);
+            } elseif (isset($_GET['error']) && $_GET['error'] === 'unauthorized') {
+                $pesan_error_admin = 'Anda tidak memiliki izin untuk mengakses halaman tersebut.';
+            }
+            ?>
+            <?php if ($pesan_error_admin !== ''): ?>
+                <div class="alert alert-error"><?php echo htmlspecialchars($pesan_error_admin, ENT_QUOTES, 'UTF-8'); ?></div>
+            <?php endif; ?>
+
             <?php if (!$conn): ?>
                 <div class="alert alert-warning">
-                    Koneksi database belum aktif (menunggu config/database.php dari Role 1). Menampilkan data placeholder.
+                    Koneksi database belum aktif. Menampilkan data kosong.
                 </div>
             <?php endif; ?>
 
@@ -155,6 +173,7 @@ if ($conn) {
 
             <div class="section-box">
                 <h2>Peringatan Stok Makanan Menipis (Stok &lt;= 5)</h2>
+                <div style="overflow-x: auto;">
                 <table class="table-modern table-striped">
                     <thead>
                         <tr class="table-header">
@@ -181,6 +200,7 @@ if ($conn) {
                         <?php endif; ?>
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>

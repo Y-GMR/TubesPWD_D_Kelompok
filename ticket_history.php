@@ -75,7 +75,7 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
                         <button type="button" class="ticket-filter-pill" data-filter="done">Sudah Selesai (<?php echo htmlspecialchars((string) $tiket_selesai, ENT_QUOTES, 'UTF-8'); ?>)</button>
                     </div>
                     <div class="ticket-search-box">
-                        <input type="text" id="ticketSearchInput" class="ticket-search-input" placeholder="Cari nomor tiket atau kata kunci..." />
+                        <input type="text" id="ticketSearchInput" class="ticket-search-input" />
                     </div>
                 </div>
 
@@ -139,8 +139,8 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
                     <div class="footer-col-left" id="help">
                         <div class="footer-heading">Tetap Terhubung</div>
                         <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
-                        <div class="footer-contact-p">Instagram: @pangkalanpangan</div>
-                        <div class="footer-contact-p">Surel: info@pangkalanpangan.id</div>
+                        <div class="footer-contact-p">Instagram: @PP</div>
+                        <div class="footer-contact-p">Surel: PangkalanPangan@gmail.com</div>
                     </div>
                     <div class="footer-col-center">
                         <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />

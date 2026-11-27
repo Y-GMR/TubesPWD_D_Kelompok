@@ -88,10 +88,13 @@ document.addEventListener('DOMContentLoaded', function () {
     var regUsername = document.getElementById('regUsername');
     var usernameFeedback = document.getElementById('usernameFeedback');
 
-    if (regUsername && usernameFeedback) {
+    if (regUsername && usernameFeedback && !window.AjaxValidator) {
         regUsername.addEventListener('input', function () {
+            if (window.AjaxValidator) {
+                return;
+            }
             var val = this.value.trim();
-            if (val.length >= 4) {
+            if (/^[a-zA-Z0-9_]{4,30}$/.test(val)) {
                 regUsername.classList.add('is-valid');
                 usernameFeedback.style.display = 'block';
             } else {
@@ -101,7 +104,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    var emailcheck = /^[a-z0-9][a-z0-9_\.-]*[a-z0-9]@[a-z0-9][a-z0-9_\.-]*[a-z0-9]\.[a-z0-9]{2,4}$/i;
+    var emailcheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     var dbUsers = [
         {
@@ -189,9 +192,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 sMsg += "\nFormat alamat email tidak valid.";
             }
 
+            var formAction = loginForm.getAttribute('action') || '';
+            var isPhpBackend = (formAction.indexOf('.php') !== -1);
+
             if (valPass === '') {
                 sMsg += "\nKata sandi tidak boleh kosong.";
-            } else if (valPass.length < 8) {
+            } else if (!isPhpBackend && valPass.length < 8) {
                 sMsg += "\nKata sandi minimal harus 8 karakter.";
             }
 
@@ -199,6 +205,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert("Harap perbaiki kesalahan berikut:" + sMsg);
                 e.preventDefault();
                 return false;
+            }
+
+            if (isPhpBackend) {
+                return true;
             }
 
             var identifier = (valUser !== '' ? valUser : valEmail).toLowerCase();
@@ -333,6 +343,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (valUser.length < 4 || valUser.length > 30) {
                 sMsg += "\nUsername harus terdiri dari 4 sampai 30 karakter.";
+            } else if (!/^[a-zA-Z0-9_]{4,30}$/.test(valUser)) {
+                sMsg += "\nUsername hanya boleh berisi huruf, angka, dan garis bawah (_).";
             }
 
             if (emailInput) {

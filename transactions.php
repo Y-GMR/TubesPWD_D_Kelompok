@@ -30,6 +30,9 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
 // 2. Ambil data profil pengguna
 $data_pengguna = ambilPenggunaById($conn, $user_id);
+$nama_user_tampil = ($data_pengguna && isset($data_pengguna['nama_lengkap']))
+    ? $data_pengguna['nama_lengkap']
+    : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Pengguna');
 $status_sktm = ($data_pengguna && isset($data_pengguna['status_verifikasi'])) ? $data_pengguna['status_verifikasi'] : 'menunggu';
 
 // 3. Hitung Kuota Harian Konsumen (Maksimal 25 porsi dan 5 kali checkout per hari)
@@ -38,7 +41,7 @@ $maks_checkout_harian = 5;
 $sudah_porsi_hari_ini = 0;
 $sudah_checkout_hari_ini = 0;
 
-if ($conn) {
+if ($conn && $user_role === 'konsumen') {
     // Total porsi hari ini
     $sql_kp = "SELECT COALESCE(SUM(dt.jumlah), 0) AS total_porsi_hari_ini
                FROM transaksi t
@@ -84,27 +87,47 @@ $sisa_checkout_harian = max(0, $maks_checkout_harian - $sudah_checkout_hari_ini)
 $daftar_transaksi = array();
 
 if ($conn) {
-    if ($user_role === 'produsen') {
+    if ($user_role === 'admin') {
         $sql_trx = "SELECT t.id, t.kode_transaksi, t.total_harga, t.status, t.dibuat_pada,
+                           pk.nama_lengkap AS nama_konsumen, pp.nama_lengkap AS nama_produsen,
+                           pk.nama_lengkap AS pihak_terkait, pk.id AS pihak_id,
+                           (SELECT m.alamat_ambil FROM detail_transaksi dt JOIN makanan m ON dt.makanan_id = m.id WHERE dt.transaksi_id = t.id LIMIT 1) AS alamat_ambil
+                    FROM transaksi t
+                    INNER JOIN pengguna pk ON t.konsumen_id = pk.id
+                    INNER JOIN pengguna pp ON t.produsen_id = pp.id
+                    ORDER BY t.dibuat_pada DESC";
+        $stmt_trx = mysqli_prepare($conn, $sql_trx);
+    } elseif ($user_role === 'produsen') {
+        $sql_trx = "SELECT t.id, t.kode_transaksi, t.total_harga, t.status, t.dibuat_pada,
+                           pk.nama_lengkap AS nama_konsumen, pp.nama_lengkap AS nama_produsen,
                            pk.nama_lengkap AS pihak_terkait, pk.id AS pihak_id,
                            NULL AS alamat_ambil
                     FROM transaksi t
                     INNER JOIN pengguna pk ON t.konsumen_id = pk.id
+                    INNER JOIN pengguna pp ON t.produsen_id = pp.id
                     WHERE t.produsen_id = ?
                     ORDER BY t.dibuat_pada DESC";
+        $stmt_trx = mysqli_prepare($conn, $sql_trx);
+        if ($stmt_trx) {
+            mysqli_stmt_bind_param($stmt_trx, "i", $user_id);
+        }
     } else {
         $sql_trx = "SELECT t.id, t.kode_transaksi, t.total_harga, t.status, t.dibuat_pada,
+                           pk.nama_lengkap AS nama_konsumen, pp.nama_lengkap AS nama_produsen,
                            pp.nama_lengkap AS pihak_terkait, pp.id AS pihak_id,
                            (SELECT m.alamat_ambil FROM detail_transaksi dt JOIN makanan m ON dt.makanan_id = m.id WHERE dt.transaksi_id = t.id LIMIT 1) AS alamat_ambil
                     FROM transaksi t
+                    INNER JOIN pengguna pk ON t.konsumen_id = pk.id
                     INNER JOIN pengguna pp ON t.produsen_id = pp.id
                     WHERE t.konsumen_id = ?
                     ORDER BY t.dibuat_pada DESC";
+        $stmt_trx = mysqli_prepare($conn, $sql_trx);
+        if ($stmt_trx) {
+            mysqli_stmt_bind_param($stmt_trx, "i", $user_id);
+        }
     }
 
-    $stmt_trx = mysqli_prepare($conn, $sql_trx);
     if ($stmt_trx) {
-        mysqli_stmt_bind_param($stmt_trx, "i", $user_id);
         mysqli_stmt_execute($stmt_trx);
         $res_trx = mysqli_stmt_get_result($stmt_trx);
 
@@ -154,7 +177,8 @@ if ($tiket_aktif === null && !empty($daftar_transaksi)) {
 }
 
 $page_title = 'Riwayat Klaim & Tiket Transaksi - Pangkalan Pangan';
-$extra_css = array('checkout.css?v=6');
+$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+$extra_js = array('crud1_navbar.js?v=1');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
 ?>
@@ -201,9 +225,10 @@ require_once 'includes/navbar.php';
                     ?>
 
                     <ul class="summary-list">
+<?php if ($user_role === 'konsumen'): ?>
                         <li class="summary-item">
                             <span class="summary-item-label">Penerima Manfaat</span>
-                            <span class="summary-item-val val-teal"><?php echo escapeHtml($data_pengguna['nama_lengkap']); ?></span>
+                            <span class="summary-item-val val-teal"><?php echo escapeHtml($nama_user_tampil); ?></span>
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Status SKTM</span>
@@ -231,6 +256,24 @@ require_once 'includes/navbar.php';
                             <span class="summary-item-label">Tempat Pengambilan</span>
                             <span class="summary-item-val val-dark"><?php echo escapeHtml($tiket_aktif['pihak_terkait']); ?></span>
                         </li>
+<?php else: ?>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Konsumen</span>
+                            <span class="summary-item-val val-teal"><?php echo escapeHtml($tiket_aktif['nama_konsumen']); ?></span>
+                        </li>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Gerai Produsen</span>
+                            <span class="summary-item-val val-dark"><?php echo escapeHtml($tiket_aktif['nama_produsen']); ?></span>
+                        </li>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Total Pembayaran</span>
+                            <span class="summary-item-val val-green"><?php echo formatRupiah($tiket_aktif['total_harga']); ?></span>
+                        </li>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Waktu Pemesanan</span>
+                            <span class="summary-item-val val-dark"><?php echo escapeHtml(date('d M Y, H:i', strtotime($tiket_aktif['dibuat_pada']))); ?> WIB</span>
+                        </li>
+<?php endif; ?>
                         <?php if (!empty($tiket_aktif['alamat_ambil'])): ?>
                             <li class="summary-item">
                                 <span class="summary-item-label">Alamat Gerai</span>
@@ -271,36 +314,42 @@ require_once 'includes/navbar.php';
                     <?php endif; ?>
 
                     <!-- Tombol Aksi Pembatalan (Jika Masih Status Menunggu) -->
-                    <?php if ($user_role === 'konsumen' && $tiket_aktif['status'] === 'menunggu'): ?>
+                    <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tiket_aktif['status'] === 'menunggu'): ?>
                         <form action="actions/crud2_status_update.php" method="post" style="margin: 0 0 12px 0;" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ini? Stok porsi akan dikembalikan ke inventaris.');">
-                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                            <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
-                            <input type="hidden" name="aksi" value="batal" />
-                            <button type="submit" class="btn-cancel-checkout" style="width: 100%; border: 1px solid #E53E3E; background-color: #FFF5F5; color: #E53E3E; cursor: pointer; padding: 10px; border-radius: 6px; font-weight: bold;">
-                                &#10005; Batalkan Klaim Ini
-                            </button>
+                            <div>
+                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
+                                <input type="hidden" name="aksi" value="batal" />
+                                <button type="submit" class="btn-cancel-checkout" style="width: 100%; border: 1px solid #E53E3E; background-color: #FFF5F5; color: #E53E3E; cursor: pointer; padding: 10px; border-radius: 6px; font-weight: bold;">
+                                    Batalkan Klaim Ini
+                                </button>
+                            </div>
                         </form>
                     <?php endif; ?>
 
-                    <!-- Tombol Aksi untuk Produsen (Ubah Status ke Siap Diambil / Selesai) -->
-                    <?php if ($user_role === 'produsen'): ?>
+                    <!-- Tombol Aksi untuk Produsen atau Admin (Ubah Status ke Siap Diambil / Selesai) -->
+                    <?php if ($user_role === 'produsen' || $user_role === 'admin'): ?>
                         <?php if ($tiket_aktif['status'] === 'menunggu'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
-                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                                <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
-                                <input type="hidden" name="status" value="siap_diambil" />
-                                <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer;">
-                                    Tandai Siap Diambil
-                                </button>
+                                <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                    <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
+                                    <input type="hidden" name="status" value="siap_diambil" />
+                                    <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer;">
+                                        Tandai Siap Diambil
+                                    </button>
+                                </div>
                             </form>
                         <?php elseif ($tiket_aktif['status'] === 'siap_diambil'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
-                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                                <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
-                                <input type="hidden" name="status" value="selesai" />
-                                <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; background-color: #2B6CB0;">
-                                    Tandai Telah Selesai Diambil
-                                </button>
+                                <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                    <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
+                                    <input type="hidden" name="status" value="selesai" />
+                                    <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; background-color: #2B6CB0;">
+                                        Tandai Telah Selesai Diambil
+                                    </button>
+                                </div>
                             </form>
                         <?php endif; ?>
                     <?php endif; ?>
@@ -313,7 +362,7 @@ require_once 'includes/navbar.php';
                 <?php endif; ?>
 
                 <p class="checkout-trouble-note" style="margin-top: 16px; text-align: center;">
-                    Mengalami kendala klaim? <a href="katalog.php#help" class="checkout-trouble-link">Bantuan</a>
+                    Mengalami kendala klaim? <a href="customer_service.php" class="checkout-trouble-link">Bantuan</a>
                 </p>
             </div>
 
@@ -367,8 +416,13 @@ require_once 'includes/navbar.php';
                                 </div>
 
                                 <div style="font-size: 13px; color: #4A5568; margin-bottom: 8px;">
+<?php if ($user_role === 'admin'): ?>
+                                    <strong>Konsumen:</strong> <?php echo escapeHtml($tr['nama_konsumen']); ?> &#8226;
+                                    <strong>Produsen:</strong> <?php echo escapeHtml($tr['nama_produsen']); ?>
+<?php else: ?>
                                     <strong><?php echo ($user_role === 'produsen') ? 'Konsumen:' : 'Gerai Produsen:'; ?></strong>
                                     <?php echo escapeHtml($tr['pihak_terkait']); ?>
+<?php endif; ?>
                                 </div>
 
                                 <div style="font-size: 13px; color: #718096; margin-bottom: 8px;">
@@ -387,14 +441,16 @@ require_once 'includes/navbar.php';
                                             Lihat Tiket
                                         </a>
 
-                                        <?php if ($user_role === 'konsumen' && $tr['status'] === 'menunggu'): ?>
+                                        <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tr['status'] === 'menunggu'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Batalkan pesanan <?php echo escapeHtml($tr['kode_transaksi']); ?>?');">
-                                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                                                <input type="hidden" name="transaksi_id" value="<?php echo (int) $tr['id']; ?>" />
-                                                <input type="hidden" name="aksi" value="batal" />
-                                                <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0;">
-                                                    Batalkan
-                                                </button>
+                                                <div style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                                    <input type="hidden" name="transaksi_id" value="<?php echo (int) $tr['id']; ?>" />
+                                                    <input type="hidden" name="aksi" value="batal" />
+                                                    <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0;">
+                                                        Batalkan
+                                                    </button>
+                                                </div>
                                             </form>
                                         <?php endif; ?>
                                     </div>
