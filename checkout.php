@@ -315,7 +315,7 @@ require_once 'includes/navbar.php';
                                         <p class="checkout-item-meta">Kategori: <?php echo escapeHtml($item['nama_kategori']); ?></p>
                                         <p class="checkout-item-price-tag">
                                             <?php echo formatRupiah($item['harga']); ?>
-                                            <span class="checkout-item-price-original">x <?php echo (int) $item['jumlah']; ?> porsi</span>
+                                            <span style="color: #6b7280; font-size: 13px; font-weight: normal; margin-left: 6px;">x <?php echo (int) $item['jumlah']; ?> porsi</span>
                                         </p>
                                     </div>
                                     <div style="font-weight: bold; color: #2F855A; font-size: 15px;">
@@ -383,7 +383,7 @@ require_once 'includes/navbar.php';
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Sisa Kuota Checkout</span>
-                            <span class="summary-item-val val-amber"><?php echo (int) $sisa_checkout_hari_ini; ?> kali transaksi lagi</span>
+                            <span class="summary-item-val val-amber"><?php echo (int) $sisa_checkout_harian; ?> kali transaksi lagi</span>
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Total Pembayaran</span>
@@ -398,7 +398,6 @@ require_once 'includes/navbar.php';
                     <!-- Formulir POST ke Backend Transaksi CRUD 2 -->
                     <form action="actions/crud2_transaction.php" method="post" style="margin: 0;">
                         <div>
-                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                             <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; text-align: center;">Konfirmasi Klaim Sekarang</button>
                         </div>
                     </form>

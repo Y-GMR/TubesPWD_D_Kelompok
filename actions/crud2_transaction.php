@@ -42,14 +42,6 @@ if ($user_role !== 'konsumen' && $user_role !== 'admin') {
     exit();
 }
 
-// 2. Validasi Token CSRF
-$token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
-    $_SESSION['flash_error'] = 'Permintaan tidak valid (Token CSRF kedaluwarsa atau tidak sah). Silakan coba lagi.';
-    header('Location: ../checkout.php');
-    exit();
-}
-
 if (!$conn) {
     $_SESSION['flash_error'] = 'Koneksi basis data terputus. Mohon hubungi administrator.';
     header('Location: ../checkout.php');

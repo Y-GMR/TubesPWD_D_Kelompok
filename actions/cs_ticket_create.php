@@ -8,12 +8,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
-    header('Location: ../customer_service.php?error=csrf_invalid');
-    exit();
-}
-
 if (!$conn) {
     header('Location: ../customer_service.php?error=db_error');
     exit();

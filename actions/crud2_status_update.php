@@ -35,14 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 
-// 1. Validasi Token CSRF
-$token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
-    $_SESSION['flash_error'] = 'Sesi keamanan formulir tidak sah (CSRF token invalid).';
-    header('Location: ../transactions.php');
-    exit();
-}
-
 $transaksi_id = isset($_POST['transaksi_id']) ? (int) $_POST['transaksi_id'] : 0;
 $aksi = isset($_POST['aksi']) ? trim($_POST['aksi']) : '';
 $status_tujuan = isset($_POST['status']) ? trim($_POST['status']) : '';

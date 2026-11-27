@@ -248,7 +248,6 @@ require_once 'includes/navbar.php';
                                         <?php if ($stok_int > 0): ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-close" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
-                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="tutup_donasi" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Tutup Donasi</button>
@@ -266,7 +265,6 @@ require_once 'includes/navbar.php';
                                         <?php else: ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-delete" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
-                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="delete" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Hapus</button>
@@ -291,7 +289,6 @@ require_once 'includes/navbar.php';
             <div class="inv-modal">
                 <form action="actions/crud1_item.php" method="post" id="stockModalForm">
                     <div>
-                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                         <input type="hidden" name="action" value="update_stok" />
                         <input type="hidden" name="id" id="modalItemIdInput" value="" />
                     </div>

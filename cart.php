@@ -63,13 +63,6 @@ function crud2AmbilMakananValidUntukKeranjang($conn, $makanan_id) {
 
 // 3. Handler Aksi Keranjang (Tambah via GET/POST, Ubah Jumlah, Hapus Item, Kosongkan)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
-    $token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
-        $_SESSION['flash_error'] = 'Sesi keamanan formulir tidak sah (Token CSRF invalid). Silakan coba lagi.';
-        header("Location: cart.php?status=csrf_invalid");
-        exit();
-    }
-
     $item_id = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
 
     if ($_POST['aksi'] === 'tambah' && $item_id > 0) {
@@ -420,7 +413,6 @@ require_once 'includes/navbar.php';
                             </div>
                             <form action="cart.php" method="post" style="margin: 0;">
                                 <div>
-                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="aksi" value="kosongkan" />
                                     <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 13px; cursor: pointer; text-decoration: underline;" onclick="return confirm('Kosongkan seluruh isi keranjang?');">Kosongkan Keranjang</button>
                                 </div>
@@ -465,7 +457,6 @@ require_once 'includes/navbar.php';
                                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                                         <form action="cart.php" method="post" style="margin: 0;">
                                             <div class="checkout-stepper-wrap">
-                                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                 <input type="hidden" name="aksi" value="ubah" />
                                                 <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
 
@@ -477,7 +468,6 @@ require_once 'includes/navbar.php';
 
                                         <form action="cart.php" method="post" style="margin: 0;">
                                             <div>
-                                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                 <input type="hidden" name="aksi" value="hapus" />
                                                 <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
                                                 <button type="submit" style="background: none; border: none; color: #A0AEC0; font-size: 12px; cursor: pointer; text-decoration: underline;" title="Hapus dari keranjang">Hapus</button>

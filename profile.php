@@ -234,9 +234,6 @@ require_once 'includes/header.php';
                             <hr class="profile-divider" />
 
                             <form action="actions/auth_profile_update.php" method="post" enctype="multipart/form-data" class="profile-edit-form" id="profileEditForm">
-                                <div>
-                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
-                                </div>
                                 <div class="form-group-full">
                                     <label for="inputNamaLengkap" class="profile-form-label">Nama Lengkap</label>
                                     <input type="text" id="inputNamaLengkap" name="nama_lengkap" class="profile-form-input" value="<?php echo escapeHtml($pengguna['nama_lengkap']); ?>" />

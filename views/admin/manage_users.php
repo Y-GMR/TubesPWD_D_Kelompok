@@ -33,18 +33,7 @@ if (isset($_SESSION['flash_error'])) {
     $pesan_error = 'Anda tidak memiliki izin untuk mengakses halaman tersebut.';
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
-    $token_kiriman = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-    if (!hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
-        $_SESSION['flash_error'] = 'Sesi formulir tidak sah (CSRF token invalid). Silakan coba lagi.';
-        header('Location: manage_users.php');
-        exit();
-    }
-
     $aksi = isset($_POST['aksi']) ? $_POST['aksi'] : '';
 
     if ($aksi === 'verifikasi_pengguna') {
@@ -217,7 +206,6 @@ if ($conn) {
                                         <?php else: ?>
                                         <form method="post" action="manage_users.php" class="inline-form">
                                             <div>
-                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="hidden" name="aksi" value="verifikasi_pengguna" />
                                                 <input type="hidden" name="pengguna_id" value="<?php echo htmlspecialchars((string) $user['id'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="text" name="catatan_verifikasi" class="form-control" value="<?php echo htmlspecialchars((string) $user['catatan_verifikasi'], ENT_QUOTES, 'UTF-8'); ?>" />
@@ -271,7 +259,6 @@ if ($conn) {
                                     <td>
                                         <form method="post" action="manage_users.php" class="inline-form">
                                             <div>
-                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="hidden" name="aksi" value="balas_tiket" />
                                                 <input type="hidden" name="tiket_id" value="<?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?>" />
                                                 <input type="text" name="balasan_admin" class="form-control" value="<?php echo htmlspecialchars((string) $tiket['balasan_admin'], ENT_QUOTES, 'UTF-8'); ?>" />

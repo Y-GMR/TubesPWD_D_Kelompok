@@ -100,7 +100,6 @@ require_once 'includes/header.php';
                             <input type="checkbox" name="remember" value="1" />
                             <span>Ingat saya di perangkat ini</span>
                         </label>
-                        <a href="#help" class="auth-forgot-link">Lupa kata sandi?</a>
                     </div>
 
                     <div>

@@ -106,7 +106,6 @@ require_once 'includes/navbar.php';
 
             <form action="actions/crud1_item.php" method="post" enctype="multipart/form-data" id="formAddFood" class="add-food-grid">
                 <div>
-                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                     <input type="hidden" name="action" value="<?php echo escapeHtml($val_action); ?>" />
                     <?php if ($is_edit): ?>
                         <input type="hidden" name="id" value="<?php echo escapeHtml($val_id); ?>" />

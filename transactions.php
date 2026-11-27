@@ -6,10 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 $conn = null;
 if (file_exists('config/database.php')) {
     require_once 'config/database.php';
@@ -250,7 +246,7 @@ require_once 'includes/navbar.php';
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Sisa Kuota Checkout</span>
-                            <span class="summary-item-val val-amber"><?php echo (int) $sisa_checkout_hari_ini; ?> kali lagi</span>
+                            <span class="summary-item-val val-amber"><?php echo (int) $sisa_checkout_harian; ?> kali lagi</span>
                         </li>
                         <li class="summary-item">
                             <span class="summary-item-label">Tempat Pengambilan</span>
@@ -317,7 +313,6 @@ require_once 'includes/navbar.php';
                     <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tiket_aktif['status'] === 'menunggu'): ?>
                         <form action="actions/crud2_status_update.php" method="post" style="margin: 0 0 12px 0;" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ini? Stok porsi akan dikembalikan ke inventaris.');">
                             <div>
-                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                 <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                 <input type="hidden" name="aksi" value="batal" />
                                 <button type="submit" class="btn-cancel-checkout" style="width: 100%; border: 1px solid #E53E3E; background-color: #FFF5F5; color: #E53E3E; cursor: pointer; padding: 10px; border-radius: 6px; font-weight: bold;">
@@ -332,7 +327,6 @@ require_once 'includes/navbar.php';
                         <?php if ($tiket_aktif['status'] === 'menunggu'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
                                 <div>
-                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                     <input type="hidden" name="status" value="siap_diambil" />
                                     <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer;">
@@ -343,7 +337,6 @@ require_once 'includes/navbar.php';
                         <?php elseif ($tiket_aktif['status'] === 'siap_diambil'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
                                 <div>
-                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                     <input type="hidden" name="status" value="selesai" />
                                     <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; background-color: #2B6CB0;">
@@ -444,7 +437,6 @@ require_once 'includes/navbar.php';
                                         <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tr['status'] === 'menunggu'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Batalkan pesanan <?php echo escapeHtml($tr['kode_transaksi']); ?>?');">
                                                 <div style="display: inline;">
-                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tr['id']; ?>" />
                                                     <input type="hidden" name="aksi" value="batal" />
                                                     <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0;">

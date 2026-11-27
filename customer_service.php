@@ -65,9 +65,6 @@ if (isset($_GET['error'])) {
                 <?php endif; ?>
 
                 <form action="actions/cs_ticket_create.php" method="post" id="csTicketForm">
-                    <div>
-                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : '', ENT_QUOTES, 'UTF-8'); ?>" />
-                    </div>
                     <h2 class="cs-section-title">Informasi Kontak Pengadu</h2>
                     <div class="cs-form-row">
                         <div class="cs-form-col">

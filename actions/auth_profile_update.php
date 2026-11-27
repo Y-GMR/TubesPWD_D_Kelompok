@@ -12,13 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Verifikasi CSRF token
-$csrf_dikirim = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-if (!hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
-    header('Location: ' . $target_kembali . '?error=csrf_tidak_valid');
-    exit();
-}
-
 $user_id          = (int) $_SESSION['user_id'];
 $nama_lengkap     = isset($_POST['nama_lengkap']) ? bersihkanInput($_POST['nama_lengkap']) : '';
 $username         = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
@@ -169,6 +162,7 @@ if ($dokumen_baru !== null) {
     $bind_types .= "s";
     $bind_params[] = $dokumen_baru;
     $set_clauses[] = "status_verifikasi = 'menunggu'";
+    $set_clauses[] = "catatan_verifikasi = NULL";
 }
 
 $bind_types .= "i";

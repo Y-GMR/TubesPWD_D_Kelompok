@@ -10,10 +10,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
 function cariPathRoot($target_file) {
     if (file_exists($target_file)) {
         return $target_file;

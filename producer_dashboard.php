@@ -233,7 +233,6 @@ require_once 'includes/navbar.php';
                                         <?php if ($trx['status'] === 'menunggu'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="margin: 0;">
                                                 <div>
-                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo escapeHtml((string) ((int) $trx['id'])); ?>" />
                                                     <input type="hidden" name="status" value="siap_diambil" />
                                                     <input type="hidden" name="redirect_to" value="producer_dashboard" />
@@ -243,7 +242,6 @@ require_once 'includes/navbar.php';
                                         <?php elseif ($trx['status'] === 'siap_diambil'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="margin: 0;">
                                                 <div>
-                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo escapeHtml((string) ((int) $trx['id'])); ?>" />
                                                     <input type="hidden" name="status" value="selesai" />
                                                     <input type="hidden" name="redirect_to" value="producer_dashboard" />

@@ -276,7 +276,6 @@ require_once 'includes/navbar.php';
                                                 <?php if ($konsumen_terverifikasi): ?>
                                                     <form action="cart.php" method="post" style="display: inline; margin: 0; padding: 0;">
                                                         <div style="display: inline;">
-                                                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                             <input type="hidden" name="aksi" value="tambah" />
                                                             <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $mid); ?>" />
                                                             <input type="hidden" name="jumlah" value="1" />

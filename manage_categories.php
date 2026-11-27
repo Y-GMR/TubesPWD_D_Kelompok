@@ -80,7 +80,6 @@ require_once 'includes/navbar.php';
                         <div class="category-form-body">
                             <form id="categoryForm" action="actions/crud1_category.php" method="post">
                                 <div>
-                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" id="catActionInput" name="action" value="<?php echo escapeHtml($form_action_mode); ?>" />
                                     <input type="hidden" id="catIdInput" name="id" value="<?php echo escapeHtml($form_id_val); ?>" />
                                 </div>
@@ -148,7 +147,6 @@ require_once 'includes/navbar.php';
                                                         <?php else: ?>
                                                             <form action="actions/crud1_category.php" method="post" class="form-cat-delete">
                                                                 <div>
-                                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                                     <input type="hidden" name="action" value="delete" />
                                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $kat_id); ?>" />
                                                                     <button type="submit" class="btn-cat-delete-active">Hapus</button>

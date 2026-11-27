@@ -38,7 +38,7 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
         }
     }
 }
-$help_target = $is_logged_in ? 'customer_service.php' : 'katalog.php#help';
+$help_target = 'customer_service.php';
 $producer_target = file_exists($root_dir . '/producer_dashboard.php') ? 'producer_dashboard.php' : 'inventory.php';
 $transactions_target = 'transactions.php';
 $cart_total_qty = 0;
@@ -56,7 +56,7 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                 <img src="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>assets/images/logo_sprout.svg" alt="Logo Pangkalan Pangan" class="nav-logo-img" />
             </a>
             <ul class="nav-menu-list">
-                <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>katalog.php#about">Tentang kami</a></li>
+                <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>katalog.php">Katalog</a></li>
 <?php if ($is_logged_in): ?>
                 <li><a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php">Pengaturan</a></li>
 <?php else: ?>

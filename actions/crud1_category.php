@@ -11,13 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Verifikasi CSRF token
-$csrf_dikirim = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
-if (!hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
-    header('Location: ../manage_categories.php?error=csrf_tidak_valid');
-    exit();
-}
-
 if (!$conn) {
     header('Location: ../manage_categories.php?error=koneksi_gagal');
     exit();
