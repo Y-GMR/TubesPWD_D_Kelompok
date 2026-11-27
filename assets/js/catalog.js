@@ -489,6 +489,56 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    if (window.location.pathname.indexOf('producer_dashboard.xhtml') !== -1) {
+        var tableActionBtns = document.querySelectorAll('.btn-table-action');
+        tableActionBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var row = this.closest('tr');
+                if (!row) return;
+                var codeEl = row.querySelector('.table-claim-code');
+                var userEl = row.querySelector('.table-user-name');
+                var portionEl = row.querySelector('.table-portion');
+                var badgeEl = row.querySelector('.col-status .badge, .table-col-status .badge');
+                var trxCode = codeEl ? codeEl.textContent.trim() : '-';
+                var userName = userEl ? userEl.textContent.trim() : '-';
+                var portionText = portionEl ? portionEl.textContent.trim() : '-';
+
+                if (this.classList.contains('btn-action-teal')) {
+                    if (badgeEl) {
+                        badgeEl.className = 'badge badge-ready';
+                        badgeEl.textContent = 'Siap Diambil';
+                    }
+                    this.className = 'btn-table-action btn-action-orange';
+                    this.textContent = 'Tandai Selesai';
+                } else if (this.classList.contains('btn-action-orange')) {
+                    if (badgeEl) {
+                        badgeEl.className = 'badge badge-done';
+                        badgeEl.textContent = 'Selesai';
+                    }
+                    this.className = 'btn-table-action btn-action-gray';
+                    this.textContent = 'Lihat Bukti';
+                } else if (this.classList.contains('btn-action-gray')) {
+                    alert('Bukti Penyaluran Pangan\nKode Klaim: ' + trxCode + '\nPenerima: ' + userName + '\nJumlah: ' + portionText + '\nStatus: Selesai Disalurkan');
+                }
+            });
+        });
+
+        var closeDonationBtns = document.querySelectorAll('.food-card-actions .btn-danger');
+        closeDonationBtns.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var card = this.closest('.food-card');
+                if (!card) return;
+                if (card.style.opacity === '0.55') {
+                    card.style.opacity = '1';
+                    this.textContent = 'Tutup Donasi';
+                } else {
+                    card.style.opacity = '0.55';
+                    this.textContent = 'Buka Kembali';
+                }
+            });
+        });
+    }
+
     applyFilter();
     updateCartUI();
 });

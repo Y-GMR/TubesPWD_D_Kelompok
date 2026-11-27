@@ -20,7 +20,7 @@
             <ul class="auth-nav-menu">
                 <li><a href="food_catalogue.xhtml#about">Tentang kami</a></li>
                 <li><a href="food_catalogue.xhtml">Katalog Pangan</a></li>
-                <li><a href="food_catalogue.xhtml#help">Bantuan</a></li>
+                <li><a href="customer_service.xhtml">Bantuan</a></li>
             </ul>
             <a href="food_catalogue.xhtml" class="btn-nav-back">Kembali ke Beranda</a>
         </div>
@@ -38,37 +38,37 @@
                         <ul class="summary-list">
                             <li class="summary-item">
                                 <span class="summary-item-label">Penerima Manfaat</span>
-                                <span class="summary-item-val val-teal">Iwang Petra</span>
+                                <span class="summary-item-val val-teal" id="ticketConsumerText">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Peran Akun</span>
-                                <span class="summary-item-val val-dark">Konsumen</span>
+                                <span class="summary-item-val val-dark" id="ticketRoleText">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Status SKTM</span>
-                                <span class="summary-item-val val-green">Valid</span>
+                                <span class="summary-item-val val-green">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Sisa Kuota Hari Ini</span>
-                                <span class="summary-item-val val-amber">1 dari 2 porsi</span>
+                                <span class="summary-item-val val-amber">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Total Riwayat Klaim</span>
-                                <span class="summary-item-val val-teal">0 Transaksi</span>
+                                <span class="summary-item-val val-teal">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Tempat Pengambilan</span>
-                                <span class="summary-item-val val-dark" id="ticketPlaceText">Dunkin Donuts Sudirman</span>
+                                <span class="summary-item-val val-dark" id="ticketPlaceText">-</span>
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Batas Waktu Pengambilan</span>
-                                <span class="summary-item-val val-amber" id="ticketDeadlineText">Hari ini, 15:00 WIB</span>
+                                <span class="summary-item-val val-amber" id="ticketDeadlineText">-</span>
                             </li>
                         </ul>
 
                         <div class="ticket-box">
                             <div class="ticket-label">KODE</div>
-                            <div class="ticket-code" id="ticketCodeText">TRX-8821</div>
+                            <div class="ticket-code" id="ticketCodeText">-</div>
                         </div>
 
                         <p class="ticket-reminder-note">Tunjukkan kode transaksi kepada kasir produsen sebelum batas waktu berakhir hari ini.</p>
@@ -76,7 +76,7 @@
                         <a href="food_catalogue.xhtml" class="btn-ticket-catalog">Katalog</a>
 
                         <p class="checkout-trouble-note">
-                            Mengalami kendala klaim? <a href="food_catalogue.xhtml#help" class="checkout-trouble-link">Bantuan</a>
+                            Mengalami kendala klaim? <a href="customer_service.xhtml" class="checkout-trouble-link">Bantuan</a>
                         </p>
                     </div>
 
@@ -94,6 +94,7 @@
                         </div>
 
                         <ul class="past-history-list" id="pastHistoryList" style="display: none;">
+                            <li style="display: none;">Belum ada riwayat</li>
                         </ul>
                     </div>
 
@@ -132,6 +133,6 @@
 
     </div>
 
-    <script type="text/javascript" src="assets/js/claim_history.js?v=5"></script>
+    <script type="text/javascript" src="assets/js/claim_history.js?v=6"></script>
 </body>
 </html>

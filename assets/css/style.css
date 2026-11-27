@@ -220,8 +220,7 @@ body {
 }
 
 .profile-consumer-dropdown.is-open .profile-dropdown-content,
-.profile-consumer-dropdown:hover .profile-dropdown-content,
-.profile-consumer-dropdown:focus-within .profile-dropdown-content {
+.profile-consumer-dropdown:hover .profile-dropdown-content {
     display: block;
 }
 

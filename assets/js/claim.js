@@ -1,18 +1,25 @@
 document.addEventListener('DOMContentLoaded', function () {
     'use strict';
 
+    var profileDropdown = document.querySelector('.profile-consumer-dropdown');
     var profilePillBtn = document.getElementById('profilePillBtn');
-    var profileDropdownMenu = document.getElementById('profileDropdownMenu');
 
-    if (profilePillBtn && profileDropdownMenu) {
+    if (profileDropdown && profilePillBtn) {
         profilePillBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            profileDropdownMenu.classList.toggle('show');
+            profileDropdown.classList.toggle('is-open');
         });
 
         document.addEventListener('click', function (e) {
-            if (!profileDropdownMenu.contains(e.target) && e.target !== profilePillBtn) {
-                profileDropdownMenu.classList.remove('show');
+            if (!profileDropdown.contains(e.target)) {
+                profileDropdown.classList.remove('is-open');
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' || e.keyCode === 27) {
+                profileDropdown.classList.remove('is-open');
             }
         });
     }
@@ -147,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function handleVoucherVerification() {
-        if (!voucherCodeInput) return;
+        if (!voucherCodeInput || !tableBody) return;
         var rawInput = voucherCodeInput.value.trim();
         if (!rawInput) {
             alert('Silakan masukkan nomor atau kode voucher yang ingin diperiksa.');
@@ -208,6 +215,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    function setCellBadge(cell, className, text) {
+        if (!cell) return;
+        while (cell.firstChild) cell.removeChild(cell.firstChild);
+        var span = document.createElement('span');
+        span.className = className;
+        span.textContent = text;
+        cell.appendChild(span);
+    }
+
+    function createClaimButton(className, text, attrs) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = className;
+        btn.textContent = text;
+        for (var k in attrs) {
+            if (Object.prototype.hasOwnProperty.call(attrs, k)) {
+                btn.setAttribute(k, attrs[k]);
+            }
+        }
+        return btn;
+    }
+
     if (tableBody) {
         tableBody.addEventListener('click', function (e) {
             var target = e.target;
@@ -215,19 +244,17 @@ document.addEventListener('DOMContentLoaded', function () {
             if (target.classList.contains('btn-action-prepare')) {
                 var rowPrepare = target.closest('tr');
                 if (!rowPrepare) return;
-                var trxPrepare = target.getAttribute('data-trx');
+                var trxPrepare = target.getAttribute('data-trx') || '';
 
                 rowPrepare.setAttribute('data-status', 'ready');
-
-                var badgePrepareCell = rowPrepare.cells[5];
-                if (badgePrepareCell) {
-                    badgePrepareCell.innerHTML = '<span class="badge-claim-status badge-ready">Siap Diambil</span>';
-                }
+                setCellBadge(rowPrepare.cells[5], 'badge-claim-status badge-ready', 'Siap Diambil');
 
                 var actionsCell = target.closest('.claim-actions-cell');
                 if (actionsCell) {
-                    actionsCell.innerHTML = '<button type="button" class="btn-action-complete" data-trx="' + trxPrepare + '">Tandai Selesai</button> ' +
-                                            '<button type="button" class="btn-action-cancel" data-trx="' + trxPrepare + '">Batalkan</button>';
+                    while (actionsCell.firstChild) actionsCell.removeChild(actionsCell.firstChild);
+                    actionsCell.appendChild(createClaimButton('btn-action-complete', 'Tandai Selesai', { 'data-trx': trxPrepare }));
+                    actionsCell.appendChild(document.createTextNode(' '));
+                    actionsCell.appendChild(createClaimButton('btn-action-cancel', 'Batalkan', { 'data-trx': trxPrepare }));
                 }
 
                 updateMetrics();
@@ -235,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (target.classList.contains('btn-action-complete')) {
                 var rowComplete = target.closest('tr');
                 if (!rowComplete) return;
-                var trxComplete = target.getAttribute('data-trx');
+                var trxComplete = target.getAttribute('data-trx') || '';
 
                 var consumerNameElem = rowComplete.querySelector('.consumer-name');
                 var portionElem = rowComplete.querySelector('.portion-count');
@@ -243,21 +270,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 var portionText = portionElem ? portionElem.textContent.trim() : '1 Porsi';
 
                 rowComplete.setAttribute('data-status', 'completed');
-
-                var badgeCompleteCell = rowComplete.cells[5];
-                if (badgeCompleteCell) {
-                    badgeCompleteCell.innerHTML = '<span class="badge-claim-status badge-completed">Selesai</span>';
-                }
+                setCellBadge(rowComplete.cells[5], 'badge-claim-status badge-completed', 'Selesai');
 
                 var actionsCompleteCell = target.closest('.claim-actions-cell');
                 if (actionsCompleteCell) {
                     var now = new Date();
                     var formattedTime = 'Hari ini - ' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2) + ' WIB';
-                    actionsCompleteCell.innerHTML = '<button type="button" class="btn-action-proof" ' +
-                        'data-trx="' + trxComplete + '" ' +
-                        'data-consumer="' + consumerName + '" ' +
-                        'data-portion="' + portionText + '" ' +
-                        'data-time="' + formattedTime + '">Lihat Bukti</button>';
+                    while (actionsCompleteCell.firstChild) actionsCompleteCell.removeChild(actionsCompleteCell.firstChild);
+                    actionsCompleteCell.appendChild(createClaimButton('btn-action-proof', 'Lihat Bukti', {
+                        'data-trx': trxComplete,
+                        'data-consumer': consumerName,
+                        'data-portion': portionText,
+                        'data-time': formattedTime
+                    }));
                 }
 
                 updateMetrics();
@@ -265,20 +290,16 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (target.classList.contains('btn-action-cancel')) {
                 var rowCancel = target.closest('tr');
                 if (!rowCancel) return;
-                var trxCancel = target.getAttribute('data-trx');
+                var trxCancel = target.getAttribute('data-trx') || '';
 
                 var isConfirmed = window.confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ' + trxCancel + '?');
                 if (isConfirmed) {
                     rowCancel.setAttribute('data-status', 'cancelled');
-
-                    var badgeCancelCell = rowCancel.cells[5];
-                    if (badgeCancelCell) {
-                        badgeCancelCell.innerHTML = '<span class="badge-claim-status badge-cancelled">Dibatalkan</span>';
-                    }
+                    setCellBadge(rowCancel.cells[5], 'badge-claim-status badge-cancelled', 'Dibatalkan');
 
                     var actionsCancelCell = target.closest('.claim-actions-cell');
                     if (actionsCancelCell) {
-                        actionsCancelCell.innerHTML = '<span class="consumer-role-desc">Pesanan Dibatalkan</span>';
+                        setCellBadge(actionsCancelCell, 'consumer-role-desc', 'Pesanan Dibatalkan');
                     }
 
                     updateMetrics();

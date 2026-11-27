@@ -43,17 +43,26 @@
     }
 
     function initNavbarDropdown() {
+        var dropdown = document.querySelector(".profile-consumer-dropdown");
         var btn = document.getElementById("profilePillBtn");
-        var menu = document.getElementById("profileDropdownMenu");
-        if (!btn || !menu) return;
+        if (!dropdown || !btn) return;
 
         btn.addEventListener("click", function (e) {
+            e.preventDefault();
             e.stopPropagation();
-            menu.classList.toggle("show");
+            dropdown.classList.toggle("is-open");
         });
 
-        document.addEventListener("click", function () {
-            menu.classList.remove("show");
+        document.addEventListener("click", function (e) {
+            if (!dropdown.contains(e.target)) {
+                dropdown.classList.remove("is-open");
+            }
+        });
+
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape" || e.keyCode === 27) {
+                dropdown.classList.remove("is-open");
+            }
         });
     }
 
@@ -246,10 +255,14 @@
                     card.classList.remove("is-closed");
                     target.textContent = "Tutup Donasi";
                     target.classList.remove("closed");
+                    var manageBtn = card.querySelector(".btn-inv-manage");
+                    var curStock = manageBtn ? parseInt(manageBtn.getAttribute("data-stock"), 10) || 0 : 0;
+                    card.setAttribute("data-status", curStock <= 8 ? "low" : "available");
                 } else {
                     card.classList.add("is-closed");
                     target.textContent = "Buka Kembali";
                     target.classList.add("closed");
+                    card.setAttribute("data-status", "closed");
                 }
                 recalculateMetrics();
             }
