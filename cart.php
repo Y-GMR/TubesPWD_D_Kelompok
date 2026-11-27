@@ -20,17 +20,15 @@ if (file_exists('includes/functions.php')) {
 }
 
 // 1. Session Guard: Pengguna wajib login untuk mengelola keranjang klaim
-
 if (!function_exists('is_logged_in') || !is_logged_in()) {
     header("Location: login.php?error=login_required");
     exit();
 }
 
-// Inisialisasi keranjang belanja pada sesi jika belum ada
-
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
+// Inisialisasi keranjang belanja pada sesi jika belum ada
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
 }
@@ -51,6 +49,14 @@ $slug_map = array(
     'perkedel'        => 12
 );
 
+// Batas aturan bisnis:
+// Maksimal 5 item/porsi per keranjang
+// Maksimal 25 item/porsi total per hari (ekuivalen dengan 5 keranjang penuh x 5 porsi per hari)
+// Maksimal 5 kali checkout per hari
+$maks_porsi_per_keranjang = 5;
+$maks_porsi_harian = 25;
+$maks_checkout_harian = 5;
+
 // 3. Handler Aksi Keranjang (Tambah via GET/POST, Ubah Jumlah, Hapus Item, Kosongkan)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     $item_id = isset($_POST['item_id']) ? (int) $_POST['item_id'] : 0;
@@ -58,6 +64,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     if ($_POST['aksi'] === 'tambah' && $item_id > 0) {
         $tambah_qty = isset($_POST['jumlah']) ? (int) $_POST['jumlah'] : 1;
         if ($tambah_qty < 1) $tambah_qty = 1;
+
+        $total_sekarang = 0;
+        foreach ($_SESSION['cart'] as $id_cek => $it_cek) {
+            $total_sekarang += (int) $it_cek['jumlah'];
+        }
+
+        if ($total_sekarang + $tambah_qty > $maks_porsi_per_keranjang) {
+            $_SESSION['flash_error'] = "Batas porsi tercapai. Maksimal {$maks_porsi_per_keranjang} porsi dalam satu keranjang belanja.";
+            header("Location: cart.php?status=limit_reached");
+            exit();
+        }
 
         if (!isset($_SESSION['cart'][$item_id])) {
             $_SESSION['cart'][$item_id] = array('jumlah' => $tambah_qty);
@@ -69,6 +86,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     } elseif ($_POST['aksi'] === 'ubah' && isset($_SESSION['cart'][$item_id])) {
         $jumlah_baru = isset($_POST['jumlah']) ? (int) $_POST['jumlah'] : 1;
         if ($jumlah_baru > 0) {
+            $total_lain = 0;
+            foreach ($_SESSION['cart'] as $id_cek => $it_cek) {
+                if ($id_cek !== $item_id) {
+                    $total_lain += (int) $it_cek['jumlah'];
+                }
+            }
+
+            if ($total_lain + $jumlah_baru > $maks_porsi_per_keranjang) {
+                $_SESSION['flash_error'] = "Batas porsi tercapai. Maksimal {$maks_porsi_per_keranjang} porsi dalam satu keranjang belanja.";
+                header("Location: cart.php?status=limit_reached");
+                exit();
+            }
+
             $_SESSION['cart'][$item_id]['jumlah'] = $jumlah_baru;
         } else {
             unset($_SESSION['cart'][$item_id]);
@@ -86,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi'])) {
     }
 }
 
-// Handler Tambah Cepat via URL GET (misal: cart.php?action=add&id=7 atau &slug=pepperoni-slice) -agy
+// Handler Tambah Cepat via URL GET (misal: cart.php?action=add&id=7 atau &slug=pepperoni-slice)
 if (isset($_GET['action']) && $_GET['action'] === 'add') {
     $target_id = 0;
     if (isset($_GET['id'])) {
@@ -100,6 +130,18 @@ if (isset($_GET['action']) && $_GET['action'] === 'add') {
     if ($target_id > 0) {
         $qty = isset($_GET['qty']) ? (int) $_GET['qty'] : 1;
         if ($qty < 1) $qty = 1;
+
+        $total_sekarang = 0;
+        foreach ($_SESSION['cart'] as $id_cek => $it_cek) {
+            $total_sekarang += (int) $it_cek['jumlah'];
+        }
+
+        if ($total_sekarang + $qty > $maks_porsi_per_keranjang) {
+            $_SESSION['flash_error'] = "Batas porsi tercapai. Maksimal {$maks_porsi_per_keranjang} porsi dalam satu keranjang belanja.";
+            header("Location: cart.php?status=limit_reached");
+            exit();
+        }
+
         if (!isset($_SESSION['cart'][$target_id])) {
             $_SESSION['cart'][$target_id] = array('jumlah' => $qty);
         } else {
@@ -110,7 +152,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'add') {
     }
 }
 
-// 4. Ambil Data Profil Pengguna & Verifikasi (isVerified?)
+// 4. Ambil Data Profil Pengguna & Verifikasi Kelayakan (isVerified?)
 $data_pengguna = null;
 $status_verifikasi = 'menunggu';
 if ($conn) {
@@ -120,29 +162,53 @@ if ($conn) {
     }
 }
 
-// 5. Hitung Kuota Klaim Harian Konsumen (Maksimal 5 porsi per hari)
-$kuota_harian_maks = 5;
-$sudah_diklaim_hari_ini = 0;
+// 5. Hitung Batas Harian Konsumen dari Basis Data:
+//    - Total porsi yang sudah diklaim hari ini (maks 25 porsi)
+//    - Total transaksi/checkout yang sudah dilakukan hari ini (maks 5 kali)
+$sudah_porsi_hari_ini = 0;
+$sudah_checkout_hari_ini = 0;
+
 if ($conn) {
-    $sql_kuota = "SELECT COALESCE(SUM(dt.jumlah), 0) AS total_hari_ini
-                  FROM transaksi t
-                  INNER JOIN detail_transaksi dt ON t.id = dt.transaksi_id
-                  WHERE t.konsumen_id = ?
-                    AND DATE(t.dibuat_pada) = CURDATE()
-                    AND t.status != 'dibatalkan'";
-    $stmt_kuota = mysqli_prepare($conn, $sql_kuota);
-    if ($stmt_kuota) {
-        mysqli_stmt_bind_param($stmt_kuota, "i", $user_id);
-        mysqli_stmt_execute($stmt_kuota);
-        $res_kuota = mysqli_stmt_get_result($stmt_kuota);
-        $row_kuota = mysqli_fetch_assoc($res_kuota);
-        if ($row_kuota) {
-            $sudah_diklaim_hari_ini = (int) $row_kuota['total_hari_ini'];
+    // Total porsi hari ini
+    $sql_kuota_porsi = "SELECT COALESCE(SUM(dt.jumlah), 0) AS total_porsi_hari_ini
+                        FROM transaksi t
+                        INNER JOIN detail_transaksi dt ON t.id = dt.transaksi_id
+                        WHERE t.konsumen_id = ?
+                          AND DATE(t.dibuat_pada) = CURDATE()
+                          AND t.status != 'dibatalkan'";
+    $stmt_kp = mysqli_prepare($conn, $sql_kuota_porsi);
+    if ($stmt_kp) {
+        mysqli_stmt_bind_param($stmt_kp, "i", $user_id);
+        mysqli_stmt_execute($stmt_kp);
+        $res_kp = mysqli_stmt_get_result($stmt_kp);
+        $row_kp = mysqli_fetch_assoc($res_kp);
+        if ($row_kp) {
+            $sudah_porsi_hari_ini = (int) $row_kp['total_porsi_hari_ini'];
         }
-        mysqli_stmt_close($stmt_kuota);
+        mysqli_stmt_close($stmt_kp);
+    }
+
+    // Total checkout/transaksi hari ini
+    $sql_kuota_trx = "SELECT COUNT(*) AS total_trx_hari_ini
+                      FROM transaksi
+                      WHERE konsumen_id = ?
+                        AND DATE(dibuat_pada) = CURDATE()
+                        AND status != 'dibatalkan'";
+    $stmt_kt = mysqli_prepare($conn, $sql_kuota_trx);
+    if ($stmt_kt) {
+        mysqli_stmt_bind_param($stmt_kt, "i", $user_id);
+        mysqli_stmt_execute($stmt_kt);
+        $res_kt = mysqli_stmt_get_result($stmt_kt);
+        $row_kt = mysqli_fetch_assoc($res_kt);
+        if ($row_kt) {
+            $sudah_checkout_hari_ini = (int) $row_kt['total_trx_hari_ini'];
+        }
+        mysqli_stmt_close($stmt_kt);
     }
 }
-$sisa_kuota_hari_ini = max(0, $kuota_harian_maks - $sudah_diklaim_hari_ini);
+
+$sisa_porsi_harian = max(0, $maks_porsi_harian - $sudah_porsi_hari_ini);
+$sisa_checkout_harian = max(0, $maks_checkout_harian - $sudah_checkout_hari_ini);
 
 // 6. Muat Rincian Item dari Basis Data untuk Isi Keranjang
 $daftar_item_keranjang = array();
@@ -207,11 +273,246 @@ if ($conn && !empty($_SESSION['cart'])) {
 }
 
 // Periksa kelayakan tombol checkout
-$melebihi_kuota = ($sudah_diklaim_hari_ini + $total_porsi_keranjang > $kuota_harian_maks);
-$bisa_checkout = (!empty($daftar_item_keranjang) && !$stok_bermasalah && !$melebihi_kuota && $status_verifikasi === 'disetujui');
+$melebihi_porsi_keranjang = ($total_porsi_keranjang > $maks_porsi_per_keranjang);
+$melebihi_porsi_harian = ($sudah_porsi_hari_ini + $total_porsi_keranjang > $maks_porsi_harian);
+$melebihi_checkout_harian = ($sudah_checkout_hari_ini >= $maks_checkout_harian);
+
+$bisa_checkout = (!empty($daftar_item_keranjang) && !$stok_bermasalah && !$melebihi_porsi_keranjang && !$melebihi_porsi_harian && !$melebihi_checkout_harian && $status_verifikasi === 'disetujui');
 
 $page_title = 'Keranjang Klaim Pangan - Pangkalan Pangan';
 $extra_css = array('checkout.css?v=6', 'components.css?v=6');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
+?>
+
+<div class="checkout-main-section">
+    <div class="checkout-container">
+        <h1 class="checkout-page-title">Keranjang Klaim Pangan</h1>
+
+        <?php if (isset($_SESSION['flash_success'])): ?>
+            <div class="alert alert-success" style="margin-bottom: 20px; padding: 12px 16px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; border-radius: 6px;">
+                <?php echo escapeHtml($_SESSION['flash_success']); unset($_SESSION['flash_success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (isset($_SESSION['flash_error'])): ?>
+            <div class="alert alert-danger" style="margin-bottom: 20px; padding: 12px 16px; background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 6px;">
+                <?php echo escapeHtml($_SESSION['flash_error']); unset($_SESSION['flash_error']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($status_verifikasi !== 'disetujui'): ?>
+            <div class="posko-alert-box" style="margin-bottom: 24px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; padding: 14px 18px;">
+                <strong>Perhatian Akun:</strong> Status verifikasi akun Anda saat ini adalah <em><?php echo escapeHtml(ucfirst($status_verifikasi)); ?></em>.
+                Klaim paket pangan hanya dapat diselesaikan setelah dokumen kelayakan (SKTM/KKS) disetujui oleh admin.
+            </div>
+        <?php endif; ?>
+
+        <?php if (empty($daftar_item_keranjang)): ?>
+            <div class="checkout-card" style="text-align: center; padding: 48px 24px;">
+                <img src="assets/images/logo_sprout.svg" alt="Pangkalan Pangan" style="width: 64px; height: 64px; margin-bottom: 16px;" />
+                <h2 style="font-size: 20px; color: #2D3748; margin-bottom: 8px;">Keranjang Klaim Anda Sedang Kosong</h2>
+                <p style="color: #718096; margin-bottom: 24px;">Jelajahi berbagai pilihan makanan bergizi yang tersedia untuk Anda klaim dari produsen mitra kami.</p>
+                <a href="katalog.php" class="btn-confirm-claim" style="display: inline-block; text-decoration: none; max-width: 280px; margin: 0 auto;">Lihat Katalog Makanan</a>
+            </div>
+        <?php else: ?>
+
+            <div class="checkout-content-grid">
+                <div class="checkout-left-col">
+                    <div class="checkout-card food-detail-card">
+                        <div class="checkout-merchant-header">
+                            <div>
+                                <h2 class="checkout-merchant-title">Daftar Porsi Makanan Dipilih</h2>
+                                <p class="checkout-merchant-subtitle">Metode: Ambil Sendiri di Gerai Produsen (Pick-up Only) &#8226; Maksimal 5 Porsi per Keranjang</p>
+                            </div>
+                            <form action="cart.php" method="post" style="margin: 0;">
+                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                <input type="hidden" name="aksi" value="kosongkan" />
+                                <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 13px; cursor: pointer; text-decoration: underline;" onclick="return confirm('Kosongkan seluruh isi keranjang?');">Kosongkan Keranjang</button>
+                            </form>
+                        </div>
+
+                        <hr class="checkout-hr" />
+
+                        <div class="checkout-items-list">
+                            <?php foreach ($daftar_item_keranjang as $item): ?>
+                                <?php
+                                $foto_path = $item['foto_makanan'];
+                                if (strpos($foto_path, '/') === false) {
+                                    $foto_src = 'assets/uploads/' . $foto_path;
+                                } else {
+                                    $foto_src = $foto_path;
+                                }
+                                $is_overstock = ($item['jumlah'] > $item['stok']);
+                                ?>
+                                <div class="checkout-item-row" style="align-items: center; padding: 14px 0; border-bottom: 1px solid #EDF2F7;">
+                                    <div class="checkout-item-thumb">
+                                        <img src="<?php echo escapeHtml($foto_src); ?>" alt="<?php echo escapeHtml($item['nama_makanan']); ?>" />
+                                    </div>
+                                    <div class="checkout-item-info" style="flex: 1; padding: 0 16px;">
+                                        <h3 class="checkout-item-name" style="margin: 0 0 4px 0; font-size: 16px; color: #2D3748;">
+                                            <?php echo escapeHtml($item['nama_makanan']); ?>
+                                        </h3>
+                                        <p class="checkout-item-meta" style="margin: 0 0 4px 0; font-size: 13px; color: #718096;">
+                                            Kategori: <?php echo escapeHtml($item['nama_kategori']); ?> &#8226; Produsen: <strong><?php echo escapeHtml($item['nama_produsen']); ?></strong>
+                                        </p>
+                                        <p class="checkout-item-meta" style="margin: 0 0 6px 0; font-size: 12px; color: #A0AEC0;">
+                                            Lokasi Pick-up: <?php echo escapeHtml($item['alamat_ambil']); ?>
+                                        </p>
+                                        <p class="checkout-item-price-tag" style="margin: 0; font-size: 14px; font-weight: bold; color: #2F855A;">
+                                            <?php echo formatRupiah($item['harga']); ?> / porsi
+                                            <?php if ($is_overstock): ?>
+                                                <span style="color: #E53E3E; font-size: 12px; font-weight: normal; margin-left: 8px;">(Stok hanya tersisa: <?php echo (int) $item['stok']; ?>!)</span>
+                                            <?php else: ?>
+                                                <span style="color: #718096; font-size: 12px; font-weight: normal; margin-left: 8px;">(Sisa stok: <?php echo (int) $item['stok']; ?>)</span>
+                                            <?php endif; ?>
+                                        </p>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
+                                        <form action="cart.php" method="post" class="checkout-stepper-wrap" style="margin: 0;">
+                                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                            <input type="hidden" name="aksi" value="ubah" />
+                                            <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
+
+                                            <button type="submit" name="jumlah" value="<?php echo (int) ($item['jumlah'] - 1); ?>" class="btn-step" title="Kurangi 1">-</button>
+                                            <span class="step-qty-val"><?php echo (int) $item['jumlah']; ?></span>
+                                            <button type="submit" name="jumlah" value="<?php echo (int) ($item['jumlah'] + 1); ?>" class="btn-step" title="Tambah 1" <?php if ($item['jumlah'] >= $item['stok'] || $total_porsi_keranjang >= $maks_porsi_per_keranjang) echo 'disabled="disabled"'; ?>>+</button>
+                                        </form>
+
+                                        <form action="cart.php" method="post" style="margin: 0;">
+                                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                            <input type="hidden" name="aksi" value="hapus" />
+                                            <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
+                                            <button type="submit" style="background: none; border: none; color: #A0AEC0; font-size: 12px; cursor: pointer; text-decoration: underline;" title="Hapus dari keranjang">Hapus</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <hr class="checkout-hr" />
+
+                        <div class="food-detail-bottom" style="display: flex; justify-content: space-between; align-items: center;">
+                            <span class="food-claim-qty" style="font-weight: bold; color: #2D3748;">
+                                Total Klaim: <?php echo (int) $total_porsi_keranjang; ?> / <?php echo (int) $maks_porsi_per_keranjang; ?> Porsi
+                            </span>
+                            <span class="food-claim-price" style="font-size: 18px; font-weight: bold; color: #2F855A;">
+                                Total: <?php echo formatRupiah($total_harga_keranjang); ?>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="checkout-right-col">
+                    <div class="checkout-card summary-card">
+                        <h3 class="summary-title">Ringkasan Validasi</h3>
+                        <hr class="summary-divider" />
+
+                        <ul class="summary-list">
+                            <li class="summary-item">
+                                <span class="summary-item-label">Penerima Manfaat</span>
+                                <span class="summary-item-val val-teal"><?php echo escapeHtml($_SESSION['full_name'] ?? $_SESSION['username']); ?></span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Status SKTM</span>
+                                <span class="summary-item-val <?php echo ($status_verifikasi === 'disetujui') ? 'val-green' : 'val-amber'; ?>">
+                                    <?php echo escapeHtml(ucfirst($status_verifikasi)); ?>
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Porsi di Keranjang</span>
+                                <span class="summary-item-val <?php echo ($melebihi_porsi_keranjang ? 'val-amber' : 'val-dark'); ?>">
+                                    <?php echo (int) $total_porsi_keranjang; ?> dari <?php echo (int) $maks_porsi_per_keranjang; ?> porsi maks
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Total Porsi Hari Ini</span>
+                                <span class="summary-item-val val-dark">
+                                    <?php echo (int) $sudah_porsi_hari_ini; ?> dari <?php echo (int) $maks_porsi_harian; ?> porsi
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Sisa Kuota Porsi</span>
+                                <span class="summary-item-val <?php echo ($melebihi_porsi_harian ? 'val-amber' : 'val-green'); ?>">
+                                    <?php echo (int) $sisa_porsi_harian; ?> porsi lagi
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Checkout Hari Ini</span>
+                                <span class="summary-item-val val-dark">
+                                    <?php echo (int) $sudah_checkout_hari_ini; ?> dari <?php echo (int) $maks_checkout_harian; ?> kali
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Sisa Checkout</span>
+                                <span class="summary-item-val <?php echo ($melebihi_checkout_harian ? 'val-amber' : 'val-green'); ?>">
+                                    <?php echo (int) $sisa_checkout_harian; ?> kali lagi
+                                </span>
+                            </li>
+                            <li class="summary-item">
+                                <span class="summary-item-label">Total Tagihan</span>
+                                <span class="summary-item-val val-green"><?php echo formatRupiah($total_harga_keranjang); ?></span>
+                            </li>
+                        </ul>
+
+                        <hr class="summary-divider" />
+
+                        <?php if ($melebihi_porsi_keranjang): ?>
+                            <div class="alert alert-warning" style="font-size: 13px; margin-bottom: 16px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; border-radius: 4px;">
+                                Total porsi di keranjang melebihi batas maksimal <?php echo (int) $maks_porsi_per_keranjang; ?> porsi per keranjang. Silakan kurangi porsi untuk melanjutkan.
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($melebihi_porsi_harian): ?>
+                            <div class="alert alert-warning" style="font-size: 13px; margin-bottom: 16px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; border-radius: 4px;">
+                                Total klaim porsi hari ini melebihi batas maksimal <?php echo (int) $maks_porsi_harian; ?> porsi per hari. Sisa kuota porsi Anda hari ini adalah <?php echo (int) $sisa_porsi_harian; ?> porsi.
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($melebihi_checkout_harian): ?>
+                            <div class="alert alert-warning" style="font-size: 13px; margin-bottom: 16px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; border-radius: 4px;">
+                                Anda telah mencapai batas maksimal <?php echo (int) $maks_checkout_harian; ?> kali checkout per hari. Silakan kembali lagi besok.
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($stok_bermasalah): ?>
+                            <div class="alert alert-warning" style="font-size: 13px; margin-bottom: 16px; padding: 10px; background-color: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; border-radius: 4px;">
+                                Sebagian item melebihi stok yang tersedia saat ini di basis data produsen. Silakan sesuaikan jumlah porsi.
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if ($bisa_checkout): ?>
+                            <a href="checkout.php" class="btn-confirm-claim" style="display: block; text-align: center; text-decoration: none; margin-bottom: 12px;">Lanjut ke Konfirmasi Klaim &#8594;</a>
+                        <?php else: ?>
+                            <button type="button" class="btn-confirm-claim" style="opacity: 0.5; cursor: not-allowed; width: 100%; margin-bottom: 12px;" disabled="disabled">
+                                <?php
+                                if ($status_verifikasi !== 'disetujui') {
+                                    echo 'Akun Belum Diverifikasi';
+                                } elseif ($melebihi_checkout_harian) {
+                                    echo 'Batas 5 Checkout Harian Tercapai';
+                                } elseif ($melebihi_porsi_keranjang) {
+                                    echo 'Maksimal 5 Porsi per Keranjang';
+                                } elseif ($melebihi_porsi_harian) {
+                                    echo 'Batas 25 Porsi Harian Tercapai';
+                                } elseif ($stok_bermasalah) {
+                                    echo 'Stok Tidak Cukup';
+                                } else {
+                                    echo 'Keranjang Kosong';
+                                }
+                                ?>
+                            </button>
+                        <?php endif; ?>
+
+                        <a href="katalog.php" class="btn-cancel-checkout" style="display: block; text-align: center; text-decoration: none;">+ Tambah Menu Lain</a>
+                    </div>
+                </div>
+            </div>
+
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+require_once 'includes/footer.php';
 ?>
