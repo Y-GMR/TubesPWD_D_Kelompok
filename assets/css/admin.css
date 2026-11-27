@@ -53,6 +53,7 @@ body {
 
 .admin-main {
     flex: 1;
+    min-width: 0;
     padding: 24px;
 }
 
@@ -136,6 +137,13 @@ body {
     border: 1px solid #cccccc;
     border-radius: 4px;
     font-size: 13px;
+}
+
+.inline-form > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
 }
 
 .btn {

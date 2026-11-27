@@ -141,11 +141,13 @@
                 if (hargaRaw !== '' && (!/^\d+$/.test(hargaRaw) || isNaN(hargaNum) || hargaNum < 0 || hargaNum > 100000000)) {
                     errors.push('Harga per porsi harus berupa angka bulat 0 atau lebih.');
                 }
-                if (expiryRaw !== '' && !/^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?$/.test(expiryRaw)) {
+                if (expiryRaw !== '' && !/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}(:\d{2})?$/.test(expiryRaw)) {
                     errors.push('Format batas kedaluwarsa harus YYYY-MM-DD HH:MM.');
                 } else if (expiryRaw !== '') {
                     var parsedExpiry = new Date(expiryRaw.replace(' ', 'T'));
-                    if (isNaN(parsedExpiry.getTime()) || parsedExpiry.getTime() <= Date.now()) {
+                    if (isNaN(parsedExpiry.getTime())) {
+                        errors.push('Format batas kedaluwarsa tidak valid.');
+                    } else if ((!isEditMode || isNaN(stokNum) || stokNum > 0) && parsedExpiry.getTime() <= Date.now()) {
                         errors.push('Batas waktu kedaluwarsa harus lebih besar dari waktu saat ini.');
                     }
                 }

@@ -114,11 +114,13 @@
                 var errors = [];
                 var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-                if (!namaVal) {
-                    errors.push('Nama lengkap wajib diisi.');
+                if (!namaVal || namaVal.length < 2 || namaVal.length > 100) {
+                    errors.push('Nama lengkap harus terdiri dari 2 hingga 100 karakter.');
                 }
                 if (userVal.length < 4 || userVal.length > 30) {
                     errors.push('Username harus terdiri dari 4 sampai 30 karakter.');
+                } else if (!/^[a-zA-Z0-9_]{4,30}$/.test(userVal)) {
+                    errors.push('Username hanya boleh berisi huruf, angka, dan garis bawah (_).');
                 }
                 if (!emailVal || !emailPattern.test(emailVal)) {
                     errors.push('Alamat email wajib diisi dengan format yang valid.');

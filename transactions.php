@@ -26,6 +26,11 @@ $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
 // 2. Ambil data profil pengguna
 $data_pengguna = ambilPenggunaById($conn, $user_id);
+if ($conn && !$data_pengguna) {
+    hapusSesiPengguna();
+    header("Location: login.php?error=login_required");
+    exit();
+}
 $nama_user_tampil = ($data_pengguna && isset($data_pengguna['nama_lengkap']))
     ? $data_pengguna['nama_lengkap']
     : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Pengguna');
@@ -155,7 +160,7 @@ if ($conn) {
 
 // Cari transaksi aktif utama untuk tiket display (status 'menunggu' atau 'siap_diambil')
 $tiket_aktif = null;
-$kode_fokus = isset($_GET['code']) ? trim($_GET['code']) : '';
+$kode_fokus = (isset($_GET['code']) && is_string($_GET['code'])) ? trim($_GET['code']) : '';
 
 foreach ($daftar_transaksi as $t) {
     if ($kode_fokus !== '' && $t['kode_transaksi'] === $kode_fokus) {
@@ -435,7 +440,7 @@ require_once 'includes/navbar.php';
                                         </a>
 
                                         <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tr['status'] === 'menunggu'): ?>
-                                            <form action="actions/crud2_status_update.php" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Batalkan pesanan <?php echo escapeHtml($tr['kode_transaksi']); ?>?');">
+                                            <form action="actions/crud2_status_update.php" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ini?');">
                                                 <div style="display: inline;">
                                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tr['id']; ?>" />
                                                     <input type="hidden" name="aksi" value="batal" />

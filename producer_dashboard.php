@@ -8,6 +8,14 @@ require_role('produsen');
 
 $produsen_id = (int) $_SESSION['user_id'];
 $produsen = ambilPenggunaById($conn, $produsen_id);
+if ($conn && !$produsen) {
+    hapusSesiPengguna();
+    header('Location: login.php?error=login_required');
+    exit();
+}
+$status_verif_produsen = ($produsen && isset($produsen['status_verifikasi'])) ? $produsen['status_verifikasi'] : 'menunggu';
+$catatan_verif_produsen = ($produsen && isset($produsen['catatan_verifikasi'])) ? trim((string) $produsen['catatan_verifikasi']) : '';
+$produsen_terverifikasi = ($status_verif_produsen === 'disetujui');
 $nama_gerai = ($produsen && trim((string) $produsen['nama_lengkap']) !== '')
     ? $produsen['nama_lengkap']
     : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Mitra Produsen');
@@ -19,7 +27,7 @@ $daftar_transaksi = array();
 $daftar_makanan = array();
 
 if ($conn) {
-    $stmt_stok = mysqli_prepare($conn, "SELECT COALESCE(SUM(stok), 0) AS total_stok FROM makanan WHERE produsen_id = ? AND stok > 0");
+    $stmt_stok = mysqli_prepare($conn, "SELECT COALESCE(SUM(stok), 0) AS total_stok FROM makanan WHERE produsen_id = ? AND stok > 0 AND (kedaluwarsa_pada IS NULL OR kedaluwarsa_pada > NOW())");
     if ($stmt_stok) {
         mysqli_stmt_bind_param($stmt_stok, "i", $produsen_id);
         mysqli_stmt_execute($stmt_stok);
@@ -89,7 +97,7 @@ if ($conn) {
 
     $sql_food = "SELECT m.id, m.nama_makanan, m.harga, m.stok, m.foto_makanan, m.kedaluwarsa_pada, k.nama_kategori "
               . "FROM makanan m INNER JOIN kategori k ON m.kategori_id = k.id "
-              . "WHERE m.produsen_id = ? AND m.stok > 0 "
+              . "WHERE m.produsen_id = ? AND m.stok > 0 AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) "
               . "ORDER BY m.dibuat_pada DESC LIMIT 8";
     $stmt_food = mysqli_prepare($conn, $sql_food);
     if ($stmt_food) {
@@ -113,12 +121,16 @@ if (isset($_SESSION['flash_success'])) {
     $flash_success = trim((string) $_SESSION['flash_success']);
     unset($_SESSION['flash_success']);
 }
-if ($flash_error === '' && isset($_GET['error']) && $_GET['error'] === 'unauthorized') {
-    $flash_error = 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.';
+if ($flash_error === '' && isset($_GET['error'])) {
+    if ($_GET['error'] === 'unauthorized') {
+        $flash_error = 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.';
+    } elseif ($_GET['error'] === 'belum_diverifikasi') {
+        $flash_error = 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
+    }
 }
 
 $page_title = 'Dashboard Produsen - Pangkalan Pangan';
-$extra_css = array('components.css?v=9', 'catalog.css?v=6');
+$extra_css = array('components.css?v=9', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1');
 
 require_once 'includes/header.php';
@@ -133,10 +145,26 @@ require_once 'includes/navbar.php';
                     <p class="welcome-subtitle">Kelola ketersediaan makanan berlebih, pantau klaim masuk dari konsumen, dan pastikan pangan tersalurkan tepat waktu.</p>
                 </div>
                 <div class="welcome-actions">
+<?php if ($produsen_terverifikasi): ?>
                     <a href="add_food.php" class="btn btn-primary">+ Donasi Makanan Baru</a>
                     <a href="inventory.php" class="btn btn-secondary">Kelola Inventaris</a>
+<?php else: ?>
+                    <a href="profile.php" class="btn btn-secondary">Lihat Status Profil</a>
+<?php endif; ?>
                 </div>
             </div>
+
+            <?php if (!$produsen_terverifikasi): ?>
+                <?php if ($status_verif_produsen === 'ditolak'): ?>
+                    <div class="alert alert-error">
+                        Akun produsen Anda saat ini berstatus <strong>Ditolak</strong><?php echo $catatan_verif_produsen !== '' ? (' (' . escapeHtml($catatan_verif_produsen) . ')') : ''; ?>. Anda belum dapat menambahkan atau mengelola donasi makanan.
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning">
+                        Akun produsen Anda sedang menunggu verifikasi admin. Setelah disetujui, Anda dapat menambahkan dan mengelola donasi makanan.
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
 
             <?php if ($flash_error !== ''): ?>
                 <div class="alert alert-error"><?php echo escapeHtml($flash_error); ?></div>
@@ -265,10 +293,16 @@ require_once 'includes/navbar.php';
             </div>
 
             <div class="inventory-scroll-container">
+                <?php if (empty($daftar_makanan) && !$produsen_terverifikasi): ?>
+                    <div class="alert alert-warning" style="width: 100%; margin-bottom: 0;">
+                        Belum ada makanan aktif dalam inventaris gerai Anda.
+                    </div>
+                <?php endif; ?>
                 <?php foreach ($daftar_makanan as $item): ?>
                     <?php
                     $foto_url = crud1FormatFotoUrl($item['foto_makanan']);
                     $batas_ambil = crud1FormatKedaluwarsaTampil($item['kedaluwarsa_pada']);
+                    $sudah_kedaluwarsa = (!empty($item['kedaluwarsa_pada']) && strtotime($item['kedaluwarsa_pada']) <= time());
                     ?>
                     <div class="food-card">
                         <div class="food-card-thumb-wrap">
@@ -279,25 +313,30 @@ require_once 'includes/navbar.php';
                             <h3 class="food-card-title"><?php echo escapeHtml($item['nama_makanan']); ?></h3>
                             <p class="food-card-category">Kategori: <?php echo escapeHtml($item['nama_kategori']); ?> &#8226; <?php echo escapeHtml($nama_gerai); ?></p>
                             <p class="food-card-price"><?php echo escapeHtml(formatRupiah((int) $item['harga'])); ?></p>
-                            <p class="food-card-time">Batas Ambil: <?php echo escapeHtml($batas_ambil); ?></p>
+                            <p class="food-card-time">Batas Ambil: <?php echo escapeHtml($batas_ambil); ?><?php echo $sudah_kedaluwarsa ? ' (Kedaluwarsa)' : ''; ?></p>
+                            <?php if ($produsen_terverifikasi): ?>
                             <div class="food-card-actions">
                                 <a href="add_food.php?id=<?php echo escapeHtml((string) ((int) $item['id'])); ?>" class="btn btn-sm btn-secondary">Ubah Detail</a>
-                                <form action="actions/crud1_item.php" method="post" style="flex: 1; display: flex; margin: 0;">
+                                <form action="actions/crud1_item.php" method="post" style="flex: 1; display: flex; margin: 0;" onsubmit="return confirm('Tutup donasi untuk makanan ini (stok akan disetel menjadi 0)?');">
                                     <div style="width: 100%; display: flex;">
+                                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                         <input type="hidden" name="action" value="tutup_donasi" />
                                         <input type="hidden" name="id" value="<?php echo escapeHtml((string) ((int) $item['id'])); ?>" />
                                         <button type="submit" class="btn btn-sm btn-danger" style="width: 100%;">Tutup Donasi</button>
                                     </div>
                                 </form>
                             </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
 
+                <?php if ($produsen_terverifikasi): ?>
                 <a href="add_food.php" class="add-food-card-box" title="Tambah Donasi Makanan Baru">
                     <span class="add-food-card-icon">+</span>
                     <span class="add-food-card-text">Tambah Makanan Baru</span>
                 </a>
+                <?php endif; ?>
             </div>
 
         </div>

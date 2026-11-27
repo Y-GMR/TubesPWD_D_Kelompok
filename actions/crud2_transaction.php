@@ -35,10 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 
-// 1. Verifikasi peran pengguna (Konsumen atau Admin)
-if ($user_role !== 'konsumen' && $user_role !== 'admin') {
+// 1. Verifikasi peran pengguna (Hanya Konsumen)
+if ($user_role !== 'konsumen') {
     $_SESSION['flash_error'] = 'Hanya akun konsumen yang memiliki akses untuk mengklaim paket pangan.';
-    header('Location: ../katalog.php');
+    $tujuan = function_exists('urlBerandaPeran') ? urlBerandaPeran($user_role) : '../katalog.php';
+    header('Location: ' . $tujuan . '?error=unauthorized');
+    exit();
+}
+
+// 2. Validasi Token CSRF
+$token_kiriman = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
+    $_SESSION['flash_error'] = 'Permintaan tidak valid (Token CSRF kedaluwarsa atau tidak sah). Silakan coba lagi.';
+    header('Location: ../checkout.php');
     exit();
 }
 
@@ -51,8 +60,8 @@ if (!$conn) {
 // 3. Validasi Status Verifikasi Akun Pengguna (isVerified? pada Flowchart)
 $data_pengguna = ambilPenggunaById($conn, $user_id);
 if (!$data_pengguna) {
-    $_SESSION['flash_error'] = 'Data profil pengguna tidak ditemukan.';
-    header('Location: ../login.php');
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
     exit();
 }
 
@@ -154,7 +163,10 @@ $makanan_db = array();
 $placeholders = implode(',', array_fill(0, count($item_ids), '?'));
 $types = str_repeat('i', count($item_ids));
 
-$sql_makanan = "SELECT id, produsen_id, nama_makanan, harga, stok, kedaluwarsa_pada FROM makanan WHERE id IN ($placeholders)";
+$sql_makanan = "SELECT m.id, m.produsen_id, m.nama_makanan, m.harga, m.stok, m.kedaluwarsa_pada, p.status_verifikasi AS status_produsen "
+             . "FROM makanan m "
+             . "INNER JOIN pengguna p ON m.produsen_id = p.id "
+             . "WHERE m.id IN ($placeholders)";
 $stmt_makanan = mysqli_prepare($conn, $sql_makanan);
 if (!$stmt_makanan) {
     $_SESSION['flash_error'] = 'Gagal memverifikasi stok inventaris.';
@@ -170,7 +182,7 @@ while ($row = mysqli_fetch_assoc($res_makanan)) {
 }
 mysqli_stmt_close($stmt_makanan);
 
-// Periksa kelengkapan, kedaluwarsa, dan kecukupan stok
+// Periksa kelengkapan, status verifikasi produsen, kedaluwarsa, dan kecukupan stok
 foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
     $m_id = (int) $makanan_id;
     $qty_diminta = (int) $c_item['jumlah'];
@@ -178,6 +190,13 @@ foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
 
     if (!isset($makanan_db[$m_id])) {
         $_SESSION['flash_error'] = "Salah satu menu makanan tidak ditemukan di basis data.";
+        header('Location: ../cart.php');
+        exit();
+    }
+
+    if (!isset($makanan_db[$m_id]['status_produsen']) || $makanan_db[$m_id]['status_produsen'] !== 'disetujui') {
+        $nama_m = $makanan_db[$m_id]['nama_makanan'];
+        $_SESSION['flash_error'] = "Menu '{$nama_m}' saat ini tidak tersedia karena produsen belum terverifikasi.";
         header('Location: ../cart.php');
         exit();
     }
@@ -239,26 +258,67 @@ if ($sudah_checkout + count($pesanan_per_produsen) > $maks_checkout_harian) {
 mysqli_begin_transaction($conn);
 
 try {
+    // Kunci baris pengguna untuk mencegah race condition pada pengecekan kuota harian & status verifikasi
+    $stmt_lock_user = mysqli_prepare($conn, "SELECT status_verifikasi FROM pengguna WHERE id = ? FOR UPDATE");
+    if (!$stmt_lock_user) {
+        throw new Exception("Gagal mengunci data akun pengguna.");
+    }
+    mysqli_stmt_bind_param($stmt_lock_user, "i", $user_id);
+    if (!mysqli_stmt_execute($stmt_lock_user)) {
+        mysqli_stmt_close($stmt_lock_user);
+        throw new Exception("Gagal memverifikasi status akun dalam transaksi.");
+    }
+    $res_lock = mysqli_stmt_get_result($stmt_lock_user);
+    $row_lock = mysqli_fetch_assoc($res_lock);
+    mysqli_stmt_close($stmt_lock_user);
+
+    if (!$row_lock || $row_lock['status_verifikasi'] !== 'disetujui') {
+        throw new Exception("Status verifikasi akun Anda belum disetujui.");
+    }
+
+    $stmt_kuota_tx = mysqli_prepare($conn, $sql_cek_kuota);
+    if (!$stmt_kuota_tx) {
+        throw new Exception("Gagal memverifikasi kuota harian dalam transaksi.");
+    }
+    mysqli_stmt_bind_param($stmt_kuota_tx, "i", $user_id);
+    if (!mysqli_stmt_execute($stmt_kuota_tx)) {
+        mysqli_stmt_close($stmt_kuota_tx);
+        throw new Exception("Gagal menghitung kuota harian dalam transaksi.");
+    }
+    $res_ktx = mysqli_stmt_get_result($stmt_kuota_tx);
+    $row_ktx = mysqli_fetch_assoc($res_ktx);
+    mysqli_stmt_close($stmt_kuota_tx);
+
+    $sudah_checkout_tx = isset($row_ktx['total_trx_hari_ini']) ? (int) $row_ktx['total_trx_hari_ini'] : 0;
+    $sudah_porsi_tx = isset($row_ktx['total_porsi_hari_ini']) ? (int) $row_ktx['total_porsi_hari_ini'] : 0;
+
+    if ($sudah_checkout_tx + count($pesanan_per_produsen) > $maks_checkout_harian) {
+        throw new Exception("Batas maksimal {$maks_checkout_harian} kali checkout per hari terlampaui.");
+    }
+    if ($sudah_porsi_tx + $total_porsi_baru > $maks_porsi_harian) {
+        throw new Exception("Batas kuota {$maks_porsi_harian} porsi per hari terlampaui.");
+    }
+
     $kode_transaksi_list = array();
 
     $sql_insert_trx = "INSERT INTO transaksi (kode_transaksi, konsumen_id, produsen_id, total_harga, status, dibuat_pada)
                        VALUES (?, ?, ?, ?, 'menunggu', NOW())";
     $stmt_insert_trx = mysqli_prepare($conn, $sql_insert_trx);
     if (!$stmt_insert_trx) {
-        throw new Exception("Gagal mempersiapkan kueri transaksi utama: " . mysqli_error($conn));
+        throw new Exception("Gagal mempersiapkan kueri transaksi utama.");
     }
 
     $sql_insert_detail = "INSERT INTO detail_transaksi (transaksi_id, makanan_id, jumlah, harga_satuan, subtotal)
                           VALUES (?, ?, ?, ?, ?)";
     $stmt_insert_detail = mysqli_prepare($conn, $sql_insert_detail);
     if (!$stmt_insert_detail) {
-        throw new Exception("Gagal mempersiapkan kueri rincian transaksi: " . mysqli_error($conn));
+        throw new Exception("Gagal mempersiapkan kueri rincian transaksi.");
     }
 
-    $sql_potong_stok = "UPDATE makanan SET stok = stok - ? WHERE id = ? AND stok >= ? AND (kedaluwarsa_pada IS NULL OR kedaluwarsa_pada > NOW())";
+    $sql_potong_stok = "UPDATE makanan m INNER JOIN pengguna p ON m.produsen_id = p.id SET m.stok = m.stok - ? WHERE m.id = ? AND m.stok >= ? AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.status_verifikasi = 'disetujui'";
     $stmt_potong_stok = mysqli_prepare($conn, $sql_potong_stok);
     if (!$stmt_potong_stok) {
-        throw new Exception("Gagal mempersiapkan kueri pembaruan stok: " . mysqli_error($conn));
+        throw new Exception("Gagal mempersiapkan kueri pembaruan stok.");
     }
 
     foreach ($pesanan_per_produsen as $prod_id => $data_trx) {
@@ -271,7 +331,7 @@ try {
         // Simpan baris induk transaksi
         mysqli_stmt_bind_param($stmt_insert_trx, "siii", $kode_trx, $user_id, $prod_id, $total_harga);
         if (!mysqli_stmt_execute($stmt_insert_trx)) {
-            throw new Exception("Gagal menyimpan transaksi produsen #{$prod_id}: " . mysqli_stmt_error($stmt_insert_trx));
+            throw new Exception("Gagal menyimpan transaksi produsen #{$prod_id}.");
         }
 
         $transaksi_id = mysqli_insert_id($conn);
@@ -290,13 +350,13 @@ try {
 
             mysqli_stmt_bind_param($stmt_insert_detail, "iiiii", $transaksi_id, $m_id, $qty, $harga, $sub);
             if (!mysqli_stmt_execute($stmt_insert_detail)) {
-                throw new Exception("Gagal mencatat detail transaksi untuk makanan ID #{$m_id}: " . mysqli_stmt_error($stmt_insert_detail));
+                throw new Exception("Gagal mencatat detail transaksi untuk makanan ID #{$m_id}.");
             }
 
             // Pemotongan stok dengan kondisi pengaman atomik stok >= qty
             mysqli_stmt_bind_param($stmt_potong_stok, "iii", $qty, $m_id, $qty);
             if (!mysqli_stmt_execute($stmt_potong_stok)) {
-                throw new Exception("Gagal memperbarui stok makanan ID #{$m_id}: " . mysqli_stmt_error($stmt_potong_stok));
+                throw new Exception("Gagal memperbarui stok makanan ID #{$m_id}.");
             }
 
             if (mysqli_stmt_affected_rows($stmt_potong_stok) !== 1) {

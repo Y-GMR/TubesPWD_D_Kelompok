@@ -2,9 +2,16 @@
 require_once '../includes/session.php';
 require_login();
 require_once '../config/database.php';
+require_once '../includes/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     header('Location: ../customer_service.php');
+    exit();
+}
+
+$token_kiriman = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
+    header('Location: ../customer_service.php?error=csrf_invalid');
     exit();
 }
 
@@ -14,10 +21,15 @@ if (!$conn) {
 }
 
 $pengguna_id = (int) $_SESSION['user_id'];
-$kode_transaksi = isset($_POST['trx_code']) ? trim($_POST['trx_code']) : '';
-$topik = isset($_POST['topic']) ? trim($_POST['topic']) : '';
-$subjek = isset($_POST['subject']) ? trim($_POST['subject']) : '';
-$pesan_inti = isset($_POST['message']) ? trim($_POST['message']) : '';
+if (!ambilPenggunaById($conn, $pengguna_id)) {
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
+    exit();
+}
+$kode_transaksi = (isset($_POST['trx_code']) && is_string($_POST['trx_code'])) ? trim($_POST['trx_code']) : '';
+$topik = (isset($_POST['topic']) && is_string($_POST['topic'])) ? trim($_POST['topic']) : '';
+$subjek = (isset($_POST['subject']) && is_string($_POST['subject'])) ? trim($_POST['subject']) : '';
+$pesan_inti = (isset($_POST['message']) && is_string($_POST['message'])) ? trim($_POST['message']) : '';
 
 if ($pesan_inti === '' || $subjek === '' || $topik === '') {
     header('Location: ../customer_service.php?error=empty_fields');

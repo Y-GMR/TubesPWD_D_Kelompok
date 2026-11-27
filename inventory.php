@@ -8,6 +8,11 @@ require_role('produsen');
 
 $produsen_id = (int) $_SESSION['user_id'];
 $produsen = ambilPenggunaById($conn, $produsen_id);
+if ($conn && !$produsen) {
+    hapusSesiPengguna();
+    header('Location: login.php?error=login_required');
+    exit();
+}
 
 // Blokir produsen yang belum diverifikasi admin
 if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
@@ -66,11 +71,13 @@ $jumlah_stok_menipis = 0;
 $count_semua = count($daftar_makanan);
 $count_tersedia = 0;
 $count_menipis = 0;
+$count_expired = 0;
 $count_ditutup = 0;
 
 foreach ($daftar_makanan as $item) {
     $stok_item = (int) $item['stok'];
-    if ($stok_item > 0) {
+    $sudah_kedaluwarsa_item = (!empty($item['kedaluwarsa_pada']) && strtotime($item['kedaluwarsa_pada']) <= time());
+    if ($stok_item > 0 && !$sudah_kedaluwarsa_item) {
         $total_siap_diambil += $stok_item;
         if ($stok_item <= 8) {
             $jumlah_stok_menipis++;
@@ -78,7 +85,9 @@ foreach ($daftar_makanan as $item) {
         } else {
             $count_tersedia++;
         }
-    } else {
+    } elseif ($stok_item > 0 && $sudah_kedaluwarsa_item) {
+        $count_expired++;
+    } elseif ($stok_item <= 0) {
         $count_ditutup++;
     }
 }
@@ -101,7 +110,8 @@ $map_error = array(
     'stok_tidak_valid'           => 'Nilai stok harus berupa bilangan bulat antara 0 hingga 9999.',
     'makanan_memiliki_transaksi' => 'Produk tidak dapat dihapus karena tercatat dalam riwayat klaim transaksi. Gunakan tombol Tutup Donasi untuk menonaktifkan.',
     'gagal_simpan'               => 'Gagal menyimpan perubahan data inventaris.',
-    'gagal_hapus'                => 'Gagal menghapus item makanan dari basis data.'
+    'gagal_hapus'                => 'Gagal menghapus item makanan dari basis data.',
+    'csrf_tidak_valid'           => 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.'
 );
 
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);
@@ -119,7 +129,7 @@ if (isset($_SESSION['flash_success'])) {
 }
 
 $page_title = 'Manajemen Inventaris Pangan - Pangkalan Pangan';
-$extra_css = array('components.css?v=8', 'inventory.css?v=1');
+$extra_css = array('components.css?v=9', 'inventory.css?v=1');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_inventory.js?v=2');
 
 require_once 'includes/header.php';
@@ -130,7 +140,7 @@ require_once 'includes/navbar.php';
             <div class="inventory-container">
 
                 <div class="inventory-top-bar">
-                    <a href="katalog.php" class="inventory-back-link">&#8592; Kembali ke Katalog</a>
+                    <a href="producer_dashboard.php" class="inventory-back-link">&#8592; Kembali ke Dashboard Produsen</a>
                     <h1 class="inventory-title">Inventaris Produk</h1>
                     <a href="add_food.php" class="btn-add-food-top">+ Donasi Makanan Baru</a>
                 </div>
@@ -188,6 +198,7 @@ require_once 'includes/navbar.php';
                         <button type="button" class="inv-pill active inv-filter-all">Semua (<?php echo escapeHtml((string) $count_semua); ?>)</button>
                         <button type="button" class="inv-pill inv-filter-available">Tersedia (<?php echo escapeHtml((string) $count_tersedia); ?>)</button>
                         <button type="button" class="inv-pill inv-filter-low">Stok Menipis (<?php echo escapeHtml((string) $count_menipis); ?>)</button>
+                        <button type="button" class="inv-pill inv-filter-expired">Kedaluwarsa (<?php echo escapeHtml((string) $count_expired); ?>)</button>
                         <button type="button" class="inv-pill inv-filter-closed">Ditutup (<?php echo escapeHtml((string) $count_ditutup); ?>)</button>
                     </div>
                 </div>
@@ -211,6 +222,8 @@ require_once 'includes/navbar.php';
 
                             if ($stok_int <= 0) {
                                 $status_kartu = 'closed';
+                            } elseif ($sudah_kedaluwarsa) {
+                                $status_kartu = 'expired';
                             } elseif ($stok_int <= 8) {
                                 $status_kartu = 'low';
                             } else {
@@ -224,7 +237,7 @@ require_once 'includes/navbar.php';
                                     <img src="<?php echo escapeHtml($foto_src); ?>" alt="<?php echo escapeHtml($item['nama_makanan']); ?>" class="inv-banner-img" />
                                     <span class="inv-stock-badge<?php echo ($stok_int <= 8) ? ' warning' : ''; ?> stock-badge-val">Stok: <?php echo escapeHtml((string) $stok_int); ?></span>
                                     <?php if ($stok_int > 0 && $sudah_kedaluwarsa): ?>
-                                        <span class="inv-low-stock-badge">Kedaluwarsa</span>
+                                        <span class="inv-low-stock-badge expired">Kedaluwarsa</span>
                                     <?php elseif ($stok_int > 0 && $stok_int <= 8): ?>
                                         <span class="inv-low-stock-badge">Stok Menipis</span>
                                     <?php elseif ($stok_int <= 0): ?>

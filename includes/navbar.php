@@ -32,7 +32,8 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
         }
     }
     if (isset($_SESSION['profile_image']) && trim($_SESSION['profile_image']) !== '' && $_SESSION['profile_image'] !== 'default_avatar.png') {
-        $img_rel = ltrim(trim($_SESSION['profile_image']), '/');
+        $img_raw = ltrim(trim($_SESSION['profile_image']), '/');
+        $img_rel = (strpos($img_raw, '/') === false) ? ('assets/uploads/avatars/' . $img_raw) : $img_raw;
         if (strpos($img_rel, '..') === false && file_exists($root_dir . '/' . $img_rel)) {
             $user_avatar = $base_url . $img_rel;
         }

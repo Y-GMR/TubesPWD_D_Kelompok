@@ -1,17 +1,22 @@
 <?php
 header('Content-Type: application/json; charset=UTF-8');
 
+if (file_exists('../includes/session.php')) {
+    require_once '../includes/session.php';
+} elseif (file_exists('includes/session.php')) {
+    require_once 'includes/session.php';
+}
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$field = isset($_GET['field']) ? trim($_GET['field']) : '';
-$value = isset($_GET['value']) ? trim($_GET['value']) : '';
+$field = (isset($_GET['field']) && is_string($_GET['field'])) ? trim($_GET['field']) : '';
+$value = (isset($_GET['value']) && is_string($_GET['value'])) ? trim($_GET['value']) : '';
 
-if ($field === '' && isset($_POST['field'])) {
+if ($field === '' && isset($_POST['field']) && is_string($_POST['field'])) {
     $field = trim($_POST['field']);
 }
-if ($value === '' && isset($_POST['value'])) {
+if ($value === '' && isset($_POST['value']) && is_string($_POST['value'])) {
     $value = trim($_POST['value']);
 }
 
@@ -35,6 +40,9 @@ if ($value === '') {
     exit();
 }
 
+if (!defined('DB_NO_DIE')) {
+    define('DB_NO_DIE', true);
+}
 $conn = null;
 if (file_exists('../config/database.php')) {
     require_once '../config/database.php';

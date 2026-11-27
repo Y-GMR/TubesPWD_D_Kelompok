@@ -1,6 +1,9 @@
 <?php
 function bersihkanInput($data) {
-    return trim((string) $data);
+    if (is_string($data) || is_int($data) || is_float($data)) {
+        return trim((string) $data);
+    }
+    return '';
 }
 
 function escapeHtml($teks) {
@@ -16,6 +19,9 @@ function formatRupiah($angka) {
 }
 
 function ambilPenggunaById($conn, $pengguna_id) {
+    if (!$conn) {
+        return null;
+    }
     $id_bersih = (int) $pengguna_id;
     $sql = "SELECT id, username, email, nama_lengkap, foto_profil, peran, dokumen_kelayakan, status_verifikasi, catatan_verifikasi, dibuat_pada "
          . "FROM pengguna WHERE id = ? LIMIT 1";
@@ -40,11 +46,35 @@ function simpanSesiPengguna($data_pengguna) {
     $_SESSION['full_name'] = $data_pengguna['nama_lengkap'];
     $_SESSION['role'] = $data_pengguna['peran'];
     $_SESSION['profile_image'] = $data_pengguna['foto_profil'];
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function hapusSesiPengguna() {
+    $_SESSION = array();
+
+    if (ini_get('session.use_cookies')) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', array(
+            'expires' => time() - 42000,
+            'path' => $params['path'],
+            'domain' => $params['domain'],
+            'secure' => $params['secure'],
+            'httponly' => $params['httponly'],
+            'samesite' => isset($params['samesite']) ? $params['samesite'] : 'Lax'
+        ));
+    }
+
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
 }
 
 function prosesUploadBerkasPengguna($file, $ekstensi_diizinkan, $peta_mime_ke_ext, $direktori_relatif, $awalan_nama, $prefix_relatif = '../', $kembalikan_path_penuh = true) {
     if (!is_array($file) || !isset($file['error'])) {
         return array('ok' => true, 'uploaded' => false, 'path' => null, 'error' => '');
+    }
+    if (is_array($file['error'])) {
+        return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_gagal');
     }
 
     $kode_error = (int) $file['error'];
@@ -60,9 +90,9 @@ function prosesUploadBerkasPengguna($file, $ekstensi_diizinkan, $peta_mime_ke_ex
         return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_gagal');
     }
 
-    $tmp_name = isset($file['tmp_name']) ? (string) $file['tmp_name'] : '';
-    $orig_name = isset($file['name']) ? (string) $file['name'] : '';
-    $file_size = isset($file['size']) ? (int) $file['size'] : 0;
+    $tmp_name = (isset($file['tmp_name']) && is_string($file['tmp_name'])) ? $file['tmp_name'] : '';
+    $orig_name = (isset($file['name']) && is_string($file['name'])) ? $file['name'] : '';
+    $file_size = (isset($file['size']) && !is_array($file['size'])) ? (int) $file['size'] : 0;
 
     if ($tmp_name === '' || !is_uploaded_file($tmp_name)) {
         return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_gagal');
@@ -149,7 +179,8 @@ function hapusBerkasAman($path_relatif, $dir_diizinkan, $prefix_relatif = '../')
     if ($base_dir === false || $target === false) {
         return false;
     }
-    if (strncmp($target, $base_dir, strlen($base_dir)) !== 0) {
+    $base_prefix = rtrim($base_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    if (strncmp($target, $base_prefix, strlen($base_prefix)) !== 0) {
         return false;
     }
     if (is_file($target)) {

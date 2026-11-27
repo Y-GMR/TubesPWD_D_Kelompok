@@ -309,6 +309,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     font-size: 12.5px;
 }
 
@@ -320,6 +321,7 @@
 .summary-item-val {
     font-weight: 700;
     text-align: right;
+    word-break: break-word;
 }
 
 .val-teal {
@@ -515,6 +517,13 @@
     font-weight: 500;
 }
 
+.checkout-item-qty-meta {
+    font-size: 12px;
+    color: #64748b;
+    margin-left: 6px;
+    font-weight: 600;
+}
+
 .checkout-stepper-wrap {
     display: flex;
     align-items: center;
@@ -547,6 +556,13 @@
 .btn-step:hover {
     background-color: #b54128;
     transform: scale(1.05);
+}
+
+.btn-step:disabled {
+    background-color: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+    transform: none;
 }
 
 .step-qty-val {
@@ -770,12 +786,15 @@
 }
 
 @media (max-width: 1024px) {
-    .checkout-content-grid {
+    .checkout-content-grid,
+    .claim-history-grid {
         flex-direction: column;
         align-items: center;
     }
     .checkout-left-col,
-    .checkout-right-col {
+    .checkout-right-col,
+    .claim-ticket-card,
+    .claim-past-card {
         width: 100%;
         max-width: 600px;
     }
@@ -796,6 +815,13 @@
 }
 
 @media (max-width: 576px) {
+    .checkout-merchant-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .checkout-item-row {
+        flex-wrap: wrap;
+    }
     .food-detail-top {
         flex-direction: column;
         align-items: flex-start;

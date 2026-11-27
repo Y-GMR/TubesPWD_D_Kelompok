@@ -4,54 +4,15 @@ require_once 'config/database.php';
 require_once 'includes/functions.php';
 require_once 'includes/crud1_helpers.php';
 
-// 1. Session Guard: Wajib Login
-require_login();
+// 1. Session Guard: Wajib Login sebagai Konsumen
+require_role('konsumen');
 
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
-if ($user_role === 'produsen') {
-    $_SESSION['flash_error'] = 'Akun produsen tidak dapat melakukan klaim pangan konsumen.';
-    header("Location: producer_dashboard.php?error=unauthorized");
-    exit();
-}
-
 // Inisialisasi keranjang jika belum ada
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
-}
-
-// Dukungan jembatan kompatibilitas dari tautan katalog statis (?item= atau ?merchant=)
-$slug_map = array(
-    'donat-cokelat'   => 1,
-    'donat-glaze'     => 2,
-    'donat-oreo'      => 3,
-    'fire-flosss'     => 4,
-    'choco-bun'       => 5,
-    'cheese-boat'     => 6,
-    'pepperoni-slice' => 7,
-    'cheese-slice'    => 8,
-    'garlic-bread'    => 9,
-    'ayam-crispy'     => 10,
-    'ayam-original'   => 11,
-    'perkedel'        => 12
-);
-
-if (empty($_SESSION['cart'])) {
-    if (isset($_GET['item']) && isset($slug_map[$_GET['item']])) {
-        $_SESSION['cart'][$slug_map[$_GET['item']]] = array('jumlah' => 1);
-    } elseif (isset($_GET['merchant'])) {
-        $m_param = strtolower(trim($_GET['merchant']));
-        if ($m_param === 'dunkin') {
-            $_SESSION['cart'][2] = array('jumlah' => 1); // Donat glaze
-        } elseif ($m_param === 'breadtalk') {
-            $_SESSION['cart'][4] = array('jumlah' => 1); // Fire flosss
-        } elseif ($m_param === 'pizzahut') {
-            $_SESSION['cart'][7] = array('jumlah' => 1); // Pepperoni slice
-        } elseif ($m_param === 'kfc') {
-            $_SESSION['cart'][10] = array('jumlah' => 1); // Ayam crispy
-        }
-    }
 }
 
 // Jika keranjang tetap kosong, arahkan kembali ke katalog
@@ -64,7 +25,8 @@ if (empty($_SESSION['cart'])) {
 // 2. Validasi Akun Pengguna & Status Verifikasi (isVerified?)
 $data_pengguna = ambilPenggunaById($conn, $user_id);
 if (!$data_pengguna) {
-    header("Location: login.php");
+    hapusSesiPengguna();
+    header("Location: login.php?error=login_required");
     exit();
 }
 
@@ -153,7 +115,8 @@ if ($conn && !empty($ids)) {
     $sql_items = "SELECT m.id, m.nama_makanan, m.harga, m.stok, m.foto_makanan, m.alamat_ambil,
                          m.latitude_ambil, m.longitude_ambil, m.kedaluwarsa_pada,
                          k.nama_kategori,
-                         p.id AS produsen_id, p.nama_lengkap AS nama_produsen, p.foto_profil AS logo_produsen
+                         p.id AS produsen_id, p.nama_lengkap AS nama_produsen, p.foto_profil AS logo_produsen,
+                         p.status_verifikasi AS status_produsen
                   FROM makanan m
                   INNER JOIN kategori k ON m.kategori_id = k.id
                   INNER JOIN pengguna p ON m.produsen_id = p.id
@@ -165,9 +128,13 @@ if ($conn && !empty($ids)) {
         mysqli_stmt_execute($stmt_items);
         $res_items = mysqli_stmt_get_result($stmt_items);
 
+        $ada_produsen_nonaktif = false;
         while ($row = mysqli_fetch_assoc($res_items)) {
             $item_id = (int) $row['id'];
             $ditemukan_ids[$item_id] = true;
+            if (!isset($row['status_produsen']) || $row['status_produsen'] !== 'disetujui') {
+                $ada_produsen_nonaktif = true;
+            }
             $qty = isset($_SESSION['cart'][$item_id]['jumlah']) ? (int) $_SESSION['cart'][$item_id]['jumlah'] : 1;
             $harga = (int) $row['harga'];
             $subtotal = $harga * $qty;
@@ -223,6 +190,12 @@ foreach ($ids as $id_cek) {
 
 if (empty($produsen_groups) || $total_porsi <= 0) {
     $_SESSION['flash_error'] = 'Item pada keranjang Anda sudah tidak tersedia. Silakan pilih menu lain.';
+    header("Location: cart.php");
+    exit();
+}
+
+if (!empty($ada_produsen_nonaktif)) {
+    $_SESSION['flash_error'] = 'Sebagian menu berasal dari produsen yang belum terverifikasi. Silakan hapus item tersebut dari keranjang.';
     header("Location: cart.php");
     exit();
 }
@@ -315,7 +288,7 @@ require_once 'includes/navbar.php';
                                         <p class="checkout-item-meta">Kategori: <?php echo escapeHtml($item['nama_kategori']); ?></p>
                                         <p class="checkout-item-price-tag">
                                             <?php echo formatRupiah($item['harga']); ?>
-                                            <span style="color: #6b7280; font-size: 13px; font-weight: normal; margin-left: 6px;">x <?php echo (int) $item['jumlah']; ?> porsi</span>
+                                            <span class="checkout-item-qty-meta">x <?php echo (int) $item['jumlah']; ?> porsi</span>
                                         </p>
                                     </div>
                                     <div style="font-weight: bold; color: #2F855A; font-size: 15px;">
@@ -338,7 +311,7 @@ require_once 'includes/navbar.php';
                         <h3 class="posko-card-title">Lokasi Pengambilan di Gerai Produsen</h3>
                         <div class="posko-name"><?php echo escapeHtml($group['nama_produsen']); ?></div>
                         <div class="posko-address"><?php echo escapeHtml($group['alamat_ambil']); ?></div>
-                        <?php if (!empty($group['latitude_ambil']) && !empty($group['longitude_ambil'])): ?>
+                        <?php if ($group['latitude_ambil'] !== null && $group['longitude_ambil'] !== null): ?>
                             <div class="posko-meta">
                                 Koordinat GPS: <span class="posko-meta-orange"><?php echo escapeHtml($group['latitude_ambil']); ?>, <?php echo escapeHtml($group['longitude_ambil']); ?></span>
                             </div>

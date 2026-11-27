@@ -11,8 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+// Verifikasi CSRF token
+$csrf_dikirim = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ../manage_categories.php?error=csrf_tidak_valid');
+    exit();
+}
+
 if (!$conn) {
     header('Location: ../manage_categories.php?error=koneksi_gagal');
+    exit();
+}
+
+if (!ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
     exit();
 }
 

@@ -8,19 +8,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-$nama_lengkap     = isset($_POST['fullname']) ? bersihkanInput($_POST['fullname']) : '';
-$username         = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
-$email            = isset($_POST['email']) ? bersihkanInput($_POST['email']) : '';
-$password         = isset($_POST['password']) ? $_POST['password'] : '';
-$confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
-$peran            = isset($_POST['role']) ? bersihkanInput($_POST['role']) : 'konsumen';
-
+$peran = isset($_POST['role']) ? bersihkanInput($_POST['role']) : 'konsumen';
 if (!in_array($peran, array('konsumen', 'produsen'), true)) {
     $peran = 'konsumen';
 }
 
 $target_kembali = '../register.php';
 $role_query = ($peran === 'produsen') ? '&role=donor' : '';
+
+$csrf_dikirim = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ' . $target_kembali . '?error=csrf_tidak_valid' . $role_query);
+    exit();
+}
+
+$nama_lengkap     = isset($_POST['fullname']) ? bersihkanInput($_POST['fullname']) : '';
+$username         = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
+$email            = isset($_POST['email']) ? bersihkanInput($_POST['email']) : '';
+$password         = (isset($_POST['password']) && is_string($_POST['password'])) ? $_POST['password'] : '';
+$confirm_password = (isset($_POST['confirm_password']) && is_string($_POST['confirm_password'])) ? $_POST['confirm_password'] : '';
 
 if ($nama_lengkap === '' || $username === '' || $email === '' || $password === '' || $confirm_password === '') {
     header('Location: ' . $target_kembali . '?error=data_tidak_lengkap' . $role_query);

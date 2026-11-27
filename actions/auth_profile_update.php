@@ -12,12 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+// Verifikasi CSRF token
+$csrf_dikirim = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ' . $target_kembali . '?error=csrf_tidak_valid');
+    exit();
+}
+
 $user_id          = (int) $_SESSION['user_id'];
 $nama_lengkap     = isset($_POST['nama_lengkap']) ? bersihkanInput($_POST['nama_lengkap']) : '';
 $username         = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
 $email            = isset($_POST['email']) ? bersihkanInput($_POST['email']) : '';
-$password_baru    = isset($_POST['password_baru']) ? $_POST['password_baru'] : '';
-$konfirmasi_sandi = isset($_POST['konfirmasi_sandi']) ? $_POST['konfirmasi_sandi'] : '';
+$password_baru    = (isset($_POST['password_baru']) && is_string($_POST['password_baru'])) ? $_POST['password_baru'] : '';
+$konfirmasi_sandi = (isset($_POST['konfirmasi_sandi']) && is_string($_POST['konfirmasi_sandi'])) ? $_POST['konfirmasi_sandi'] : '';
 
 if ($nama_lengkap === '' || $username === '' || $email === '') {
     header('Location: ' . $target_kembali . '?error=data_tidak_lengkap');
@@ -52,6 +59,7 @@ if (!$conn) {
 
 $pengguna_lama = ambilPenggunaById($conn, $user_id);
 if (!$pengguna_lama) {
+    hapusSesiPengguna();
     header('Location: ../login.php?error=login_required');
     exit();
 }
@@ -192,6 +200,7 @@ if (mysqli_stmt_execute($stmt_update)) {
 
     $_SESSION['full_name'] = $nama_lengkap;
     $_SESSION['username']  = $username;
+    $_SESSION['role']      = $pengguna_lama['peran'];
     if ($foto_profil_baru !== null) {
         $_SESSION['profile_image'] = $foto_profil_baru;
     }

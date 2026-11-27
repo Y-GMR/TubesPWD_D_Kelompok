@@ -6,6 +6,12 @@ require_once 'includes/crud1_helpers.php';
 
 require_role('admin');
 
+if ($conn && !ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
+    hapusSesiPengguna();
+    header('Location: login.php?error=login_required');
+    exit();
+}
+
 $daftar_kategori = crud1AmbilDaftarKategoriDenganJumlah($conn);
 
 $edit_id = isset($_GET['edit_id']) ? (int) $_GET['edit_id'] : 0;
@@ -35,7 +41,8 @@ $map_error = array(
     'kategori_tidak_ditemukan'  => 'Data kategori yang dituju tidak ditemukan.',
     'kategori_masih_digunakan'  => 'Kategori tidak dapat dihapus karena masih memiliki produk makanan terkait.',
     'gagal_simpan'              => 'Gagal menyimpan data kategori ke basis data.',
-    'gagal_hapus'               => 'Gagal menghapus data kategori dari basis data.'
+    'gagal_hapus'               => 'Gagal menghapus data kategori dari basis data.',
+    'csrf_tidak_valid'          => 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.'
 );
 
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);

@@ -2,21 +2,21 @@
 require_once 'includes/session.php';
 require_login();
 require_once 'config/database.php';
+require_once 'includes/functions.php';
 
 $pengguna_id = (int) $_SESSION['user_id'];
 $email_user = '';
 $nama_user = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : '';
 
-$stmt = $conn ? mysqli_prepare($conn, "SELECT email, nama_lengkap FROM pengguna WHERE id = ?") : false;
-if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "i", $pengguna_id);
-    mysqli_stmt_execute($stmt);
-    $res = mysqli_stmt_get_result($stmt);
-    if ($row = mysqli_fetch_assoc($res)) {
-        $email_user = $row['email'];
-        $nama_user = $row['nama_lengkap'];
+if ($conn) {
+    $pengguna_cs = ambilPenggunaById($conn, $pengguna_id);
+    if (!$pengguna_cs) {
+        hapusSesiPengguna();
+        header('Location: login.php?error=login_required');
+        exit();
     }
-    mysqli_stmt_close($stmt);
+    $email_user = $pengguna_cs['email'];
+    $nama_user = $pengguna_cs['nama_lengkap'];
 }
 
 $pesan_error = '';
@@ -46,7 +46,7 @@ if (isset($_GET['error'])) {
     <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=7" />
     <link rel="stylesheet" type="text/css" href="assets/css/customer_service.css?v=1" />
 </head>
-<body data-auth="true">
+<body>
     <div class="page-wrapper">
         <?php include 'includes/navbar.php'; ?>
 

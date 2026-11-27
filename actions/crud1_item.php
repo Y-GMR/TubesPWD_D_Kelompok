@@ -11,6 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+// Verifikasi CSRF token
+$csrf_dikirim = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ../inventory.php?error=csrf_tidak_valid');
+    exit();
+}
+
 if (!$conn) {
     header('Location: ../inventory.php?error=koneksi_gagal');
     exit();
@@ -22,7 +29,13 @@ $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 
 // Pastikan produsen sudah diverifikasi admin sebelum boleh mengubah data makanan
 $data_produsen_cek = ambilPenggunaById($conn, $produsen_id);
-if (!$data_produsen_cek || $data_produsen_cek['status_verifikasi'] !== 'disetujui') {
+if (!$data_produsen_cek) {
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
+    exit();
+}
+if ($data_produsen_cek['status_verifikasi'] !== 'disetujui') {
+    $_SESSION['flash_error'] = 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
     header('Location: ../producer_dashboard.php?error=belum_diverifikasi');
     exit();
 }
@@ -73,7 +86,7 @@ function crud1ValidasiPayloadMakanan($conn, $post, $wajib_higienis, $stok_minima
     if ($kedaluwarsa_db === false) {
         return array('ok' => false, 'error' => 'kedaluwarsa_tidak_valid');
     }
-    if ($kedaluwarsa_db !== null && strtotime($kedaluwarsa_db) <= time()) {
+    if ($stok > 0 && $kedaluwarsa_db !== null && strtotime($kedaluwarsa_db) <= time()) {
         return array('ok' => false, 'error' => 'kedaluwarsa_sudah_lewat');
     }
 

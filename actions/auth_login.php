@@ -8,9 +8,15 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+$csrf_dikirim = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf_dikirim)) {
+    header('Location: ../login.php?error=csrf_tidak_valid');
+    exit();
+}
+
 $username = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
 $email    = isset($_POST['email']) ? bersihkanInput($_POST['email']) : '';
-$password = isset($_POST['password']) ? $_POST['password'] : '';
+$password = (isset($_POST['password']) && is_string($_POST['password'])) ? $_POST['password'] : '';
 $remember = isset($_POST['remember']);
 
 if (($username === '' && $email === '') || $password === '') {

@@ -2,17 +2,23 @@
 require_once 'includes/session.php';
 require_login();
 require_once 'config/database.php';
+require_once 'includes/functions.php';
 
 $pengguna_id = (int) $_SESSION['user_id'];
+if ($conn && !ambilPenggunaById($conn, $pengguna_id)) {
+    hapusSesiPengguna();
+    header('Location: login.php?error=login_required');
+    exit();
+}
 $daftar_tiket = array();
 $total_tiket = 0;
 $tiket_menunggu = 0;
 $tiket_selesai = 0;
 
-$stmt = mysqli_prepare(
+$stmt = $conn ? mysqli_prepare(
     $conn,
     "SELECT id, kode_transaksi, pesan, balasan_admin, status, dibuat_pada FROM tiket_bantuan WHERE pengguna_id = ? ORDER BY id DESC"
-);
+) : false;
 if ($stmt) {
     mysqli_stmt_bind_param($stmt, "i", $pengguna_id);
     mysqli_stmt_execute($stmt);
@@ -46,7 +52,7 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
     <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=7" />
     <link rel="stylesheet" type="text/css" href="assets/css/customer_service.css?v=1" />
 </head>
-<body data-auth="true">
+<body>
     <div class="page-wrapper">
         <?php include 'includes/navbar.php'; ?>
 
@@ -70,9 +76,9 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
 
                 <div class="ticket-filter-bar">
                     <div class="ticket-filter-pills">
-                        <button type="button" class="ticket-filter-pill active" data-filter="all">Semua Tiket (<?php echo htmlspecialchars((string) $total_tiket, ENT_QUOTES, 'UTF-8'); ?>)</button>
-                        <button type="button" class="ticket-filter-pill" data-filter="pending">Menunggu Balasan (<?php echo htmlspecialchars((string) $tiket_menunggu, ENT_QUOTES, 'UTF-8'); ?>)</button>
-                        <button type="button" class="ticket-filter-pill" data-filter="done">Sudah Selesai (<?php echo htmlspecialchars((string) $tiket_selesai, ENT_QUOTES, 'UTF-8'); ?>)</button>
+                        <button type="button" class="ticket-filter-pill ticket-filter-all active">Semua Tiket (<?php echo htmlspecialchars((string) $total_tiket, ENT_QUOTES, 'UTF-8'); ?>)</button>
+                        <button type="button" class="ticket-filter-pill ticket-filter-pending">Menunggu Balasan (<?php echo htmlspecialchars((string) $tiket_menunggu, ENT_QUOTES, 'UTF-8'); ?>)</button>
+                        <button type="button" class="ticket-filter-pill ticket-filter-done">Sudah Selesai (<?php echo htmlspecialchars((string) $tiket_selesai, ENT_QUOTES, 'UTF-8'); ?>)</button>
                     </div>
                     <div class="ticket-search-box">
                         <input type="text" id="ticketSearchInput" class="ticket-search-input" />
@@ -88,11 +94,11 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
                         <?php foreach ($daftar_tiket as $tiket): ?>
                             <?php
                             $is_done = ($tiket['status'] === 'selesai');
-                            $data_status = $is_done ? 'done' : 'pending';
+                            $status_class = $is_done ? 'ticket-status-done' : 'ticket-status-pending';
                             $badge_class = $is_done ? 'ticket-badge-done' : 'ticket-badge-pending';
                             $status_label = $is_done ? 'Selesai' : 'Menunggu Balasan';
                             ?>
-                            <div class="ticket-item-card" data-status="<?php echo htmlspecialchars($data_status, ENT_QUOTES, 'UTF-8'); ?>" data-ticket-id="#CS-<?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?>">
+                            <div class="ticket-item-card <?php echo htmlspecialchars($status_class, ENT_QUOTES, 'UTF-8'); ?>" id="ticket-card-<?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?>">
                                 <div class="ticket-top-line">
                                     <div class="ticket-meta-left">
                                         <span class="ticket-id">#CS-<?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?></span>

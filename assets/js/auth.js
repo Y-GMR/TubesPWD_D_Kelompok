@@ -106,71 +106,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     var emailcheck = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    var dbUsers = [
-        {
-            username: 'admin',
-            email: 'admin@pangkalanpangan.id',
-            passwords: ['password123', 'admin123'],
-            role: 'admin',
-            name: 'Administrator Pangkalan Pangan',
-            target: 'views/admin/dashboard.php'
-        },
-        {
-            username: 'kfc_babarsari',
-            aliases: ['kfcsudirman', 'kfc', 'produsen'],
-            email: 'kfc@pangkalanpangan.id',
-            passwords: ['password123', 'AyamGorengOriginal', 'kfc123'],
-            role: 'produsen',
-            name: 'KFC Babarsari',
-            target: 'producer_dashboard.xhtml'
-        },
-        {
-            username: 'dunkin_sudirman',
-            aliases: ['dunkin'],
-            email: 'dunkin@pangkalanpangan.id',
-            passwords: ['password123', 'dunkin123'],
-            role: 'produsen',
-            name: 'Dunkin Donuts Sudirman',
-            target: 'producer_dashboard.xhtml'
-        },
-        {
-            username: 'breadtalk_seturan',
-            aliases: ['breadtalk'],
-            email: 'breadtalk@pangkalanpangan.id',
-            passwords: ['password123'],
-            role: 'produsen',
-            name: 'BreadTalk Seturan',
-            target: 'producer_dashboard.xhtml'
-        },
-        {
-            username: 'pizzahut_gejayan',
-            aliases: ['pizzahut'],
-            email: 'pizzahut@pangkalanpangan.id',
-            passwords: ['password123'],
-            role: 'produsen',
-            name: 'Pizza Hut Gejayan',
-            target: 'producer_dashboard.xhtml'
-        },
-        {
-            username: 'iwang_petra',
-            aliases: ['yillogmr', 'petra', 'konsumen'],
-            email: 'iwangpetra@gmail.com',
-            passwords: ['password123', 'PetraKonsumenLapar', 'petra123'],
-            role: 'konsumen',
-            name: 'Iwang Petra',
-            target: 'food_catalogue.xhtml'
-        },
-        {
-            username: 'budi_santoso',
-            aliases: ['budi'],
-            email: 'budi@gmail.com',
-            passwords: ['password123'],
-            role: 'konsumen',
-            name: 'Budi Santoso',
-            target: 'food_catalogue.xhtml'
-        }
-    ];
-
     var loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function (e) {
@@ -211,61 +146,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 return true;
             }
 
-            var identifier = (valUser !== '' ? valUser : valEmail).toLowerCase();
-            var matchedUser = null;
-
-            for (var i = 0; i < dbUsers.length; i++) {
-                var u = dbUsers[i];
-                var matchUser = (u.username.toLowerCase() === identifier);
-                var matchEmail = (u.email.toLowerCase() === identifier);
-                var matchAlias = false;
-
-                if (u.aliases && u.aliases.length > 0) {
-                    for (var j = 0; j < u.aliases.length; j++) {
-                        if (u.aliases[j].toLowerCase() === identifier) {
-                            matchAlias = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (matchUser || matchEmail || matchAlias) {
-                    var matchPass = false;
-                    for (var k = 0; k < u.passwords.length; k++) {
-                        if (u.passwords[k] === valPass) {
-                            matchPass = true;
-                            break;
-                        }
-                    }
-
-                    if (matchPass) {
-                        matchedUser = u;
-                        break;
-                    }
-                }
-            }
-
-            var formAction = loginForm.getAttribute('action') || '';
-            var isPhpBackend = (formAction.indexOf('.php') !== -1);
-
-            if (matchedUser) {
-                try {
-                    localStorage.setItem('tubespwd_role', matchedUser.role);
-                    sessionStorage.setItem('tubespwd_role', matchedUser.role);
-                    localStorage.setItem('tubespwd_username', matchedUser.username);
-                    localStorage.setItem('tubespwd_fullname', matchedUser.name);
-                } catch (err) {}
-
-                if (!isPhpBackend) {
-                    loginForm.action = matchedUser.target;
-                }
-            } else {
-                if (!isPhpBackend) {
-                    alert("Kombinasi username/email dan kata sandi tidak sesuai dengan akun basis data.");
-                    e.preventDefault();
-                    return false;
-                }
-            }
+            alert("Gunakan halaman login.php untuk masuk ke aplikasi.");
+            e.preventDefault();
+            return false;
         });
     }
 
@@ -337,8 +220,8 @@ document.addEventListener('DOMContentLoaded', function () {
             var adaHuruf = /[a-zA-Z]/.test(valPass);
             var adaAngka = /[0-9]/.test(valPass);
 
-            if (valName.length < 2) {
-                sMsg += "\nNama lengkap minimal harus 2 karakter.";
+            if (valName.length < 2 || valName.length > 100) {
+                sMsg += "\nNama lengkap harus terdiri dari 2 hingga 100 karakter.";
             }
 
             if (valUser.length < 4 || valUser.length > 30) {

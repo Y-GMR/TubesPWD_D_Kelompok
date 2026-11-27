@@ -8,7 +8,7 @@ if (function_exists('require_role')) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    if (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         header('HTTP/1.1 403 Forbidden');
         header('Location: ../../login.php?error=unauthorized');
         exit();
@@ -18,6 +18,17 @@ if (function_exists('require_role')) {
 $conn = null;
 if (file_exists('../../config/database.php')) {
     require_once '../../config/database.php';
+}
+if (file_exists('../../includes/functions.php')) {
+    require_once '../../includes/functions.php';
+}
+
+if ($conn && function_exists('ambilPenggunaById') && !ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
+    if (function_exists('hapusSesiPengguna')) {
+        hapusSesiPengguna();
+    }
+    header('Location: ../../login.php?error=login_required');
+    exit();
 }
 
 $total_admin = 0;
@@ -47,10 +58,9 @@ if ($conn) {
     }
 
     $status_menunggu = 'menunggu';
-    $peran_konsumen = 'konsumen';
-    $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS jumlah FROM pengguna WHERE peran = ? AND status_verifikasi = ?");
+    $stmt = mysqli_prepare($conn, "SELECT COUNT(*) AS jumlah FROM pengguna WHERE peran IN ('konsumen', 'produsen') AND status_verifikasi = ?");
     if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "ss", $peran_konsumen, $status_menunggu);
+        mysqli_stmt_bind_param($stmt, "s", $status_menunggu);
         mysqli_stmt_execute($stmt);
         $res = mysqli_stmt_get_result($stmt);
         if ($row = mysqli_fetch_assoc($res)) {
@@ -101,6 +111,7 @@ if ($conn) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dashboard Admin - Tubes PWD</title>
     <link rel="stylesheet" type="text/css" href="../../assets/css/admin.css" />
 </head>

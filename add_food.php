@@ -8,6 +8,11 @@ require_role('produsen');
 
 $produsen_id = (int) $_SESSION['user_id'];
 $produsen = ambilPenggunaById($conn, $produsen_id);
+if ($conn && !$produsen) {
+    hapusSesiPengguna();
+    header('Location: login.php?error=login_required');
+    exit();
+}
 
 // Blokir produsen yang belum diverifikasi admin
 if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
@@ -74,13 +79,14 @@ $map_error = array(
     'upload_tidak_valid'        => 'Berkas unggahan tidak valid.',
     'direktori_gagal'           => 'Direktori penyimpanan foto gagal disiapkan.',
     'upload_gagal'              => 'Gagal mengunggah berkas foto makanan.',
-    'gagal_simpan'              => 'Gagal menyimpan data makanan ke basis data.'
+    'gagal_simpan'              => 'Gagal menyimpan data makanan ke basis data.',
+    'csrf_tidak_valid'          => 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.'
 );
 
 $flash = crud1AmbilFlashPesan(array(), $map_error);
 
 $page_title = ($is_edit ? 'Ubah Data Makanan' : 'Donasi Makanan Baru') . ' - Pangkalan Pangan';
-$extra_css = array('components.css', 'catalog.css');
+$extra_css = array('components.css?v=9', 'catalog.css?v=7');
 $extra_js = array('geolocation.js', 'image_preview.js', 'crud1_navbar.js?v=1', 'crud1_add_food.js?v=2');
 
 require_once 'includes/header.php';

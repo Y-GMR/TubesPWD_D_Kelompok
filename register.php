@@ -5,6 +5,17 @@ require_once 'includes/functions.php';
 redirect_if_logged_in();
 
 $pesan_error = '';
+$session_flash_error = '';
+if (isset($_SESSION['flash_error'])) {
+    $session_flash_error = trim((string) $_SESSION['flash_error']);
+    unset($_SESSION['flash_error']);
+}
+if (isset($_SESSION['flash_success'])) {
+    unset($_SESSION['flash_success']);
+}
+
+$role_query_param = isset($_GET['role']) ? strtolower(bersihkanInput($_GET['role'])) : '';
+$is_donor_mode = ($role_query_param === 'donor' || $role_query_param === 'produsen');
 
 if (isset($_GET['error'])) {
     $err = bersihkanInput($_GET['error']);
@@ -36,17 +47,21 @@ if (isset($_GET['error'])) {
         $pesan_error = 'Berkas dokumen kelayakan tidak valid atau bukan PDF/gambar asli.';
     } elseif ($err === 'dokumen_upload_gagal') {
         $pesan_error = 'Gagal mengunggah dokumen kelayakan. Silakan coba lagi.';
+    } elseif ($err === 'csrf_tidak_valid') {
+        $pesan_error = 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.';
     } elseif ($err === 'koneksi_gagal') {
         $pesan_error = 'Gagal terhubung ke basis data. Pastikan server MySQL berjalan.';
     } else {
         $pesan_error = 'Terjadi kesalahan sistem saat mendaftar. Silakan coba kembali.';
     }
+} elseif ($session_flash_error !== '') {
+    $pesan_error = $session_flash_error;
 }
 
 $page_title = 'Registrasi Akun - Pangkalan Pangan';
 $page_wrapper_class = 'auth-page-wrapper';
 $extra_css = array('auth.css?v=7');
-$extra_js = array('auth.js?v=3', 'ajax_validator.js?v=2');
+$extra_js = array('auth.js?v=4', 'ajax_validator.js?v=2');
 
 require_once 'includes/header.php';
 ?>
@@ -75,13 +90,14 @@ require_once 'includes/header.php';
                 <?php endif; ?>
 
                 <div class="auth-role-toggle">
-                    <button type="button" class="btn-role-tab active" id="btnRoleConsumer">Penerima Manfaat (Konsumen)</button>
-                    <button type="button" class="btn-role-tab" id="btnRoleDonor">Donatur Pangan (Produsen)</button>
+                    <button type="button" class="btn-role-tab<?php echo !$is_donor_mode ? ' active' : ''; ?>" id="btnRoleConsumer">Penerima Manfaat (Konsumen)</button>
+                    <button type="button" class="btn-role-tab<?php echo $is_donor_mode ? ' active' : ''; ?>" id="btnRoleDonor">Donatur Pangan (Produsen)</button>
                 </div>
 
                 <form action="actions/auth_register.php" method="post" enctype="multipart/form-data" class="auth-form" id="registerForm">
                     <div>
-                        <input type="hidden" name="role" id="regRole" value="konsumen" />
+                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                        <input type="hidden" name="role" id="regRole" value="<?php echo $is_donor_mode ? 'produsen' : 'konsumen'; ?>" />
                     </div>
 
                     <div class="auth-form-group">
@@ -112,7 +128,7 @@ require_once 'includes/header.php';
                         </div>
                     </div>
 
-                    <div class="auth-form-group" id="sktmUploadGroup">
+                    <div class="auth-form-group" id="sktmUploadGroup"<?php echo $is_donor_mode ? ' style="display: none;"' : ''; ?>>
                         <label for="regDocument" class="auth-label">Dokumen Kelayakan SKTM / KKS (Opsional)</label>
                         <div class="auth-file-box">
                             <input type="file" id="regDocument" name="dokumen_kelayakan" accept="application/pdf,image/jpeg,image/png" class="auth-file-input" />

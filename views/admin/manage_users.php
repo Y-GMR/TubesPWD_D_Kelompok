@@ -8,7 +8,7 @@ if (function_exists('require_role')) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    if (isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
+    if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
         header('HTTP/1.1 403 Forbidden');
         header('Location: ../../login.php?error=unauthorized');
         exit();
@@ -18,6 +18,17 @@ if (function_exists('require_role')) {
 $conn = null;
 if (file_exists('../../config/database.php')) {
     require_once '../../config/database.php';
+}
+if (file_exists('../../includes/functions.php')) {
+    require_once '../../includes/functions.php';
+}
+
+if ($conn && function_exists('ambilPenggunaById') && !ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
+    if (function_exists('hapusSesiPengguna')) {
+        hapusSesiPengguna();
+    }
+    header('Location: ../../login.php?error=login_required');
+    exit();
 }
 
 $pesan_sukses = '';
@@ -34,12 +45,19 @@ if (isset($_SESSION['flash_error'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
-    $aksi = isset($_POST['aksi']) ? $_POST['aksi'] : '';
+    $token_kiriman = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+    if (!hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
+        $_SESSION['flash_error'] = 'Sesi formulir tidak sah (CSRF token invalid). Silakan coba lagi.';
+        header('Location: manage_users.php');
+        exit();
+    }
+
+    $aksi = (isset($_POST['aksi']) && is_string($_POST['aksi'])) ? $_POST['aksi'] : '';
 
     if ($aksi === 'verifikasi_pengguna') {
         $pengguna_id = isset($_POST['pengguna_id']) ? (int) $_POST['pengguna_id'] : 0;
-        $status_baru = isset($_POST['status_verifikasi']) ? $_POST['status_verifikasi'] : '';
-        $catatan = isset($_POST['catatan_verifikasi']) ? trim($_POST['catatan_verifikasi']) : '';
+        $status_baru = (isset($_POST['status_verifikasi']) && is_string($_POST['status_verifikasi'])) ? $_POST['status_verifikasi'] : '';
+        $catatan = (isset($_POST['catatan_verifikasi']) && is_string($_POST['catatan_verifikasi'])) ? trim($_POST['catatan_verifikasi']) : '';
 
         if ($pengguna_id === (int) $_SESSION['user_id']) {
             $_SESSION['flash_error'] = 'Anda tidak dapat mengubah status verifikasi akun Anda sendiri.';
@@ -59,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $conn) {
         }
     } elseif ($aksi === 'balas_tiket') {
         $tiket_id = isset($_POST['tiket_id']) ? (int) $_POST['tiket_id'] : 0;
-        $balasan = isset($_POST['balasan_admin']) ? trim($_POST['balasan_admin']) : '';
+        $balasan = (isset($_POST['balasan_admin']) && is_string($_POST['balasan_admin'])) ? trim($_POST['balasan_admin']) : '';
         $status_selesai = 'selesai';
 
         if ($tiket_id > 0 && $balasan !== '') {
@@ -119,6 +137,7 @@ if ($conn) {
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="id" lang="id">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Kelola Pengguna &amp; CS - Tubes PWD</title>
     <link rel="stylesheet" type="text/css" href="../../assets/css/admin.css" />
 </head>
@@ -180,25 +199,37 @@ if ($conn) {
                             <?php foreach ($daftar_pengguna as $user): ?>
                                 <?php
                                 $doc_val = trim((string) $user['dokumen_kelayakan']);
+                                $doc_rel = '';
                                 $doc_href = '';
-                                if ($doc_val !== '') {
-                                    $doc_href = (strpos($doc_val, 'assets/') === 0) ? ('../../' . $doc_val) : ('../../assets/uploads/documents/' . $doc_val);
+                                $doc_exists = false;
+                                if ($doc_val !== '' && strpos($doc_val, '..') === false) {
+                                    $doc_rel = (strpos($doc_val, 'assets/') === 0) ? $doc_val : ('assets/uploads/documents/' . $doc_val);
+                                    $doc_href = '../../' . $doc_rel;
+                                    $doc_exists = is_file(__DIR__ . '/../../' . $doc_rel);
                                 }
                                 $st_ver = isset($user['status_verifikasi']) ? $user['status_verifikasi'] : 'menunggu';
+                                $ver_badge_cls = 'badge-pending';
+                                if ($st_ver === 'disetujui') {
+                                    $ver_badge_cls = 'badge-success';
+                                } elseif ($st_ver === 'ditolak') {
+                                    $ver_badge_cls = 'badge-danger';
+                                }
                                 ?>
                                 <tr>
                                     <td><?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars($user['nama_lengkap'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars($user['peran'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td>
-                                        <?php if ($doc_href !== ''): ?>
+                                        <?php if ($doc_exists): ?>
                                             <a href="<?php echo htmlspecialchars($doc_href, ENT_QUOTES, 'UTF-8'); ?>">Lihat Dokumen</a>
+                                        <?php elseif ($doc_val !== ''): ?>
+                                            <span><?php echo htmlspecialchars(basename($doc_val), ENT_QUOTES, 'UTF-8'); ?> (arsip contoh)</span>
                                         <?php else: ?>
                                             <span>Belum ada</span>
                                         <?php endif; ?>
                                     </td>
                                     <td>
-                                        <span class="badge"><?php echo htmlspecialchars($st_ver, ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <span class="badge <?php echo htmlspecialchars($ver_badge_cls, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($st_ver, ENT_QUOTES, 'UTF-8'); ?></span>
                                     </td>
                                     <td>
                                         <?php if ((int) $user['id'] === (int) $_SESSION['user_id']): ?>
@@ -251,10 +282,10 @@ if ($conn) {
                                 <tr>
                                     <td><?php echo htmlspecialchars((string) $tiket['id'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars($tiket['username'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td><?php echo htmlspecialchars((string) $tiket['kode_transaksi'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?php echo !empty($tiket['kode_transaksi']) ? htmlspecialchars((string) $tiket['kode_transaksi'], ENT_QUOTES, 'UTF-8') : '-'; ?></td>
                                     <td><?php echo htmlspecialchars($tiket['pesan'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td>
-                                        <span class="badge"><?php echo htmlspecialchars($tiket['status'], ENT_QUOTES, 'UTF-8'); ?></span>
+                                        <span class="badge <?php echo ($tiket['status'] === 'selesai') ? 'badge-success' : 'badge-pending'; ?>"><?php echo htmlspecialchars($tiket['status'], ENT_QUOTES, 'UTF-8'); ?></span>
                                     </td>
                                     <td>
                                         <form method="post" action="manage_users.php" class="inline-form">

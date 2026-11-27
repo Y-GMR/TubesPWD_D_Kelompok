@@ -214,6 +214,7 @@
 
 .inv-controls-right {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
     align-items: center;
 }
@@ -365,6 +366,12 @@
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+.inv-low-stock-badge.expired {
+    background-color: #fde8e8;
+    border-color: #fca5a5;
+    color: #9b1c1c;
 }
 
 .inv-card-body {
@@ -630,7 +637,9 @@
     }
 
     .inv-controls-right {
-        justify-content: space-between;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 8px;
     }
 
     .inventory-grid {

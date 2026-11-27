@@ -4,6 +4,22 @@ require_once 'config/database.php';
 require_once 'includes/functions.php';
 require_once 'includes/crud1_helpers.php';
 
+$pengguna_aktif = null;
+if ($conn && is_logged_in()) {
+    $pengguna_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+    if (!$pengguna_aktif) {
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            $_SESSION['full_name'],
+            $_SESSION['role'],
+            $_SESSION['profile_image'],
+            $_SESSION['cart']
+        );
+        session_regenerate_id(true);
+    }
+}
+
 $kata_kunci = isset($_GET['q']) ? bersihkanInput($_GET['q']) : '';
 $kategori_id = isset($_GET['kategori_id']) ? (int) $_GET['kategori_id'] : 0;
 
@@ -92,11 +108,8 @@ foreach ($daftar_makanan as $item) {
 }
 
 $konsumen_terverifikasi = false;
-if ($conn && is_logged_in() && isset($_SESSION['role']) && $_SESSION['role'] === 'konsumen') {
-    $pengguna_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
-    if ($pengguna_aktif && $pengguna_aktif['status_verifikasi'] === 'disetujui') {
-        $konsumen_terverifikasi = true;
-    }
+if ($pengguna_aktif && isset($pengguna_aktif['peran']) && $pengguna_aktif['peran'] === 'konsumen' && $pengguna_aktif['status_verifikasi'] === 'disetujui') {
+    $konsumen_terverifikasi = true;
 }
 
 $map_error = array(
@@ -125,7 +138,7 @@ if ($flash['sukses'] === '' && $session_flash_success !== '') {
 }
 
 $page_title = 'Pangkalan Pangan - Katalog Makanan';
-$extra_css = array('components.css?v=6', 'catalog.css?v=6');
+$extra_css = array('components.css?v=9', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_catalog.js?v=1');
 
 require_once 'includes/header.php';

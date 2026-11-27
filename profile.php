@@ -9,8 +9,7 @@ $user_id = (int) $_SESSION['user_id'];
 $pengguna = ambilPenggunaById($conn, $user_id);
 
 if (!$pengguna) {
-    $_SESSION = array();
-    session_destroy();
+    hapusSesiPengguna();
     header('Location: login.php?error=login_required');
     exit();
 }
@@ -106,6 +105,8 @@ if (isset($_GET['error'])) {
         $pesan_error = 'Gagal mengunggah dokumen kelayakan.';
     } elseif ($err === 'koneksi_gagal') {
         $pesan_error = 'Gagal terhubung ke basis data.';
+    } elseif ($err === 'csrf_tidak_valid') {
+        $pesan_error = 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.';
     } else {
         $pesan_error = 'Terjadi kesalahan sistem saat memperbarui profil.';
     }
@@ -206,7 +207,7 @@ require_once 'includes/header.php';
 <?php endif; ?>
                                 <li class="profile-status-item">
                                     <span class="status-item-label">Bergabung Sejak</span>
-                                    <span class="status-item-val val-dark"><?php echo escapeHtml(substr($pengguna['dibuat_pada'], 0, 10)); ?></span>
+                                    <span class="status-item-val val-dark"><?php echo escapeHtml(substr((string) (isset($pengguna['dibuat_pada']) ? $pengguna['dibuat_pada'] : ''), 0, 10)); ?></span>
                                 </li>
                             </ul>
 
@@ -220,9 +221,11 @@ require_once 'includes/header.php';
 <?php if ($status_verif === 'disetujui'): ?>
                                 Akun telah diverifikasi<?php echo $catatan_verif !== '' ? (': ' . escapeHtml($catatan_verif)) : '.'; ?>
 <?php elseif ($status_verif === 'ditolak'): ?>
-                                Verifikasi ditolak<?php echo $catatan_verif !== '' ? (': ' . escapeHtml($catatan_verif)) : '. Silakan unggah ulang dokumen yang valid.'; ?>
-<?php else: ?>
+                                Verifikasi ditolak<?php echo $catatan_verif !== '' ? (': ' . escapeHtml($catatan_verif)) : ($peran_pengguna === 'konsumen' ? '. Silakan unggah ulang dokumen yang valid.' : '. Hubungi pusat bantuan untuk klarifikasi.'); ?>
+<?php elseif ($peran_pengguna === 'konsumen'): ?>
                                 Akun menunggu verifikasi admin<?php echo $dokumen_raw === '' ? '. Unggah dokumen SKTM/KKS di formulir.' : ' (dokumen sudah diunggah).'; ?>
+<?php else: ?>
+                                Akun <?php echo escapeHtml($peran_pengguna); ?> sedang menunggu peninjauan dan persetujuan admin.
 <?php endif; ?>
                             </div>
                         </div>

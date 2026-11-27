@@ -265,6 +265,9 @@ function crud1ProsesUploadFoto($file, $prefix_relatif = '../') {
     if (!is_array($file) || !isset($file['error'])) {
         return array('ok' => true, 'uploaded' => false, 'path' => null, 'error' => '');
     }
+    if (is_array($file['error'])) {
+        return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_gagal');
+    }
 
     $kode_error = (int) $file['error'];
     if ($kode_error === UPLOAD_ERR_NO_FILE) {
@@ -279,9 +282,9 @@ function crud1ProsesUploadFoto($file, $prefix_relatif = '../') {
         return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_gagal');
     }
 
-    $tmp_name = isset($file['tmp_name']) ? (string) $file['tmp_name'] : '';
-    $orig_name = isset($file['name']) ? (string) $file['name'] : '';
-    $file_size = isset($file['size']) ? (int) $file['size'] : 0;
+    $tmp_name = (isset($file['tmp_name']) && is_string($file['tmp_name'])) ? $file['tmp_name'] : '';
+    $orig_name = (isset($file['name']) && is_string($file['name'])) ? $file['name'] : '';
+    $file_size = (isset($file['size']) && !is_array($file['size'])) ? (int) $file['size'] : 0;
 
     if ($tmp_name === '' || !is_uploaded_file($tmp_name)) {
         return array('ok' => false, 'uploaded' => false, 'path' => null, 'error' => 'upload_tidak_valid');
@@ -360,7 +363,8 @@ function crud1HapusFotoFisik($path_foto, $prefix_relatif = '../') {
         return false;
     }
 
-    if (strncmp($target_file, $base_dir, strlen($base_dir)) !== 0) {
+    $base_prefix = rtrim($base_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    if (strncmp($target_file, $base_prefix, strlen($base_prefix)) !== 0) {
         return false;
     }
 
@@ -377,15 +381,15 @@ function crud1HapusFotoFisik($path_foto, $prefix_relatif = '../') {
 function crud1AmbilFlashPesan($map_pesan, $map_error) {
     $hasil = array('sukses' => '', 'error' => '');
 
-    if (isset($_GET['pesan'])) {
-        $kode = trim((string) $_GET['pesan']);
+    if (isset($_GET['pesan']) && is_string($_GET['pesan'])) {
+        $kode = trim($_GET['pesan']);
         if (isset($map_pesan[$kode])) {
             $hasil['sukses'] = $map_pesan[$kode];
         }
     }
 
-    if (isset($_GET['error'])) {
-        $kode = trim((string) $_GET['error']);
+    if (isset($_GET['error']) && is_string($_GET['error'])) {
+        $kode = trim($_GET['error']);
         if (isset($map_error[$kode])) {
             $hasil['error'] = $map_error[$kode];
         } else {

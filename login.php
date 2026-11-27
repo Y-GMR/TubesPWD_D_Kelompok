@@ -7,6 +7,18 @@ redirect_if_logged_in();
 $pesan_error = '';
 $pesan_sukses = '';
 
+$session_flash_error = '';
+if (isset($_SESSION['flash_error'])) {
+    $session_flash_error = trim((string) $_SESSION['flash_error']);
+    unset($_SESSION['flash_error']);
+}
+
+$session_flash_success = '';
+if (isset($_SESSION['flash_success'])) {
+    $session_flash_success = trim((string) $_SESSION['flash_success']);
+    unset($_SESSION['flash_success']);
+}
+
 if (isset($_GET['error'])) {
     $err = bersihkanInput($_GET['error']);
     if ($err === 'data_tidak_lengkap') {
@@ -14,9 +26,15 @@ if (isset($_GET['error'])) {
     } elseif ($err === 'kredensial_salah') {
         $pesan_error = 'Username, email, atau kata sandi tidak valid.';
     } elseif ($err === 'login_required') {
-        $pesan_error = 'Silakan masuk terlebih dahulu untuk mengakses halaman tersebut.';
+        $pesan_error = ($session_flash_error !== '')
+            ? $session_flash_error
+            : 'Silakan masuk terlebih dahulu untuk mengakses halaman tersebut.';
     } elseif ($err === 'unauthorized') {
         $pesan_error = 'Anda tidak memiliki hak akses untuk halaman tersebut.';
+    } elseif ($err === 'csrf_tidak_valid') {
+        $pesan_error = 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.';
+    } elseif ($err === 'akun_tidak_ditemukan') {
+        $pesan_error = 'Sesi akun Anda tidak lagi valid. Silakan masuk kembali.';
     } elseif ($err === 'koneksi_gagal') {
         $pesan_error = 'Gagal terhubung ke basis data. Pastikan server MySQL berjalan.';
     } elseif ($err === 'sistem_gagal') {
@@ -24,6 +42,8 @@ if (isset($_GET['error'])) {
     } else {
         $pesan_error = 'Terjadi kesalahan sistem. Silakan coba kembali.';
     }
+} elseif ($session_flash_error !== '') {
+    $pesan_error = $session_flash_error;
 }
 
 if (isset($_GET['pesan'])) {
@@ -33,12 +53,14 @@ if (isset($_GET['pesan'])) {
     } elseif ($psn === 'registrasi_berhasil') {
         $pesan_sukses = 'Pendaftaran akun berhasil! Silakan masuk dengan akun Anda.';
     }
+} elseif ($session_flash_success !== '') {
+    $pesan_sukses = $session_flash_success;
 }
 
 $page_title = 'Login Akun - Pangkalan Pangan';
 $page_wrapper_class = 'auth-page-wrapper';
-$extra_css = array('auth.css?v=6');
-$extra_js = array('auth.js?v=3');
+$extra_css = array('auth.css?v=7');
+$extra_js = array('auth.js?v=4');
 
 require_once 'includes/header.php';
 ?>
@@ -75,6 +97,9 @@ require_once 'includes/header.php';
                 <?php endif; ?>
 
                 <form action="actions/auth_login.php" method="post" class="auth-form" id="loginForm">
+                    <div>
+                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                    </div>
                     <div class="auth-form-group">
                         <label for="loginUsername" class="auth-label">Username</label>
                         <input type="text" id="loginUsername" name="username" class="auth-input" />

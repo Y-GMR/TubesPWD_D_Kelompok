@@ -199,6 +199,8 @@
     margin: 0;
     padding: 0;
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     align-items: center;
     gap: 10px;
 }
@@ -529,12 +531,13 @@
 
 .mini-cards-row {
     display: flex;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: flex-start;
+    gap: 20px;
 }
 
 .mini-food-card {
-    width: 136px;
+    width: calc((100% - 40px) / 3);
+    min-width: 0;
     height: 153px;
     background-color: #ffffff;
     border: 1px solid #d9e4e2;
@@ -548,7 +551,7 @@
 }
 
 .mini-food-img-wrap {
-    width: 118px;
+    width: 100%;
     height: 76px;
     border-radius: 10px;
     overflow: hidden;
@@ -699,8 +702,12 @@
 
 @media (max-width: 1200px) {
     .merchant-cards-grid {
-        grid-template-columns: 520px;
+        grid-template-columns: minmax(0, 520px);
         row-gap: 48px;
+    }
+    .merchant-main-card {
+        width: 100%;
+        max-width: 520px;
     }
     .hero-section {
         flex-direction: column;
@@ -718,6 +725,16 @@
 }
 
 @media (max-width: 576px) {
+    .catalog-section {
+        padding: 36px 16px 60px 16px;
+    }
+    .catalog-search-form {
+        height: 56px;
+        padding: 0 14px;
+    }
+    .search-icon-img {
+        margin-right: 10px;
+    }
     .category-filter-list {
         flex-wrap: wrap;
         justify-content: center;
@@ -735,11 +752,31 @@
         align-items: center;
         text-align: center;
     }
+    .merchant-meta-block {
+        width: 100%;
+        max-width: 100%;
+    }
+    .merchant-name-title {
+        font-size: 24px;
+        white-space: normal;
+        word-break: break-word;
+    }
     .merchant-location-stock-row {
+        flex-wrap: wrap;
         justify-content: center;
-        gap: 12px;
+        gap: 8px;
+    }
+    .location-meta-wrap {
+        max-width: 100%;
+        min-width: 0;
+        justify-content: center;
+        text-align: center;
+    }
+    .location-meta-wrap span {
+        word-break: break-word;
     }
     .merchant-price-category-row {
+        flex-wrap: wrap;
         justify-content: center;
     }
     .btn-merchant-claim {
@@ -765,6 +802,10 @@
     .database-mascot-img {
         max-width: 70%;
         height: auto;
+    }
+    .food-modal-title-row,
+    .food-modal-quick-info {
+        flex-wrap: wrap;
     }
 }
 

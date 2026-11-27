@@ -888,9 +888,12 @@
     padding: 6px 14px;
     background-color: #0d4347;
     color: #ffffff;
+    font-family: inherit;
     font-size: 12px;
     font-weight: 600;
+    border: none;
     border-radius: 6px;
+    cursor: pointer;
     margin-bottom: 6px;
 }
 

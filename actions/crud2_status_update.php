@@ -35,9 +35,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
 
+// 1. Validasi Token CSRF
+$token_kiriman = (isset($_POST['csrf_token']) && is_string($_POST['csrf_token'])) ? $_POST['csrf_token'] : '';
+if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token_kiriman)) {
+    $_SESSION['flash_error'] = 'Sesi keamanan formulir tidak sah (CSRF token invalid).';
+    header('Location: ../transactions.php');
+    exit();
+}
+
 $transaksi_id = isset($_POST['transaksi_id']) ? (int) $_POST['transaksi_id'] : 0;
-$aksi = isset($_POST['aksi']) ? trim($_POST['aksi']) : '';
-$status_tujuan = isset($_POST['status']) ? trim($_POST['status']) : '';
+$aksi = (isset($_POST['aksi']) && is_string($_POST['aksi'])) ? trim($_POST['aksi']) : '';
+$status_tujuan = (isset($_POST['status']) && is_string($_POST['status'])) ? trim($_POST['status']) : '';
 
 if ($transaksi_id <= 0) {
     $_SESSION['flash_error'] = 'ID Transaksi tidak valid.';
@@ -50,6 +58,14 @@ if (!$conn) {
     header('Location: ../transactions.php');
     exit();
 }
+
+$pengguna_aktif = ambilPenggunaById($conn, $user_id);
+if (!$pengguna_aktif) {
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
+    exit();
+}
+$user_role = isset($pengguna_aktif['peran']) ? $pengguna_aktif['peran'] : $user_role;
 
 // 2. Ambil Data Transaksi Saat Ini dari Basis Data
 $sql_cek = "SELECT id, kode_transaksi, konsumen_id, produsen_id, total_harga, status, dibuat_pada
@@ -123,7 +139,10 @@ if ($aksi === 'batal' || $status_tujuan === 'dibatalkan') {
             throw new Exception("Gagal membaca rincian pesanan untuk pemulihan stok.");
         }
         mysqli_stmt_bind_param($stmt_items, "i", $transaksi_id);
-        mysqli_stmt_execute($stmt_items);
+        if (!mysqli_stmt_execute($stmt_items)) {
+            mysqli_stmt_close($stmt_items);
+            throw new Exception("Gagal membaca rincian pesanan untuk pemulihan stok.");
+        }
         $res_items = mysqli_stmt_get_result($stmt_items);
 
         $daftar_kembali = array();
@@ -151,7 +170,7 @@ if ($aksi === 'batal' || $status_tujuan === 'dibatalkan') {
 
         mysqli_commit($conn);
 
-        $_SESSION['flash_success'] = 'Klaim pangan (' . htmlspecialchars($trx['kode_transaksi'], ENT_QUOTES, 'UTF-8') . ') berhasil dibatalkan. Kuota harian Anda telah dikembalikan.';
+        $_SESSION['flash_success'] = 'Klaim pangan (' . $trx['kode_transaksi'] . ') berhasil dibatalkan. Kuota harian Anda telah dikembalikan.';
         header('Location: ../transactions.php?status=cancelled');
         exit();
 
@@ -224,7 +243,7 @@ if (mysqli_stmt_execute($stmt_update_status)) {
     $label_status = ($status_tujuan === 'siap_diambil') ? 'Siap Diambil' : 'Selesai';
     $_SESSION['flash_success'] = "Status transaksi {$trx['kode_transaksi']} berhasil diperbarui menjadi: {$label_status}.";
 
-    $redirect_to = isset($_POST['redirect_to']) ? trim($_POST['redirect_to']) : '';
+    $redirect_to = (isset($_POST['redirect_to']) && is_string($_POST['redirect_to'])) ? trim($_POST['redirect_to']) : '';
     if ($user_role === 'produsen' && $redirect_to === 'producer_dashboard') {
         header('Location: ../producer_dashboard.php?status=updated');
     } else {
@@ -232,9 +251,8 @@ if (mysqli_stmt_execute($stmt_update_status)) {
     }
     exit();
 } else {
-    $err = mysqli_stmt_error($stmt_update_status);
     mysqli_stmt_close($stmt_update_status);
-    $_SESSION['flash_error'] = 'Gagal memperbarui status transaksi: ' . $err;
+    $_SESSION['flash_error'] = 'Gagal memperbarui status transaksi. Silakan coba kembali.';
     header('Location: ../transactions.php');
     exit();
 }

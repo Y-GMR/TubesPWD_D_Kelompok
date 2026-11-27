@@ -2,7 +2,7 @@
     "use strict";
 
     function applyUserRole() {
-        if (window.location.pathname.indexOf('.php') !== -1) {
+        if (window.location.pathname.indexOf('.xhtml') === -1) {
             return;
         }
         var params = new URLSearchParams(window.location.search);
@@ -101,7 +101,7 @@
             { id: "emailInput", text: "nama@posko.id" },
             { id: "nameInput", text: "Nama lengkap sesuai KTP / profil" },
             { id: "phoneInput", text: "0812-xxxx-xxxx (dapat dihubungi jika butuh klarifikasi cepat)" },
-            { id: "trxCodeInput", text: "Contoh: #PP-20261122-001 (Kosongkan jika bukan mengenai klaim)" },
+            { id: "trxCodeInput", text: "Contoh: PP-20261122-001 (Kosongkan jika bukan mengenai klaim)" },
             { id: "subjectInput", text: "Ringkasan kendala Anda dalam satu kalimat" },
             { id: "messageTextarea", text: "Jelaskan kendala Anda secara rinci, termasuk waktu kejadian, nama posko donatur, dan bantuan yang diharapkan..." },
             { id: "ticketSearchInput", text: "Cari nomor tiket atau kata kunci..." }
@@ -182,7 +182,7 @@
 
     function renderSubmittedTicket() {
         var listContainer = document.getElementById("ticketListContainer");
-        if (!listContainer || window.location.pathname.indexOf(".php") !== -1) return;
+        if (!listContainer || window.location.pathname.indexOf(".xhtml") === -1) return;
 
         var rawTicket = null;
         try {
@@ -278,13 +278,26 @@
         var currentStatus = "all";
         var currentSearch = "";
 
+        function getTicketStatus(card) {
+            if (card.classList.contains("ticket-status-done")) return "done";
+            if (card.classList.contains("ticket-status-pending")) return "pending";
+            return card.getAttribute("data-status") || "";
+        }
+
+        function getFilterTarget(pill) {
+            if (pill.classList.contains("ticket-filter-pending")) return "pending";
+            if (pill.classList.contains("ticket-filter-done")) return "done";
+            if (pill.classList.contains("ticket-filter-all")) return "all";
+            return pill.getAttribute("data-filter") || "all";
+        }
+
         function filterTickets() {
             var visibleCount = 0;
             var term = currentSearch.toLowerCase().trim();
 
             for (var i = 0; i < ticketCards.length; i++) {
                 var card = ticketCards[i];
-                var cardStatus = card.getAttribute("data-status");
+                var cardStatus = getTicketStatus(card);
                 var cardText = card.textContent.toLowerCase();
 
                 var statusMatch = (currentStatus === "all" || cardStatus === currentStatus);
@@ -309,7 +322,7 @@
                     filterPills[j].classList.remove("active");
                 }
                 this.classList.add("active");
-                currentStatus = this.getAttribute("data-filter") || "all";
+                currentStatus = getFilterTarget(this);
                 filterTickets();
             });
         }

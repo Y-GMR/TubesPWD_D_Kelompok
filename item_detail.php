@@ -19,7 +19,7 @@ $sql = "SELECT m.*, k.nama_kategori, p.nama_lengkap AS nama_produsen, p.foto_pro
      . "FROM makanan m "
      . "INNER JOIN kategori k ON m.kategori_id = k.id "
      . "INNER JOIN pengguna p ON m.produsen_id = p.id "
-     . "WHERE m.id = ? LIMIT 1";
+     . "WHERE m.id = ? AND p.status_verifikasi = 'disetujui' LIMIT 1";
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
     header('Location: katalog.php?error=item_tidak_tersedia');
@@ -58,17 +58,32 @@ $deskripsi_teks = (isset($item['deskripsi']) && trim((string) $item['deskripsi']
     ? trim((string) $item['deskripsi'])
     : 'Tidak ada catatan tambahan untuk makanan ini.';
 
+$pengguna_aktif = null;
+if ($conn && is_logged_in()) {
+    $pengguna_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+    if (!$pengguna_aktif) {
+        unset(
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            $_SESSION['full_name'],
+            $_SESSION['role'],
+            $_SESSION['profile_image'],
+            $_SESSION['cart']
+        );
+        session_regenerate_id(true);
+    }
+}
+
 $is_login = is_logged_in();
-$peran_aktif = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+$peran_aktif = ($pengguna_aktif && isset($pengguna_aktif['peran']))
+    ? $pengguna_aktif['peran']
+    : (isset($_SESSION['role']) ? $_SESSION['role'] : '');
 $status_verifikasi = '';
 $catatan_verifikasi = '';
 
-if ($is_login && $peran_aktif === 'konsumen') {
-    $pengguna = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
-    if ($pengguna) {
-        $status_verifikasi = $pengguna['status_verifikasi'];
-        $catatan_verifikasi = isset($pengguna['catatan_verifikasi']) ? (string) $pengguna['catatan_verifikasi'] : '';
-    }
+if ($is_login && $peran_aktif === 'konsumen' && $pengguna_aktif) {
+    $status_verifikasi = $pengguna_aktif['status_verifikasi'];
+    $catatan_verifikasi = isset($pengguna_aktif['catatan_verifikasi']) ? (string) $pengguna_aktif['catatan_verifikasi'] : '';
 }
 
 $qty_di_keranjang = 0;
@@ -78,7 +93,7 @@ if (isset($_SESSION['cart'][$item_id]['jumlah'])) {
 $sisa_boleh_klaim = max(0, $stok_int - $qty_di_keranjang);
 
 $page_title = $item['nama_makanan'] . ' - Rincian Makanan';
-$extra_css = array('components.css?v=6', 'catalog.css?v=6');
+$extra_css = array('components.css?v=9', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_item_detail.js?v=1');
 
 require_once 'includes/header.php';

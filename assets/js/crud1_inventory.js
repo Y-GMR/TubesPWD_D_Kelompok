@@ -4,6 +4,7 @@
     function getCardStatus(card) {
         if (card.classList.contains('inv-status-available')) return 'available';
         if (card.classList.contains('inv-status-low')) return 'low';
+        if (card.classList.contains('inv-status-expired')) return 'expired';
         if (card.classList.contains('inv-status-closed')) return 'closed';
         return '';
     }
@@ -11,6 +12,7 @@
     function getPillFilter(pill) {
         if (pill.classList.contains('inv-filter-available')) return 'available';
         if (pill.classList.contains('inv-filter-low')) return 'low';
+        if (pill.classList.contains('inv-filter-expired')) return 'expired';
         if (pill.classList.contains('inv-filter-closed')) return 'closed';
         return 'all';
     }
