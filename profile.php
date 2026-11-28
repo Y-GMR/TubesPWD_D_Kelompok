@@ -70,45 +70,65 @@ if (isset($_GET['error'])) {
     $err = bersihkanInput($_GET['error']);
     if ($err === 'data_tidak_lengkap') {
         $pesan_error = 'Nama lengkap, username, dan email wajib diisi.';
-    } elseif ($err === 'nama_tidak_valid') {
+    } 
+    else if ($err === 'nama_tidak_valid') {
         $pesan_error = 'Nama lengkap harus terdiri dari 2 hingga 100 karakter.';
-    } elseif ($err === 'email_tidak_valid') {
+    } 
+    else if ($err === 'email_tidak_valid') {
         $pesan_error = 'Format alamat email tidak valid.';
-    } elseif ($err === 'username_panjang_salah') {
+    } 
+    else if ($err === 'username_panjang_salah') {
         $pesan_error = 'Username harus terdiri dari 4 hingga 30 karakter.';
-    } elseif ($err === 'username_karakter_tidak_valid') {
+    } 
+    else if ($err === 'username_karakter_tidak_valid') {
         $pesan_error = 'Username hanya boleh berisi huruf, angka, dan garis bawah (_).';
-    } elseif ($err === 'password_terlalu_pendek') {
+    } 
+    else if ($err === 'password_terlalu_pendek') {
         $pesan_error = 'Kata sandi baru minimal harus 8 karakter.';
-    } elseif ($err === 'password_tidak_memenuhi_syarat') {
+    } 
+    else if ($err === 'password_tidak_memenuhi_syarat') {
         $pesan_error = 'Kata sandi baru harus mengandung kombinasi huruf dan angka.';
-    } elseif ($err === 'password_tidak_cocok') {
+    } 
+    else if ($err === 'password_tidak_cocok') {
         $pesan_error = 'Konfirmasi kata sandi baru tidak cocok.';
-    } elseif ($err === 'username_sudah_dipakai') {
+    } 
+    else if ($err === 'username_sudah_dipakai') {
         $pesan_error = 'Username tersebut sudah digunakan oleh akun lain.';
-    } elseif ($err === 'email_sudah_dipakai') {
+    } 
+    else if ($err === 'email_sudah_dipakai') {
         $pesan_error = 'Email tersebut sudah digunakan oleh akun lain.';
-    } elseif ($err === 'foto_format_ditolak') {
+    } 
+    else if ($err === 'foto_format_ditolak') {
         $pesan_error = 'Format foto profil harus berupa JPG, PNG, atau WEBP.';
-    } elseif ($err === 'foto_terlalu_besar') {
+    } 
+    else if ($err === 'foto_terlalu_besar') {
         $pesan_error = 'Ukuran berkas foto profil maksimal 2 MB.';
-    } elseif ($err === 'foto_mime_ditolak') {
+    } 
+    else if ($err === 'foto_mime_ditolak') {
         $pesan_error = 'Berkas foto profil tidak valid atau bukan gambar asli.';
-    } elseif ($err === 'foto_upload_gagal') {
+    } 
+    else if ($err === 'foto_upload_gagal') {
         $pesan_error = 'Gagal mengunggah foto profil baru.';
-    } elseif ($err === 'dokumen_format_ditolak') {
+    } 
+    else if ($err === 'dokumen_format_ditolak') {
         $pesan_error = 'Format dokumen kelayakan harus berupa PDF, JPG, atau PNG.';
-    } elseif ($err === 'dokumen_terlalu_besar') {
+    } 
+    else if ($err === 'dokumen_terlalu_besar') {
         $pesan_error = 'Ukuran berkas dokumen kelayakan maksimal 2 MB.';
-    } elseif ($err === 'dokumen_mime_ditolak') {
+    } 
+    else if ($err === 'dokumen_mime_ditolak') {
         $pesan_error = 'Berkas dokumen kelayakan tidak valid atau bukan PDF/gambar asli.';
-    } elseif ($err === 'dokumen_upload_gagal') {
+    } 
+    else if ($err === 'dokumen_upload_gagal') {
         $pesan_error = 'Gagal mengunggah dokumen kelayakan.';
-    } elseif ($err === 'koneksi_gagal') {
+    } 
+    else if ($err === 'koneksi_gagal') {
         $pesan_error = 'Gagal terhubung ke basis data.';
-    } elseif ($err === 'csrf_tidak_valid') {
+    } 
+    elseif ($err === 'csrf_tidak_valid') {
         $pesan_error = 'Sesi keamanan formulir tidak sah. Silakan muat ulang halaman dan coba lagi.';
-    } else {
+    } 
+    else {
         $pesan_error = 'Terjadi kesalahan sistem saat memperbarui profil.';
     }
 }
