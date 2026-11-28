@@ -34,8 +34,16 @@ if (!$data_produsen_cek) {
     header('Location: ../login.php?error=login_required');
     exit();
 }
+sinkronSesiPengguna($data_produsen_cek);
+if ($data_produsen_cek['peran'] !== 'produsen') {
+    require_role('produsen');
+}
 if ($data_produsen_cek['status_verifikasi'] !== 'disetujui') {
-    $_SESSION['flash_error'] = 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
+    if ($data_produsen_cek['status_verifikasi'] === 'ditolak') {
+        $_SESSION['flash_error'] = 'Akun produsen Anda ditolak oleh admin sehingga belum dapat mengelola makanan.';
+    } else {
+        $_SESSION['flash_error'] = 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
+    }
     header('Location: ../producer_dashboard.php?error=belum_diverifikasi');
     exit();
 }
@@ -303,7 +311,10 @@ if ($action === 'update_stok') {
     if ($ok === null) {
         header('Location: ../inventory.php?error=sistem_gagal');
     } elseif ($ok) {
-        header('Location: ../inventory.php?pesan=stok_diperbarui');
+        $batas = $item_lama['kedaluwarsa_pada'];
+        $lewat = (!empty($batas) && strtotime($batas) <= time());
+        $kode_pesan = ($stok_baru > 0 && $lewat) ? 'stok_diperbarui_kedaluwarsa' : 'stok_diperbarui';
+        header('Location: ../inventory.php?pesan=' . $kode_pesan);
     } else {
         header('Location: ../inventory.php?error=gagal_simpan');
     }
@@ -322,7 +333,15 @@ if ($action === 'tutup_donasi') {
         exit();
     }
 
-    $ok = crud1UpdateStokMakanan($conn, $id, $produsen_id, 0);
+    // Kedaluwarsa disetel ke waktu sekarang agar donasi tidak tampil lagi di katalog
+    // apabila stok terpulihkan akibat pembatalan transaksi yang masih menunggu
+    $ok = null;
+    $stmt_tutup = mysqli_prepare($conn, "UPDATE makanan SET stok = 0, kedaluwarsa_pada = NOW() WHERE id = ? AND produsen_id = ?");
+    if ($stmt_tutup) {
+        mysqli_stmt_bind_param($stmt_tutup, "ii", $id, $produsen_id);
+        $ok = mysqli_stmt_execute($stmt_tutup);
+        mysqli_stmt_close($stmt_tutup);
+    }
     if ($ok === null) {
         header('Location: ../inventory.php?error=sistem_gagal');
     } elseif ($ok) {

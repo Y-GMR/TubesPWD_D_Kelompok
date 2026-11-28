@@ -3,11 +3,16 @@ date_default_timezone_set('Asia/Jakarta');
 
 if (session_status() === PHP_SESSION_NONE) {
     ini_set('session.use_strict_mode', '1');
+    ini_set('session.gc_maxlifetime', '604800');
     session_set_cookie_params(array(
         'httponly' => true,
         'samesite' => 'Lax'
     ));
     session_start();
+}
+
+if (empty($_SESSION['csrf_token']) || !is_string($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 function cariPathRoot($target_file) {

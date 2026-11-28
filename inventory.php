@@ -13,10 +13,20 @@ if ($conn && !$produsen) {
     header('Location: login.php?error=login_required');
     exit();
 }
+if ($produsen) {
+    sinkronSesiPengguna($produsen);
+    if ($produsen['peran'] !== 'produsen') {
+        require_role('produsen');
+    }
+}
 
 // Blokir produsen yang belum diverifikasi admin
 if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
-    $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola inventaris.';
+    if ($produsen && $produsen['status_verifikasi'] === 'ditolak') {
+        $_SESSION['flash_error'] = 'Akun produsen Anda ditolak oleh admin sehingga belum dapat mengelola inventaris.';
+    } else {
+        $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola inventaris.';
+    }
     header('Location: producer_dashboard.php?error=belum_diverifikasi');
     exit();
 }
@@ -96,6 +106,7 @@ $map_pesan = array(
     'makanan_ditambah'   => 'Makanan baru berhasil ditambahkan ke inventaris Anda.',
     'makanan_diperbarui' => 'Detail makanan berhasil diperbarui.',
     'stok_diperbarui'    => 'Jumlah stok porsi berhasil diperbarui.',
+    'stok_diperbarui_kedaluwarsa' => 'Stok disimpan, tetapi batas ambil sudah lewat. Perbarui batas waktu lewat Ubah Detail agar tampil di katalog.',
     'donasi_ditutup'     => 'Donasi makanan berhasil ditutup (stok disetel menjadi 0).',
     'makanan_dihapus'    => 'Makanan berhasil dihapus dari inventaris.'
 );
@@ -129,7 +140,7 @@ if (isset($_SESSION['flash_success'])) {
 }
 
 $page_title = 'Manajemen Inventaris Pangan - Pangkalan Pangan';
-$extra_css = array('components.css?v=9', 'inventory.css?v=1');
+$extra_css = array('components.css?v=10', 'inventory.css?v=1');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_inventory.js?v=2');
 
 require_once 'includes/header.php';
@@ -261,6 +272,7 @@ require_once 'includes/navbar.php';
                                         <?php if ($stok_int > 0): ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-close" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="tutup_donasi" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Tutup Donasi</button>
@@ -278,6 +290,7 @@ require_once 'includes/navbar.php';
                                         <?php else: ?>
                                             <form action="actions/crud1_item.php" method="post" class="form-inv-delete" style="flex: 1; display: flex;">
                                                 <div style="display: flex; width: 100%;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="action" value="delete" />
                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                                     <button type="submit" class="btn-inv-close" style="width: 100%;">Hapus</button>
@@ -302,6 +315,7 @@ require_once 'includes/navbar.php';
             <div class="inv-modal">
                 <form action="actions/crud1_item.php" method="post" id="stockModalForm">
                     <div>
+                        <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                         <input type="hidden" name="action" value="update_stok" />
                         <input type="hidden" name="id" id="modalItemIdInput" value="" />
                     </div>

@@ -1,14 +1,21 @@
 <?php
 require_once 'includes/session.php';
-require_login();
+require_role(array('konsumen', 'produsen'));
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
 $pengguna_id = (int) $_SESSION['user_id'];
-if ($conn && !ambilPenggunaById($conn, $pengguna_id)) {
-    hapusSesiPengguna();
-    header('Location: login.php?error=login_required');
-    exit();
+if ($conn) {
+    $pengguna_th = ambilPenggunaById($conn, $pengguna_id);
+    if (!$pengguna_th) {
+        hapusSesiPengguna();
+        header('Location: login.php?error=login_required');
+        exit();
+    }
+    sinkronSesiPengguna($pengguna_th);
+    if (!in_array($pengguna_th['peran'], array('konsumen', 'produsen'), true)) {
+        require_role(array('konsumen', 'produsen'));
+    }
 }
 $daftar_tiket = array();
 $total_tiket = 0;
@@ -48,8 +55,8 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Riwayat Tiket - Bantuan &amp; Keluhan - Pangkalan Pangan</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=7" />
-    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=7" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=8" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=10" />
     <link rel="stylesheet" type="text/css" href="assets/css/customer_service.css?v=1" />
 </head>
 <body>
@@ -139,34 +146,7 @@ if (isset($_GET['success']) && $_GET['success'] === 'created') {
             </div>
         </div>
 
-        <div class="site-footer" id="about">
-            <div class="footer-inner">
-                <div class="footer-top-columns">
-                    <div class="footer-col-left" id="help">
-                        <div class="footer-heading">Tetap Terhubung</div>
-                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
-                        <div class="footer-contact-p">Instagram: @PP</div>
-                        <div class="footer-contact-p">Surel: PangkalanPangan@gmail.com</div>
-                    </div>
-                    <div class="footer-col-center">
-                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
-                    </div>
-                    <div class="footer-col-right">
-                        <div class="footer-heading">Ambil peran</div>
-                        <ul class="footer-link-list">
-                            <li><a href="register.php?role=donor">Donatur pangan</a></li>
-                            <li><a href="register.php?role=donor">Mitra penyaluran</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <hr class="footer-divider-line" />
-                <div class="footer-bottom-copy">
-                    <img src="assets/images/footer_copyright.svg" alt="Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script type="text/javascript" src="assets/js/customer_service.js?v=1"></script>
-</body>
-</html>
+<?php
+$extra_js = array('customer_service.js?v=1');
+require_once 'includes/footer.php';
+?>

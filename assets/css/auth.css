@@ -378,8 +378,10 @@
 
 @media (max-width: 768px) {
     .auth-nav-bar {
-        padding: 0 20px;
-        height: 80px;
+        padding: 16px 20px;
+        height: auto;
+        flex-wrap: wrap;
+        gap: 12px;
     }
     .auth-nav-menu {
         display: none;

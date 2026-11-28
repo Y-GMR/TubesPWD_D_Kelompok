@@ -39,11 +39,17 @@ if (isset($_SESSION['user_id']) && !empty($_SESSION['user_id'])) {
         }
     }
 }
-$help_target = 'customer_service.php';
+if (!$is_logged_in) {
+    $help_target = 'katalog.php#help';
+} elseif ($role_raw === 'admin') {
+    $help_target = 'views/admin/manage_users.php#antrean-cs';
+} else {
+    $help_target = 'customer_service.php';
+}
 $producer_target = file_exists($root_dir . '/producer_dashboard.php') ? 'producer_dashboard.php' : 'inventory.php';
 $transactions_target = 'transactions.php';
 $cart_total_qty = 0;
-if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+if ($is_logged_in && $role_raw === 'konsumen' && isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     foreach ($_SESSION['cart'] as $cart_item) {
         if (isset($cart_item['jumlah'])) {
             $cart_total_qty += max(0, (int) $cart_item['jumlah']);
@@ -79,20 +85,27 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                     <div class="profile-dropdown-content" id="profileDropdownMenu">
 <?php if ($role_raw === 'admin'): ?>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>views/admin/dashboard.php" class="profile-dropdown-item">Panel Admin</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>views/admin/manage_users.php" class="profile-dropdown-item">Verifikasi &amp; CS</a>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>manage_categories.php" class="profile-dropdown-item">Kelola Kategori</a>
-                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>views/admin/manage_users.php" class="profile-dropdown-item">Kelola Pengguna</a>
                         <a href="<?php echo htmlspecialchars($base_url . $transactions_target, ENT_QUOTES, 'UTF-8'); ?>" class="profile-dropdown-item">Kelola Transaksi</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php" class="profile-dropdown-item">Pengaturan Profil</a>
 <?php elseif ($role_raw === 'produsen'): ?>
                         <a href="<?php echo htmlspecialchars($base_url . $producer_target, ENT_QUOTES, 'UTF-8'); ?>" class="profile-dropdown-item">Dashboard Produsen</a>
                         <a href="<?php echo htmlspecialchars($base_url . $transactions_target, ENT_QUOTES, 'UTF-8'); ?>" class="profile-dropdown-item">Kelola Klaim</a>
+<?php if (!isset($_SESSION['status_verifikasi']) || $_SESSION['status_verifikasi'] === 'disetujui'): ?>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>inventory.php" class="profile-dropdown-item">Kelola Inventaris</a>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>add_food.php" class="profile-dropdown-item">Donasi Makanan Baru</a>
-<?php else: ?>
-                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>cart.php" class="profile-dropdown-item">Keranjang Klaim<?php echo $cart_total_qty > 0 ? (' (' . htmlspecialchars((string) $cart_total_qty, ENT_QUOTES, 'UTF-8') . ')') : ''; ?></a>
-                        <a href="<?php echo htmlspecialchars($base_url . $transactions_target, ENT_QUOTES, 'UTF-8'); ?>" class="profile-dropdown-item">Riwayat Klaim</a>
 <?php endif; ?>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php" class="profile-dropdown-item">Pengaturan Profil</a>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>customer_service.php" class="profile-dropdown-item">Pusat Bantuan</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>ticket_history.php" class="profile-dropdown-item">Riwayat Tiket CS</a>
+<?php else: ?>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>cart.php" class="profile-dropdown-item">Keranjang Klaim<?php echo $cart_total_qty > 0 ? (' (' . htmlspecialchars((string) $cart_total_qty, ENT_QUOTES, 'UTF-8') . ')') : ''; ?></a>
+                        <a href="<?php echo htmlspecialchars($base_url . $transactions_target, ENT_QUOTES, 'UTF-8'); ?>" class="profile-dropdown-item">Riwayat Klaim</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>profile.php" class="profile-dropdown-item">Pengaturan Profil</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>customer_service.php" class="profile-dropdown-item">Pusat Bantuan</a>
+                        <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>ticket_history.php" class="profile-dropdown-item">Riwayat Tiket CS</a>
+<?php endif; ?>
                         <div class="profile-dropdown-divider"></div>
                         <a href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>actions/auth_logout.php" class="profile-dropdown-item profile-dropdown-logout" id="btnLogout">Keluar</a>
                     </div>

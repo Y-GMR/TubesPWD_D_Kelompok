@@ -10,6 +10,26 @@ require_role('konsumen');
 $user_id = (int) $_SESSION['user_id'];
 $user_role = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
+// 2. Validasi Akun Pengguna & Status Verifikasi (isVerified?)
+$data_pengguna = ambilPenggunaById($conn, $user_id);
+if (!$data_pengguna) {
+    hapusSesiPengguna();
+    header("Location: login.php?error=login_required");
+    exit();
+}
+sinkronSesiPengguna($data_pengguna);
+if ($data_pengguna['peran'] !== 'konsumen') {
+    require_role('konsumen');
+}
+$user_role = $data_pengguna['peran'];
+
+$status_verifikasi = $data_pengguna['status_verifikasi'];
+if ($status_verifikasi !== 'disetujui') {
+    $_SESSION['flash_error'] = 'Akun Anda belum disetujui oleh admin. Klaim paket pangan hanya berlaku untuk akun yang telah diverifikasi kelayakannya (SKTM/KKS).';
+    header("Location: cart.php?status=unverified");
+    exit();
+}
+
 // Inisialisasi keranjang jika belum ada
 if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
     $_SESSION['cart'] = array();
@@ -19,21 +39,6 @@ if (!isset($_SESSION['cart']) || !is_array($_SESSION['cart'])) {
 if (empty($_SESSION['cart'])) {
     $_SESSION['flash_error'] = 'Keranjang belanja Anda masih kosong. Silakan pilih menu makanan terlebih dahulu.';
     header("Location: katalog.php");
-    exit();
-}
-
-// 2. Validasi Akun Pengguna & Status Verifikasi (isVerified?)
-$data_pengguna = ambilPenggunaById($conn, $user_id);
-if (!$data_pengguna) {
-    hapusSesiPengguna();
-    header("Location: login.php?error=login_required");
-    exit();
-}
-
-$status_verifikasi = $data_pengguna['status_verifikasi'];
-if ($status_verifikasi !== 'disetujui') {
-    $_SESSION['flash_error'] = 'Akun Anda belum disetujui oleh admin. Klaim paket pangan hanya berlaku untuk akun yang telah diverifikasi kelayakannya (SKTM/KKS).';
-    header("Location: cart.php");
     exit();
 }
 
@@ -116,7 +121,7 @@ if ($conn && !empty($ids)) {
                          m.latitude_ambil, m.longitude_ambil, m.kedaluwarsa_pada,
                          k.nama_kategori,
                          p.id AS produsen_id, p.nama_lengkap AS nama_produsen, p.foto_profil AS logo_produsen,
-                         p.status_verifikasi AS status_produsen
+                         p.peran AS peran_produsen, p.status_verifikasi AS status_produsen
                   FROM makanan m
                   INNER JOIN kategori k ON m.kategori_id = k.id
                   INNER JOIN pengguna p ON m.produsen_id = p.id
@@ -132,7 +137,7 @@ if ($conn && !empty($ids)) {
         while ($row = mysqli_fetch_assoc($res_items)) {
             $item_id = (int) $row['id'];
             $ditemukan_ids[$item_id] = true;
-            if (!isset($row['status_produsen']) || $row['status_produsen'] !== 'disetujui') {
+            if (!isset($row['peran_produsen'], $row['status_produsen']) || $row['peran_produsen'] !== 'produsen' || $row['status_produsen'] !== 'disetujui') {
                 $ada_produsen_nonaktif = true;
             }
             $qty = isset($_SESSION['cart'][$item_id]['jumlah']) ? (int) $_SESSION['cart'][$item_id]['jumlah'] : 1;
@@ -233,7 +238,7 @@ if ($stok_habis) {
 }
 
 $page_title = 'Konfirmasi Klaim Pangan - Pangkalan Pangan';
-$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+$extra_css = array('checkout.css?v=7', 'components.css?v=10');
 $extra_js = array('crud1_navbar.js?v=1');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -370,6 +375,9 @@ require_once 'includes/navbar.php';
 
                     <!-- Formulir POST ke Backend Transaksi CRUD 2 -->
                     <form action="actions/crud2_transaction.php" method="post" style="margin: 0;">
+                        <div>
+                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                        </div>
                         <div>
                             <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; text-align: center;">Konfirmasi Klaim Sekarang</button>
                         </div>

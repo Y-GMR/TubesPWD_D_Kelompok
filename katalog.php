@@ -14,9 +14,12 @@ if ($conn && is_logged_in()) {
             $_SESSION['full_name'],
             $_SESSION['role'],
             $_SESSION['profile_image'],
+            $_SESSION['status_verifikasi'],
             $_SESSION['cart']
         );
         session_regenerate_id(true);
+    } else {
+        sinkronSesiPengguna($pengguna_aktif);
     }
 }
 
@@ -33,7 +36,7 @@ if ($conn) {
                  . "FROM makanan m "
                  . "INNER JOIN kategori k ON m.kategori_id = k.id "
                  . "INNER JOIN pengguna p ON m.produsen_id = p.id "
-                 . "WHERE m.stok > 0 AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.status_verifikasi = 'disetujui'";
+                 . "WHERE m.stok > 0 AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.peran = 'produsen' AND p.status_verifikasi = 'disetujui'";
 
     $bind_types = "";
     $bind_params = array();
@@ -138,7 +141,7 @@ if ($flash['sukses'] === '' && $session_flash_success !== '') {
 }
 
 $page_title = 'Pangkalan Pangan - Katalog Makanan';
-$extra_css = array('components.css?v=9', 'catalog.css?v=7');
+$extra_css = array('components.css?v=10', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_catalog.js?v=1');
 
 require_once 'includes/header.php';
@@ -177,6 +180,30 @@ require_once 'includes/navbar.php';
 
             <?php if ($flash['sukses'] !== ''): ?>
                 <div class="alert alert-success"><?php echo escapeHtml($flash['sukses']); ?></div>
+            <?php endif; ?>
+
+            <?php if ($pengguna_aktif && $pengguna_aktif['peran'] === 'konsumen' && $pengguna_aktif['status_verifikasi'] !== 'disetujui'): ?>
+                <?php $catatan_k = isset($pengguna_aktif['catatan_verifikasi']) ? trim((string) $pengguna_aktif['catatan_verifikasi']) : ''; ?>
+                <?php if ($pengguna_aktif['status_verifikasi'] === 'ditolak'): ?>
+                    <div class="alert alert-error">
+                        Verifikasi akun penerima manfaat Anda ditolak<?php echo $catatan_k !== '' ? (' (' . escapeHtml($catatan_k) . ')') : ''; ?>. Periksa catatan dan unggah ulang dokumen SKTM/KKS melalui <a href="profile.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Pengaturan Profil</a>.
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning">
+                        Akun penerima manfaat Anda sedang menunggu verifikasi admin sehingga belum dapat mengklaim makanan. Lengkapi atau cek dokumen SKTM/KKS Anda di <a href="profile.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Pengaturan Profil</a>.
+                    </div>
+                <?php endif; ?>
+            <?php elseif ($pengguna_aktif && $pengguna_aktif['peran'] === 'produsen' && $pengguna_aktif['status_verifikasi'] !== 'disetujui'): ?>
+                <?php $catatan_p = isset($pengguna_aktif['catatan_verifikasi']) ? trim((string) $pengguna_aktif['catatan_verifikasi']) : ''; ?>
+                <?php if ($pengguna_aktif['status_verifikasi'] === 'ditolak'): ?>
+                    <div class="alert alert-error">
+                        Akun Mitra Produsen Anda saat ini berstatus <strong>Ditolak</strong><?php echo $catatan_p !== '' ? (' (' . escapeHtml($catatan_p) . ')') : ''; ?>. Pantau detail di <a href="producer_dashboard.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Dashboard Produsen</a> atau <a href="customer_service.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Pusat Bantuan</a>.
+                    </div>
+                <?php else: ?>
+                    <div class="alert alert-warning">
+                        Anda masuk sebagai Mitra Produsen (status verifikasi: <strong><?php echo escapeHtml(ucfirst($pengguna_aktif['status_verifikasi'])); ?></strong>). Pantau status akun di <a href="producer_dashboard.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Dashboard Produsen</a>.
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <div class="catalog-search-wrap">
@@ -255,7 +282,12 @@ require_once 'includes/navbar.php';
                                         <span class="bullet-dot">&#8226;</span>
                                         <span class="category-label"><?php echo escapeHtml($label_kategori); ?></span>
                                     </div>
-                                    <a href="item_detail.php?id=<?php echo escapeHtml((string) $item_pertama_id); ?>" class="btn-merchant-claim">Lihat &amp; Klaim Pangan</a>
+                                    <?php
+                                    $label_cta_gerai = ($pengguna_aktif && isset($pengguna_aktif['peran']) && $pengguna_aktif['peran'] !== 'konsumen')
+                                        ? 'Lihat Rincian Menu'
+                                        : 'Lihat &amp; Klaim Pangan';
+                                    ?>
+                                    <a href="item_detail.php?id=<?php echo escapeHtml((string) $item_pertama_id); ?>" class="btn-merchant-claim"><?php echo $label_cta_gerai; ?></a>
                                 </div>
                             </div>
 
@@ -289,6 +321,7 @@ require_once 'includes/navbar.php';
                                                 <?php if ($konsumen_terverifikasi): ?>
                                                     <form action="cart.php" method="post" style="display: inline; margin: 0; padding: 0;">
                                                         <div style="display: inline;">
+                                                            <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                             <input type="hidden" name="aksi" value="tambah" />
                                                             <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $mid); ?>" />
                                                             <input type="hidden" name="jumlah" value="1" />

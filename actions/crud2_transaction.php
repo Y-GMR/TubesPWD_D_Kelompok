@@ -64,10 +64,17 @@ if (!$data_pengguna) {
     header('Location: ../login.php?error=login_required');
     exit();
 }
+sinkronSesiPengguna($data_pengguna);
+if ($data_pengguna['peran'] !== 'konsumen') {
+    $_SESSION['flash_error'] = 'Hanya akun konsumen yang memiliki akses untuk mengklaim paket pangan.';
+    $tujuan = function_exists('urlBerandaPeran') ? urlBerandaPeran($data_pengguna['peran']) : '../katalog.php';
+    header('Location: ' . $tujuan . '?error=unauthorized');
+    exit();
+}
 
 if ($data_pengguna['status_verifikasi'] !== 'disetujui') {
     $_SESSION['flash_error'] = 'Akun Anda belum disetujui oleh admin. Klaim paket pangan hanya berlaku untuk penerima manfaat terverifikasi (dokumen SKTM/KKS disetujui).';
-    header('Location: ../katalog.php');
+    header('Location: ../cart.php?status=unverified');
     exit();
 }
 
@@ -163,7 +170,7 @@ $makanan_db = array();
 $placeholders = implode(',', array_fill(0, count($item_ids), '?'));
 $types = str_repeat('i', count($item_ids));
 
-$sql_makanan = "SELECT m.id, m.produsen_id, m.nama_makanan, m.harga, m.stok, m.kedaluwarsa_pada, p.status_verifikasi AS status_produsen "
+$sql_makanan = "SELECT m.id, m.produsen_id, m.nama_makanan, m.harga, m.stok, m.kedaluwarsa_pada, p.peran AS peran_produsen, p.status_verifikasi AS status_produsen "
              . "FROM makanan m "
              . "INNER JOIN pengguna p ON m.produsen_id = p.id "
              . "WHERE m.id IN ($placeholders)";
@@ -194,7 +201,7 @@ foreach ($_SESSION['cart'] as $makanan_id => $c_item) {
         exit();
     }
 
-    if (!isset($makanan_db[$m_id]['status_produsen']) || $makanan_db[$m_id]['status_produsen'] !== 'disetujui') {
+    if (!isset($makanan_db[$m_id]['peran_produsen'], $makanan_db[$m_id]['status_produsen']) || $makanan_db[$m_id]['peran_produsen'] !== 'produsen' || $makanan_db[$m_id]['status_produsen'] !== 'disetujui') {
         $nama_m = $makanan_db[$m_id]['nama_makanan'];
         $_SESSION['flash_error'] = "Menu '{$nama_m}' saat ini tidak tersedia karena produsen belum terverifikasi.";
         header('Location: ../cart.php');
@@ -259,7 +266,7 @@ mysqli_begin_transaction($conn);
 
 try {
     // Kunci baris pengguna untuk mencegah race condition pada pengecekan kuota harian & status verifikasi
-    $stmt_lock_user = mysqli_prepare($conn, "SELECT status_verifikasi FROM pengguna WHERE id = ? FOR UPDATE");
+    $stmt_lock_user = mysqli_prepare($conn, "SELECT peran, status_verifikasi FROM pengguna WHERE id = ? FOR UPDATE");
     if (!$stmt_lock_user) {
         throw new Exception("Gagal mengunci data akun pengguna.");
     }
@@ -272,8 +279,8 @@ try {
     $row_lock = mysqli_fetch_assoc($res_lock);
     mysqli_stmt_close($stmt_lock_user);
 
-    if (!$row_lock || $row_lock['status_verifikasi'] !== 'disetujui') {
-        throw new Exception("Status verifikasi akun Anda belum disetujui.");
+    if (!$row_lock || $row_lock['peran'] !== 'konsumen' || $row_lock['status_verifikasi'] !== 'disetujui') {
+        throw new Exception("Status verifikasi atau peran akun Anda tidak memenuhi syarat klaim.");
     }
 
     $stmt_kuota_tx = mysqli_prepare($conn, $sql_cek_kuota);
@@ -315,7 +322,7 @@ try {
         throw new Exception("Gagal mempersiapkan kueri rincian transaksi.");
     }
 
-    $sql_potong_stok = "UPDATE makanan m INNER JOIN pengguna p ON m.produsen_id = p.id SET m.stok = m.stok - ? WHERE m.id = ? AND m.stok >= ? AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.status_verifikasi = 'disetujui'";
+    $sql_potong_stok = "UPDATE makanan m INNER JOIN pengguna p ON m.produsen_id = p.id SET m.stok = m.stok - ? WHERE m.id = ? AND m.stok >= ? AND (m.kedaluwarsa_pada IS NULL OR m.kedaluwarsa_pada > NOW()) AND p.peran = 'produsen' AND p.status_verifikasi = 'disetujui'";
     $stmt_potong_stok = mysqli_prepare($conn, $sql_potong_stok);
     if (!$stmt_potong_stok) {
         throw new Exception("Gagal mempersiapkan kueri pembaruan stok.");

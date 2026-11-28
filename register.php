@@ -2,6 +2,32 @@
 require_once 'includes/session.php';
 require_once 'includes/functions.php';
 
+if (is_logged_in()) {
+    if (!defined('DB_NO_DIE')) {
+        define('DB_NO_DIE', true);
+    }
+    $conn = null;
+    require_once 'config/database.php';
+    if ($conn) {
+        $pengguna_cek = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+        if (!$pengguna_cek) {
+            unset(
+                $_SESSION['user_id'],
+                $_SESSION['username'],
+                $_SESSION['full_name'],
+                $_SESSION['role'],
+                $_SESSION['profile_image'],
+                $_SESSION['status_verifikasi'],
+                $_SESSION['cart']
+            );
+            session_regenerate_id(true);
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        } else {
+            sinkronSesiPengguna($pengguna_cek);
+        }
+    }
+}
+
 redirect_if_logged_in();
 
 $pesan_error = '';
@@ -60,7 +86,7 @@ if (isset($_GET['error'])) {
 
 $page_title = 'Registrasi Akun - Pangkalan Pangan';
 $page_wrapper_class = 'auth-page-wrapper';
-$extra_css = array('auth.css?v=7');
+$extra_css = array('auth.css?v=8');
 $extra_js = array('auth.js?v=4', 'ajax_validator.js?v=2');
 
 require_once 'includes/header.php';

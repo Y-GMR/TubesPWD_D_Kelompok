@@ -27,7 +27,7 @@ function crud2AmbilMakananValidUntukKeranjang($conn, $makanan_id) {
     if (!$conn || $makanan_id <= 0) {
         return null;
     }
-    $sql = "SELECT m.id, m.nama_makanan, m.stok, m.kedaluwarsa_pada, p.status_verifikasi AS status_produsen "
+    $sql = "SELECT m.id, m.nama_makanan, m.stok, m.kedaluwarsa_pada, p.peran AS peran_produsen, p.status_verifikasi AS status_produsen "
          . "FROM makanan m "
          . "INNER JOIN pengguna p ON m.produsen_id = p.id "
          . "WHERE m.id = ? LIMIT 1";
@@ -46,6 +46,7 @@ function crud2AmbilMakananValidUntukKeranjang($conn, $makanan_id) {
 // Ambil Data Profil Pengguna & Verifikasi Kelayakan (isVerified?)
 $data_pengguna = null;
 $status_verifikasi = 'menunggu';
+$catatan_verifikasi = '';
 if ($conn) {
     $data_pengguna = ambilPenggunaById($conn, $user_id);
     if (!$data_pengguna) {
@@ -53,8 +54,15 @@ if ($conn) {
         header("Location: login.php?error=login_required");
         exit();
     }
+    sinkronSesiPengguna($data_pengguna);
+    if ($data_pengguna['peran'] !== 'konsumen') {
+        require_role('konsumen');
+    }
     if (isset($data_pengguna['status_verifikasi'])) {
         $status_verifikasi = $data_pengguna['status_verifikasi'];
+    }
+    if (isset($data_pengguna['catatan_verifikasi'])) {
+        $catatan_verifikasi = trim((string) $data_pengguna['catatan_verifikasi']);
     }
 }
 
@@ -87,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi']) && is_string(
         }
         $stok_db = (int) $item_db['stok'];
         $kedaluwarsa_db = isset($item_db['kedaluwarsa_pada']) ? $item_db['kedaluwarsa_pada'] : null;
-        $produsen_ok = (isset($item_db['status_produsen']) && $item_db['status_produsen'] === 'disetujui');
+        $produsen_ok = (isset($item_db['peran_produsen'], $item_db['status_produsen']) && $item_db['peran_produsen'] === 'produsen' && $item_db['status_produsen'] === 'disetujui');
         if (!$produsen_ok || $stok_db <= 0 || ($kedaluwarsa_db !== null && trim((string) $kedaluwarsa_db) !== '' && strtotime($kedaluwarsa_db) <= time())) {
             $_SESSION['flash_error'] = 'Maaf, "' . $item_db['nama_makanan'] . '" sudah habis, melewati batas kedaluwarsa, atau tidak lagi tersedia.';
             header("Location: cart.php?status=unavailable");
@@ -136,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi']) && is_string(
             }
             $stok_db = (int) $item_db['stok'];
             $kedaluwarsa_db = isset($item_db['kedaluwarsa_pada']) ? $item_db['kedaluwarsa_pada'] : null;
-            $produsen_ok = (isset($item_db['status_produsen']) && $item_db['status_produsen'] === 'disetujui');
+            $produsen_ok = (isset($item_db['peran_produsen'], $item_db['status_produsen']) && $item_db['peran_produsen'] === 'produsen' && $item_db['status_produsen'] === 'disetujui');
             if (!$produsen_ok) {
                 unset($_SESSION['cart'][$item_id]);
                 $_SESSION['flash_error'] = 'Menu "' . $item_db['nama_makanan'] . '" tidak lagi tersedia.';
@@ -147,6 +155,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['aksi']) && is_string(
                 $_SESSION['flash_error'] = 'Menu "' . $item_db['nama_makanan'] . '" sudah kedaluwarsa. Silakan hapus dari keranjang.';
                 header("Location: cart.php?status=expired");
                 exit();
+            }
+            $qty_sekarang = isset($_SESSION['cart'][$item_id]['jumlah']) ? (int) $_SESSION['cart'][$item_id]['jumlah'] : 1;
+            if ($jumlah_baru > $stok_db && $stok_db > 0 && $jumlah_baru < $qty_sekarang) {
+                $jumlah_baru = $stok_db;
             }
             if ($jumlah_baru > $stok_db) {
                 $_SESSION['flash_error'] = 'Stok "' . $item_db['nama_makanan'] . '" hanya tersisa ' . $stok_db . ' porsi.';
@@ -254,7 +266,7 @@ if ($conn && !empty($_SESSION['cart'])) {
 
         $sql_detail = "SELECT m.id, m.nama_makanan, m.harga, m.stok, m.foto_makanan, m.alamat_ambil, m.kedaluwarsa_pada,
                               k.nama_kategori, p.id AS produsen_id, p.nama_lengkap AS nama_produsen,
-                              p.status_verifikasi AS status_produsen
+                              p.peran AS peran_produsen, p.status_verifikasi AS status_produsen
                        FROM makanan m
                        INNER JOIN kategori k ON m.kategori_id = k.id
                        INNER JOIN pengguna p ON m.produsen_id = p.id
@@ -271,12 +283,16 @@ if ($conn && !empty($_SESSION['cart'])) {
                 $m_id = (int) $row['id'];
                 $ditemukan_ids[$m_id] = true;
                 $jumlah = isset($_SESSION['cart'][$m_id]['jumlah']) ? (int) $_SESSION['cart'][$m_id]['jumlah'] : 1;
+                if ($jumlah <= 0) {
+                    unset($_SESSION['cart'][$m_id]);
+                    continue;
+                }
                 $harga = (int) $row['harga'];
                 $subtotal = $harga * $jumlah;
                 $stok_db = (int) $row['stok'];
                 $kedaluwarsa_raw = isset($row['kedaluwarsa_pada']) ? $row['kedaluwarsa_pada'] : null;
                 $is_expired = ($kedaluwarsa_raw !== null && trim((string) $kedaluwarsa_raw) !== '' && strtotime($kedaluwarsa_raw) <= time());
-                $is_prod_ok = (isset($row['status_produsen']) && $row['status_produsen'] === 'disetujui');
+                $is_prod_ok = (isset($row['peran_produsen'], $row['status_produsen']) && $row['peran_produsen'] === 'produsen' && $row['status_produsen'] === 'disetujui');
 
                 if ($jumlah > $stok_db) {
                     $stok_bermasalah = true;
@@ -328,7 +344,7 @@ $melebihi_checkout_harian = ($sudah_checkout_hari_ini >= $maks_checkout_harian) 
 $bisa_checkout = (!empty($daftar_item_keranjang) && !$stok_bermasalah && !$ada_item_kedaluwarsa && !$ada_produsen_belum_verif && !$melebihi_porsi_keranjang && !$melebihi_porsi_harian && !$melebihi_checkout_harian && $status_verifikasi === 'disetujui');
 
 $page_title = 'Keranjang Klaim Pangan - Pangkalan Pangan';
-$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+$extra_css = array('checkout.css?v=7', 'components.css?v=10');
 $extra_js = array('crud1_navbar.js?v=1');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -351,9 +367,15 @@ require_once 'includes/navbar.php';
         <?php endif; ?>
 
         <?php if ($status_verifikasi !== 'disetujui'): ?>
-            <div class="posko-alert-box" style="margin-bottom: 24px; background: #fff3cd; border-left: 4px solid #ffc107; color: #856404; padding: 14px 18px;">
-                <strong>Perhatian Akun:</strong> Status verifikasi akun Anda saat ini adalah <em><?php echo escapeHtml(ucfirst($status_verifikasi)); ?></em>.
+            <?php
+            $box_bg = ($status_verifikasi === 'ditolak') ? '#f8d7da' : '#fff3cd';
+            $box_border = ($status_verifikasi === 'ditolak') ? '#e53e3e' : '#ffc107';
+            $box_color = ($status_verifikasi === 'ditolak') ? '#721c24' : '#856404';
+            ?>
+            <div class="posko-alert-box" style="margin-bottom: 24px; background: <?php echo $box_bg; ?>; border-left: 4px solid <?php echo $box_border; ?>; color: <?php echo $box_color; ?>; padding: 14px 18px;">
+                <strong>Perhatian Akun:</strong> Status verifikasi akun Anda saat ini adalah <em><?php echo escapeHtml(ucfirst($status_verifikasi)); ?></em><?php echo ($status_verifikasi === 'ditolak' && $catatan_verifikasi !== '') ? (' (' . escapeHtml($catatan_verifikasi) . ')') : ''; ?>.
                 Klaim paket pangan hanya dapat diselesaikan setelah dokumen kelayakan (SKTM/KKS) disetujui oleh admin.
+                <a href="profile.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Periksa Pengaturan Profil</a>.
             </div>
         <?php endif; ?>
 
@@ -376,6 +398,7 @@ require_once 'includes/navbar.php';
                             </div>
                             <form action="cart.php" method="post" style="margin: 0;">
                                 <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="aksi" value="kosongkan" />
                                     <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 13px; cursor: pointer; text-decoration: underline;" onclick="return confirm('Kosongkan seluruh isi keranjang?');">Kosongkan Keranjang</button>
                                 </div>
@@ -423,6 +446,7 @@ require_once 'includes/navbar.php';
                                     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
                                         <form action="cart.php" method="post" style="margin: 0;">
                                             <div class="checkout-stepper-wrap">
+                                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                 <input type="hidden" name="aksi" value="ubah" />
                                                 <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
 
@@ -434,6 +458,7 @@ require_once 'includes/navbar.php';
 
                                         <form action="cart.php" method="post" style="margin: 0;">
                                             <div>
+                                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                 <input type="hidden" name="aksi" value="hapus" />
                                                 <input type="hidden" name="item_id" value="<?php echo (int) $item['id']; ?>" />
                                                 <button type="submit" style="background: none; border: none; color: #A0AEC0; font-size: 12px; cursor: pointer; text-decoration: underline;" title="Hapus dari keranjang">Hapus</button>
@@ -469,7 +494,7 @@ require_once 'includes/navbar.php';
                             </li>
                             <li class="summary-item">
                                 <span class="summary-item-label">Status SKTM</span>
-                                <span class="summary-item-val <?php echo ($status_verifikasi === 'disetujui') ? 'val-green' : 'val-amber'; ?>">
+                                <span class="summary-item-val <?php echo ($status_verifikasi === 'disetujui') ? 'val-green' : 'val-amber'; ?>"<?php echo ($status_verifikasi === 'ditolak') ? ' style="color: #991b1b;"' : ''; ?>>
                                     <?php echo escapeHtml(ucfirst($status_verifikasi)); ?>
                                 </span>
                             </li>
@@ -525,7 +550,11 @@ require_once 'includes/navbar.php';
 
                         <?php if ($melebihi_checkout_harian): ?>
                             <div class="alert alert-warning" style="font-size: 13px; margin-bottom: 16px; padding: 10px; background-color: #fff3cd; border: 1px solid #ffeeba; color: #856404; border-radius: 4px;">
-                                Anda telah mencapai batas maksimal <?php echo (int) $maks_checkout_harian; ?> kali checkout per hari. Silakan kembali lagi besok.
+                                <?php if ($sudah_checkout_hari_ini >= $maks_checkout_harian): ?>
+                                    Anda telah mencapai batas maksimal <?php echo (int) $maks_checkout_harian; ?> kali checkout per hari. Silakan kembali lagi besok.
+                                <?php else: ?>
+                                    Sisa kuota transaksi Anda hari ini adalah <?php echo (int) $sisa_checkout_harian; ?> kali, sedangkan keranjang ini mencakup <?php echo (int) $jumlah_trx_baru; ?> gerai produsen (1 transaksi per gerai). Kurangi jumlah gerai di keranjang.
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
 

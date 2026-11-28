@@ -20,6 +20,18 @@ if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csr
 }
 
 $user_id          = (int) $_SESSION['user_id'];
+if (!$conn) {
+    header('Location: ' . $target_kembali . '?error=koneksi_gagal');
+    exit();
+}
+
+$pengguna_lama = ambilPenggunaById($conn, $user_id);
+if (!$pengguna_lama) {
+    hapusSesiPengguna();
+    header('Location: ../login.php?error=login_required');
+    exit();
+}
+
 $nama_lengkap     = isset($_POST['nama_lengkap']) ? bersihkanInput($_POST['nama_lengkap']) : '';
 $username         = isset($_POST['username']) ? bersihkanInput($_POST['username']) : '';
 $email            = isset($_POST['email']) ? bersihkanInput($_POST['email']) : '';
@@ -49,18 +61,6 @@ if (strlen($username) < 4 || strlen($username) > 30) {
 
 if (!preg_match('/^[a-zA-Z0-9_]{4,30}$/', $username)) {
     header('Location: ' . $target_kembali . '?error=username_karakter_tidak_valid');
-    exit();
-}
-
-if (!$conn) {
-    header('Location: ' . $target_kembali . '?error=koneksi_gagal');
-    exit();
-}
-
-$pengguna_lama = ambilPenggunaById($conn, $user_id);
-if (!$pengguna_lama) {
-    hapusSesiPengguna();
-    header('Location: ../login.php?error=login_required');
     exit();
 }
 
@@ -203,6 +203,9 @@ if (mysqli_stmt_execute($stmt_update)) {
     $_SESSION['role']      = $pengguna_lama['peran'];
     if ($foto_profil_baru !== null) {
         $_SESSION['profile_image'] = $foto_profil_baru;
+    }
+    if ($dokumen_baru !== null) {
+        $_SESSION['status_verifikasi'] = 'menunggu';
     }
 
     header('Location: ' . $target_kembali . '?pesan=profil_berhasil_diperbarui');

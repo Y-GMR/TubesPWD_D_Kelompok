@@ -19,7 +19,7 @@ $sql = "SELECT m.*, k.nama_kategori, p.nama_lengkap AS nama_produsen, p.foto_pro
      . "FROM makanan m "
      . "INNER JOIN kategori k ON m.kategori_id = k.id "
      . "INNER JOIN pengguna p ON m.produsen_id = p.id "
-     . "WHERE m.id = ? AND p.status_verifikasi = 'disetujui' LIMIT 1";
+     . "WHERE m.id = ? AND p.peran = 'produsen' AND p.status_verifikasi = 'disetujui' LIMIT 1";
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
     header('Location: katalog.php?error=item_tidak_tersedia');
@@ -68,9 +68,12 @@ if ($conn && is_logged_in()) {
             $_SESSION['full_name'],
             $_SESSION['role'],
             $_SESSION['profile_image'],
+            $_SESSION['status_verifikasi'],
             $_SESSION['cart']
         );
         session_regenerate_id(true);
+    } else {
+        sinkronSesiPengguna($pengguna_aktif);
     }
 }
 
@@ -80,20 +83,31 @@ $peran_aktif = ($pengguna_aktif && isset($pengguna_aktif['peran']))
     : (isset($_SESSION['role']) ? $_SESSION['role'] : '');
 $status_verifikasi = '';
 $catatan_verifikasi = '';
+$dokumen_kelayakan = '';
 
 if ($is_login && $peran_aktif === 'konsumen' && $pengguna_aktif) {
     $status_verifikasi = $pengguna_aktif['status_verifikasi'];
-    $catatan_verifikasi = isset($pengguna_aktif['catatan_verifikasi']) ? (string) $pengguna_aktif['catatan_verifikasi'] : '';
+    $catatan_verifikasi = isset($pengguna_aktif['catatan_verifikasi']) ? trim((string) $pengguna_aktif['catatan_verifikasi']) : '';
+    $dokumen_kelayakan = isset($pengguna_aktif['dokumen_kelayakan']) ? trim((string) $pengguna_aktif['dokumen_kelayakan']) : '';
 }
 
 $qty_di_keranjang = 0;
-if (isset($_SESSION['cart'][$item_id]['jumlah'])) {
-    $qty_di_keranjang = (int) $_SESSION['cart'][$item_id]['jumlah'];
+$total_porsi_keranjang = 0;
+if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
+    foreach ($_SESSION['cart'] as $cid => $citem) {
+        $q = isset($citem['jumlah']) ? max(0, (int) $citem['jumlah']) : 0;
+        $total_porsi_keranjang += $q;
+        if ((int) $cid === $item_id) {
+            $qty_di_keranjang = $q;
+        }
+    }
 }
-$sisa_boleh_klaim = max(0, $stok_int - $qty_di_keranjang);
+$sisa_slot_keranjang = max(0, 5 - $total_porsi_keranjang);
+$sisa_stok_item = max(0, $stok_int - $qty_di_keranjang);
+$sisa_boleh_klaim = min($sisa_stok_item, $sisa_slot_keranjang);
 
 $page_title = $item['nama_makanan'] . ' - Rincian Makanan';
-$extra_css = array('components.css?v=9', 'catalog.css?v=7');
+$extra_css = array('components.css?v=10', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_item_detail.js?v=1');
 
 require_once 'includes/header.php';
@@ -155,19 +169,29 @@ require_once 'includes/navbar.php';
                     <?php endif; ?>
 
                     <?php if (!$is_login): ?>
-                        <a href="login.php?error=login_required" class="food-modal-claim-btn">Masuk Akun untuk Mengklaim</a>
+                        <a href="login.php" class="food-modal-claim-btn">Masuk Akun untuk Mengklaim</a>
                     <?php elseif ($peran_aktif !== 'konsumen'): ?>
                         <div class="alert alert-warning">
                             Fitur klaim makanan hanya dapat digunakan oleh akun Konsumen yang terverifikasi.
+                            <?php if ($peran_aktif === 'produsen'): ?>
+                                <a href="producer_dashboard.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Kembali ke Dashboard Produsen</a>.
+                            <?php elseif ($peran_aktif === 'admin'): ?>
+                                <a href="views/admin/dashboard.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Kembali ke Panel Admin</a>.
+                            <?php endif; ?>
                         </div>
                     <?php elseif ($status_verifikasi === 'menunggu'): ?>
                         <div class="alert alert-warning">
-                            Akun Anda berstatus Menunggu Verifikasi oleh Admin. Silakan tunggu persetujuan dokumen kelayakan sebelum melakukan klaim pangan.
+                            Akun Anda berstatus Menunggu Verifikasi oleh Admin<?php echo $dokumen_kelayakan === '' ? ' (dokumen SKTM/KKS belum diunggah)' : ' (dokumen sudah diunggah)'; ?>. Silakan tunggu persetujuan atau periksa di <a href="profile.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Pengaturan Profil</a>.
                         </div>
                     <?php elseif ($status_verifikasi !== 'disetujui'): ?>
                         <div class="alert alert-error">
-                            Status verifikasi akun Anda saat ini ditolak.<?php echo $catatan_verifikasi !== '' ? (' Catatan: ' . escapeHtml($catatan_verifikasi)) : ''; ?>
+                            Status verifikasi akun Anda saat ini ditolak.<?php echo $catatan_verifikasi !== '' ? (' Catatan: ' . escapeHtml($catatan_verifikasi) . '.') : ''; ?> Silakan unggah ulang dokumen yang valid di <a href="profile.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Pengaturan Profil</a>.
                         </div>
+                    <?php elseif ($sisa_slot_keranjang <= 0): ?>
+                        <div class="alert alert-warning">
+                            Keranjang Anda sudah mencapai batas maksimal 5 porsi per transaksi. Silakan checkout atau sesuaikan isi keranjang Anda.
+                        </div>
+                        <a href="cart.php" class="food-modal-claim-btn">Lihat Keranjang Klaim</a>
                     <?php elseif ($sisa_boleh_klaim <= 0): ?>
                         <div class="alert alert-warning">
                             Seluruh sisa stok makanan ini (<?php echo escapeHtml((string) $qty_di_keranjang); ?> porsi) sudah ada di keranjang Anda.
@@ -181,6 +205,7 @@ require_once 'includes/navbar.php';
                         <?php endif; ?>
                         <form action="cart.php" method="post" id="formClaimFood">
                             <div class="form-group">
+                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                 <input type="hidden" name="aksi" value="tambah" />
                                 <input type="hidden" name="item_id" value="<?php echo escapeHtml((string) $item_id); ?>" />
                                 <input type="hidden" id="maxClaimQty" value="<?php echo escapeHtml((string) $sisa_boleh_klaim); ?>" />

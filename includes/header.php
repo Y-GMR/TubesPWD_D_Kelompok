@@ -15,7 +15,7 @@ header('Content-Type: text/html; charset=utf-8');
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8'); ?></title>
-    <link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>assets/css/style.css?v=6" />
+    <link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>assets/css/style.css?v=8" />
 <?php if (isset($extra_css) && is_array($extra_css)): ?>
 <?php foreach ($extra_css as $css_file): ?>
     <link rel="stylesheet" type="text/css" href="<?php echo htmlspecialchars($base_url, ENT_QUOTES, 'UTF-8'); ?>assets/css/<?php echo htmlspecialchars($css_file, ENT_QUOTES, 'UTF-8'); ?>" />

@@ -169,6 +169,10 @@
     color: #d97706;
 }
 
+.val-danger {
+    color: #991b1b;
+}
+
 .profile-sktm-verified-box {
     background-color: #f0fdf4;
     border: 1px solid #bbf7d0;

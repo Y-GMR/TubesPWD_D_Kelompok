@@ -472,6 +472,8 @@ body {
     .subpage-nav-menu,
     .auth-nav-menu {
         gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
     }
     .footer-top-columns {
         flex-direction: column;

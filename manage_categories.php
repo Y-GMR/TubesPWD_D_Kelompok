@@ -6,10 +6,17 @@ require_once 'includes/crud1_helpers.php';
 
 require_role('admin');
 
-if ($conn && !ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
-    hapusSesiPengguna();
-    header('Location: login.php?error=login_required');
-    exit();
+if ($conn) {
+    $admin_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+    if (!$admin_aktif) {
+        hapusSesiPengguna();
+        header('Location: login.php?error=login_required');
+        exit();
+    }
+    sinkronSesiPengguna($admin_aktif);
+    if ($admin_aktif['peran'] !== 'admin') {
+        require_role('admin');
+    }
 }
 
 $daftar_kategori = crud1AmbilDaftarKategoriDenganJumlah($conn);
@@ -48,7 +55,7 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan($map_pesan, $map_error);
 
 $page_title = 'Kelola Kategori Makanan - Pangkalan Pangan';
-$extra_css = array('components.css?v=9', 'manage_categories.css?v=1');
+$extra_css = array('components.css?v=10', 'manage_categories.css?v=1');
 $extra_js = array('crud1_navbar.js?v=1', 'crud1_categories.js?v=2');
 
 require_once 'includes/header.php';
@@ -87,6 +94,7 @@ require_once 'includes/navbar.php';
                         <div class="category-form-body">
                             <form id="categoryForm" action="actions/crud1_category.php" method="post">
                                 <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" id="catActionInput" name="action" value="<?php echo escapeHtml($form_action_mode); ?>" />
                                     <input type="hidden" id="catIdInput" name="id" value="<?php echo escapeHtml($form_id_val); ?>" />
                                 </div>
@@ -154,6 +162,7 @@ require_once 'includes/navbar.php';
                                                         <?php else: ?>
                                                             <form action="actions/crud1_category.php" method="post" class="form-cat-delete">
                                                                 <div>
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                                     <input type="hidden" name="action" value="delete" />
                                                                     <input type="hidden" name="id" value="<?php echo escapeHtml((string) $kat_id); ?>" />
                                                                     <button type="submit" class="btn-cat-delete-active">Hapus</button>

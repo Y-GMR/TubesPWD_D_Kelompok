@@ -13,10 +13,20 @@ if ($conn && !$produsen) {
     header('Location: login.php?error=login_required');
     exit();
 }
+if ($produsen) {
+    sinkronSesiPengguna($produsen);
+    if ($produsen['peran'] !== 'produsen') {
+        require_role('produsen');
+    }
+}
 
 // Blokir produsen yang belum diverifikasi admin
 if (!$produsen || $produsen['status_verifikasi'] !== 'disetujui') {
-    $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola makanan.';
+    if ($produsen && $produsen['status_verifikasi'] === 'ditolak') {
+        $_SESSION['flash_error'] = 'Akun produsen Anda ditolak oleh admin sehingga belum dapat menambahkan atau mengubah makanan.';
+    } else {
+        $_SESSION['flash_error'] = 'Akun Anda sedang menunggu verifikasi admin. Anda belum dapat mengelola makanan.';
+    }
     header('Location: producer_dashboard.php?error=belum_diverifikasi');
     exit();
 }
@@ -86,7 +96,7 @@ $map_error = array(
 $flash = crud1AmbilFlashPesan(array(), $map_error);
 
 $page_title = ($is_edit ? 'Ubah Data Makanan' : 'Donasi Makanan Baru') . ' - Pangkalan Pangan';
-$extra_css = array('components.css?v=9', 'catalog.css?v=7');
+$extra_css = array('components.css?v=10', 'catalog.css?v=7');
 $extra_js = array('geolocation.js', 'image_preview.js', 'crud1_navbar.js?v=1', 'crud1_add_food.js?v=2');
 
 require_once 'includes/header.php';
@@ -112,6 +122,7 @@ require_once 'includes/navbar.php';
 
             <form action="actions/crud1_item.php" method="post" enctype="multipart/form-data" id="formAddFood" class="add-food-grid">
                 <div>
+                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                     <input type="hidden" name="action" value="<?php echo escapeHtml($val_action); ?>" />
                     <?php if ($is_edit): ?>
                         <input type="hidden" name="id" value="<?php echo escapeHtml($val_id); ?>" />
@@ -257,7 +268,7 @@ require_once 'includes/navbar.php';
                         <hr class="summary-divider" />
 
                         <label class="summary-checkbox-wrap">
-                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis" checked="checked" />
+                            <input type="checkbox" id="chkConfirmHygienic" name="konfirmasi_higienis"<?php echo $is_edit ? ' checked="checked"' : ''; ?> />
                             <span>Saya menjamin makanan dalam kondisi higienis dan layak konsumsi.</span>
                         </label>
 

@@ -13,6 +13,12 @@ if ($conn && !$produsen) {
     header('Location: login.php?error=login_required');
     exit();
 }
+if ($produsen) {
+    sinkronSesiPengguna($produsen);
+    if ($produsen['peran'] !== 'produsen') {
+        require_role('produsen');
+    }
+}
 $status_verif_produsen = ($produsen && isset($produsen['status_verifikasi'])) ? $produsen['status_verifikasi'] : 'menunggu';
 $catatan_verif_produsen = ($produsen && isset($produsen['catatan_verifikasi'])) ? trim((string) $produsen['catatan_verifikasi']) : '';
 $produsen_terverifikasi = ($status_verif_produsen === 'disetujui');
@@ -125,12 +131,14 @@ if ($flash_error === '' && isset($_GET['error'])) {
     if ($_GET['error'] === 'unauthorized') {
         $flash_error = 'Anda tidak memiliki hak akses untuk membuka halaman tersebut.';
     } elseif ($_GET['error'] === 'belum_diverifikasi') {
-        $flash_error = 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
+        $flash_error = ($status_verif_produsen === 'ditolak')
+            ? 'Akun produsen Anda ditolak oleh admin sehingga belum dapat mengelola makanan.'
+            : 'Akun Anda belum diverifikasi oleh admin. Anda belum dapat mengelola makanan.';
     }
 }
 
 $page_title = 'Dashboard Produsen - Pangkalan Pangan';
-$extra_css = array('components.css?v=9', 'catalog.css?v=7');
+$extra_css = array('components.css?v=10', 'catalog.css?v=7');
 $extra_js = array('crud1_navbar.js?v=1');
 
 require_once 'includes/header.php';
@@ -157,7 +165,7 @@ require_once 'includes/navbar.php';
             <?php if (!$produsen_terverifikasi): ?>
                 <?php if ($status_verif_produsen === 'ditolak'): ?>
                     <div class="alert alert-error">
-                        Akun produsen Anda saat ini berstatus <strong>Ditolak</strong><?php echo $catatan_verif_produsen !== '' ? (' (' . escapeHtml($catatan_verif_produsen) . ')') : ''; ?>. Anda belum dapat menambahkan atau mengelola donasi makanan.
+                        Akun produsen Anda saat ini berstatus <strong>Ditolak</strong><?php echo $catatan_verif_produsen !== '' ? (' (' . escapeHtml($catatan_verif_produsen) . ')') : ''; ?>. Anda belum dapat menambahkan atau mengelola donasi makanan. <a href="customer_service.php" style="color: inherit; font-weight: 700; text-decoration: underline;">Hubungi Pusat Bantuan</a>.
                     </div>
                 <?php else: ?>
                     <div class="alert alert-warning">
@@ -261,6 +269,7 @@ require_once 'includes/navbar.php';
                                         <?php if ($trx['status'] === 'menunggu'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="margin: 0;">
                                                 <div>
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo escapeHtml((string) ((int) $trx['id'])); ?>" />
                                                     <input type="hidden" name="status" value="siap_diambil" />
                                                     <input type="hidden" name="redirect_to" value="producer_dashboard" />
@@ -270,6 +279,7 @@ require_once 'includes/navbar.php';
                                         <?php elseif ($trx['status'] === 'siap_diambil'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="margin: 0;">
                                                 <div>
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo escapeHtml((string) ((int) $trx['id'])); ?>" />
                                                     <input type="hidden" name="status" value="selesai" />
                                                     <input type="hidden" name="redirect_to" value="producer_dashboard" />
@@ -289,7 +299,9 @@ require_once 'includes/navbar.php';
 
             <div class="section-header">
                 <h2>Inventaris Makanan Aktif</h2>
-                <a href="inventory.php" class="section-link">Kelola Semua Inventaris &#8594;</a>
+                <?php if ($produsen_terverifikasi): ?>
+                    <a href="inventory.php" class="section-link">Kelola Semua Inventaris &#8594;</a>
+                <?php endif; ?>
             </div>
 
             <div class="inventory-scroll-container">

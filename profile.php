@@ -13,6 +13,7 @@ if (!$pengguna) {
     header('Location: login.php?error=login_required');
     exit();
 }
+sinkronSesiPengguna($pengguna);
 
 $peran_pengguna = isset($pengguna['peran']) ? $pengguna['peran'] : 'konsumen';
 $status_verif = isset($pengguna['status_verifikasi']) ? $pengguna['status_verifikasi'] : 'menunggu';
@@ -135,7 +136,7 @@ if ($peran_pengguna === 'admin') {
 
 $page_title = 'Pengaturan Profil - Pangkalan Pangan';
 $page_wrapper_class = 'profile-page-wrapper';
-$extra_css = array('profile.css?v=8');
+$extra_css = array('profile.css?v=9');
 $extra_js = array('image_preview.js', 'profile.js?v=3', 'ajax_validator.js?v=2');
 
 require_once 'includes/header.php';
@@ -149,7 +150,8 @@ require_once 'includes/header.php';
             <ul class="auth-nav-menu">
                 <li><a href="katalog.php#about">Tentang kami</a></li>
                 <li><a href="katalog.php">Katalog Pangan</a></li>
-                <li><a href="customer_service.php">Bantuan</a></li>
+                <li><a href="<?php echo ($peran_pengguna === 'admin') ? 'views/admin/manage_users.php#antrean-cs' : 'customer_service.php'; ?>"><?php echo ($peran_pengguna === 'admin') ? 'Verifikasi &amp; CS' : 'Bantuan'; ?></a></li>
+                <li><a href="actions/auth_logout.php">Keluar</a></li>
             </ul>
             <a href="<?php echo escapeHtml($beranda_kembali); ?>" class="btn-nav-back">Kembali ke Beranda</a>
         </div>
@@ -193,7 +195,7 @@ require_once 'includes/header.php';
                                 </li>
                                 <li class="profile-status-item">
                                     <span class="status-item-label">Status Verifikasi</span>
-                                    <span class="status-item-val <?php echo escapeHtml($status_class); ?>" id="profileSktmStatusVal"<?php echo $status_verif === 'ditolak' ? ' style="color: #991b1b;"' : ''; ?>><?php echo escapeHtml(ucfirst($status_verif)); ?></span>
+                                    <span class="status-item-val <?php echo escapeHtml($status_class); ?>" id="profileSktmStatusVal"><?php echo escapeHtml(ucfirst($status_verif)); ?></span>
                                 </li>
 <?php if ($peran_pengguna === 'konsumen'): ?>
                                 <li class="profile-status-item">
@@ -237,6 +239,9 @@ require_once 'includes/header.php';
                             <hr class="profile-divider" />
 
                             <form action="actions/auth_profile_update.php" method="post" enctype="multipart/form-data" class="profile-edit-form" id="profileEditForm">
+                                <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
+                                </div>
                                 <div class="form-group-full">
                                     <label for="inputNamaLengkap" class="profile-form-label">Nama Lengkap</label>
                                     <input type="text" id="inputNamaLengkap" name="nama_lengkap" class="profile-form-input" value="<?php echo escapeHtml($pengguna['nama_lengkap']); ?>" />
@@ -265,7 +270,7 @@ require_once 'includes/header.php';
                                         <input type="file" id="inputDokumenKelayakan" name="dokumen_kelayakan" accept="application/pdf,image/jpeg,image/png" class="profile-doc-file-input" />
                                         <span class="profile-doc-file-name" id="profileDocFileName">
 <?php if ($dokumen_rel !== ''): ?>
-                                            Berkas tersimpan: <a href="<?php echo escapeHtml($dokumen_rel); ?>"><?php echo escapeHtml(basename($dokumen_rel)); ?></a>
+                                            Berkas tersimpan: <a href="actions/view_document.php?id=<?php echo escapeHtml((string) ((int) $pengguna['id'])); ?>"><?php echo escapeHtml(basename($dokumen_rel)); ?></a>
 <?php elseif ($dokumen_raw !== ''): ?>
                                             Berkas tercatat: <?php echo escapeHtml($dokumen_raw); ?>
 <?php else: ?>

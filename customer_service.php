@@ -1,12 +1,13 @@
 <?php
 require_once 'includes/session.php';
-require_login();
+require_role(array('konsumen', 'produsen'));
 require_once 'config/database.php';
 require_once 'includes/functions.php';
 
 $pengguna_id = (int) $_SESSION['user_id'];
 $email_user = '';
 $nama_user = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : '';
+$peran_cs = isset($_SESSION['role']) ? $_SESSION['role'] : 'konsumen';
 
 if ($conn) {
     $pengguna_cs = ambilPenggunaById($conn, $pengguna_id);
@@ -15,16 +16,27 @@ if ($conn) {
         header('Location: login.php?error=login_required');
         exit();
     }
+    sinkronSesiPengguna($pengguna_cs);
+    if (!in_array($pengguna_cs['peran'], array('konsumen', 'produsen'), true)) {
+        require_role(array('konsumen', 'produsen'));
+    }
     $email_user = $pengguna_cs['email'];
     $nama_user = $pengguna_cs['nama_lengkap'];
+    $peran_cs = $pengguna_cs['peran'];
 }
 
 $pesan_error = '';
+if (isset($_SESSION['flash_error'])) {
+    $pesan_error = trim((string) $_SESSION['flash_error']);
+    unset($_SESSION['flash_error']);
+}
 if (isset($_GET['error'])) {
     if ($_GET['error'] === 'empty_fields') {
         $pesan_error = 'Topik, subjek, dan rincian pesan wajib diisi.';
     } elseif ($_GET['error'] === 'trx_code_too_long') {
         $pesan_error = 'Kode transaksi maksimal 32 karakter.';
+    } elseif ($_GET['error'] === 'trx_code_invalid') {
+        $pesan_error = 'Kode transaksi tidak ditemukan pada akun Anda.';
     } elseif ($_GET['error'] === 'csrf_invalid') {
         $pesan_error = 'Sesi formulir tidak valid. Silakan muat ulang halaman dan coba lagi.';
     } elseif ($_GET['error'] === 'db_error') {
@@ -42,8 +54,8 @@ if (isset($_GET['error'])) {
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pusat Bantuan - Formulir Tiket Pengaduan - Pangkalan Pangan</title>
-    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=7" />
-    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=7" />
+    <link rel="stylesheet" type="text/css" href="assets/css/style.css?v=8" />
+    <link rel="stylesheet" type="text/css" href="assets/css/components.css?v=10" />
     <link rel="stylesheet" type="text/css" href="assets/css/customer_service.css?v=1" />
 </head>
 <body>
@@ -65,6 +77,9 @@ if (isset($_GET['error'])) {
                 <?php endif; ?>
 
                 <form action="actions/cs_ticket_create.php" method="post" id="csTicketForm">
+                    <div>
+                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars((string) $_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>" />
+                    </div>
                     <h2 class="cs-section-title">Informasi Kontak Pengadu</h2>
                     <div class="cs-form-row">
                         <div class="cs-form-col">
@@ -92,9 +107,15 @@ if (isset($_GET['error'])) {
                             <label for="topicSelect" class="cs-label">Pilih Topik Bantuan *</label>
                             <select id="topicSelect" name="topic" class="cs-select">
                                 <option value="">-- Pilih Topik Bantuan --</option>
+<?php if ($peran_cs === 'produsen'): ?>
+                                <option value="Verifikasi Akun Mitra Produsen">Verifikasi Akun Mitra Produsen</option>
+                                <option value="Kendala Klaim &amp; Pengambilan Konsumen">Kendala Klaim &amp; Pengambilan Konsumen</option>
+                                <option value="Manajemen Inventaris &amp; Stok Pangan">Manajemen Inventaris &amp; Stok Pangan</option>
+<?php else: ?>
                                 <option value="Kendala Pengambilan di Posko">Kendala Pengambilan di Posko</option>
                                 <option value="Mutu &amp; Kualitas Pangan">Mutu &amp; Kualitas Pangan</option>
                                 <option value="Verifikasi Dokumen SKTM / KKS">Verifikasi Dokumen SKTM / KKS</option>
+<?php endif; ?>
                                 <option value="Akun &amp; Keamanan">Akun &amp; Keamanan</option>
                                 <option value="Lainnya">Lainnya</option>
                             </select>
@@ -127,34 +148,7 @@ if (isset($_GET['error'])) {
             </div>
         </div>
 
-        <div class="site-footer" id="about">
-            <div class="footer-inner">
-                <div class="footer-top-columns">
-                    <div class="footer-col-left" id="help">
-                        <div class="footer-heading">Tetap Terhubung</div>
-                        <div class="footer-contact-p">Nomor Kontak: +6281229266070</div>
-                        <div class="footer-contact-p">Instagram: @PP</div>
-                        <div class="footer-contact-p">Surel: PangkalanPangan@gmail.com</div>
-                    </div>
-                    <div class="footer-col-center">
-                        <img src="assets/images/footer_logo_sprout.svg" alt="Logo Pangkalan Pangan Footer" class="footer-center-logo" />
-                    </div>
-                    <div class="footer-col-right">
-                        <div class="footer-heading">Ambil peran</div>
-                        <ul class="footer-link-list">
-                            <li><a href="register.php?role=donor">Donatur pangan</a></li>
-                            <li><a href="register.php?role=donor">Mitra penyaluran</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <hr class="footer-divider-line" />
-                <div class="footer-bottom-copy">
-                    <img src="assets/images/footer_copyright.svg" alt="Pangkalan Pangan. Bersama merawat kebaikan." class="footer-copy-img" />
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script type="text/javascript" src="assets/js/customer_service.js?v=1"></script>
-</body>
-</html>
+<?php
+$extra_js = array('customer_service.js?v=1');
+require_once 'includes/footer.php';
+?>

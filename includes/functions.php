@@ -41,12 +41,28 @@ function ambilPenggunaById($conn, $pengguna_id) {
 
 function simpanSesiPengguna($data_pengguna) {
     session_regenerate_id(true);
+    unset($_SESSION['cart']);
     $_SESSION['user_id'] = (int) $data_pengguna['id'];
     $_SESSION['username'] = $data_pengguna['username'];
     $_SESSION['full_name'] = $data_pengguna['nama_lengkap'];
     $_SESSION['role'] = $data_pengguna['peran'];
     $_SESSION['profile_image'] = $data_pengguna['foto_profil'];
+    $_SESSION['status_verifikasi'] = isset($data_pengguna['status_verifikasi']) ? $data_pengguna['status_verifikasi'] : 'menunggu';
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+function sinkronSesiPengguna($data_pengguna) {
+    if (!is_array($data_pengguna) || !isset($data_pengguna['id'])) {
+        return;
+    }
+    $_SESSION['user_id'] = (int) $data_pengguna['id'];
+    $_SESSION['username'] = isset($data_pengguna['username']) ? $data_pengguna['username'] : '';
+    $_SESSION['full_name'] = isset($data_pengguna['nama_lengkap']) ? $data_pengguna['nama_lengkap'] : '';
+    $_SESSION['role'] = isset($data_pengguna['peran']) ? $data_pengguna['peran'] : 'konsumen';
+    $_SESSION['profile_image'] = isset($data_pengguna['foto_profil']) ? $data_pengguna['foto_profil'] : 'default_avatar.png';
+    if (isset($data_pengguna['status_verifikasi'])) {
+        $_SESSION['status_verifikasi'] = $data_pengguna['status_verifikasi'];
+    }
 }
 
 function hapusSesiPengguna() {

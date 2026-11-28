@@ -23,10 +23,15 @@ if (!$conn) {
     exit();
 }
 
-if (!ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
+$admin_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+if (!$admin_aktif) {
     hapusSesiPengguna();
     header('Location: ../login.php?error=login_required');
     exit();
+}
+sinkronSesiPengguna($admin_aktif);
+if ($admin_aktif['peran'] !== 'admin') {
+    require_role('admin');
 }
 
 $action = isset($_POST['action']) ? bersihkanInput($_POST['action']) : '';

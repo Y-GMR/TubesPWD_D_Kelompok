@@ -23,12 +23,21 @@ if (file_exists('../../includes/functions.php')) {
     require_once '../../includes/functions.php';
 }
 
-if ($conn && function_exists('ambilPenggunaById') && !ambilPenggunaById($conn, (int) $_SESSION['user_id'])) {
-    if (function_exists('hapusSesiPengguna')) {
-        hapusSesiPengguna();
+if ($conn && function_exists('ambilPenggunaById')) {
+    $admin_aktif = ambilPenggunaById($conn, (int) $_SESSION['user_id']);
+    if (!$admin_aktif) {
+        if (function_exists('hapusSesiPengguna')) {
+            hapusSesiPengguna();
+        }
+        header('Location: ../../login.php?error=login_required');
+        exit();
     }
-    header('Location: ../../login.php?error=login_required');
-    exit();
+    if (function_exists('sinkronSesiPengguna')) {
+        sinkronSesiPengguna($admin_aktif);
+    }
+    if ($admin_aktif['peran'] !== 'admin') {
+        require_role('admin');
+    }
 }
 
 $total_admin = 0;
@@ -82,7 +91,7 @@ if ($conn) {
     }
 
     $batas_stok = 5;
-    $stmt = mysqli_prepare($conn, "SELECT id, nama_makanan, stok FROM makanan WHERE stok <= ? ORDER BY stok ASC LIMIT 5");
+    $stmt = mysqli_prepare($conn, "SELECT id, nama_makanan, stok FROM makanan WHERE stok > 0 AND stok <= ? AND (kedaluwarsa_pada IS NULL OR kedaluwarsa_pada > NOW()) ORDER BY stok ASC LIMIT 5");
     if ($stmt) {
         mysqli_stmt_bind_param($stmt, "i", $batas_stok);
         mysqli_stmt_execute($stmt);

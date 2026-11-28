@@ -1,6 +1,6 @@
 <?php
 require_once '../includes/session.php';
-require_login();
+require_role(array('konsumen', 'produsen'));
 require_once '../config/database.php';
 require_once '../includes/functions.php';
 
@@ -21,10 +21,15 @@ if (!$conn) {
 }
 
 $pengguna_id = (int) $_SESSION['user_id'];
-if (!ambilPenggunaById($conn, $pengguna_id)) {
+$pengguna_cs = ambilPenggunaById($conn, $pengguna_id);
+if (!$pengguna_cs) {
     hapusSesiPengguna();
     header('Location: ../login.php?error=login_required');
     exit();
+}
+sinkronSesiPengguna($pengguna_cs);
+if (!in_array($pengguna_cs['peran'], array('konsumen', 'produsen'), true)) {
+    require_role(array('konsumen', 'produsen'));
 }
 $kode_transaksi = (isset($_POST['trx_code']) && is_string($_POST['trx_code'])) ? trim($_POST['trx_code']) : '';
 $topik = (isset($_POST['topic']) && is_string($_POST['topic'])) ? trim($_POST['topic']) : '';
@@ -40,6 +45,23 @@ $panjang_kode = function_exists('mb_strlen') ? mb_strlen($kode_transaksi, 'UTF-8
 if ($kode_transaksi !== '' && $panjang_kode > 32) {
     header('Location: ../customer_service.php?error=trx_code_too_long');
     exit();
+}
+
+if ($kode_transaksi !== '') {
+    $stmt_kode = mysqli_prepare($conn, "SELECT id FROM transaksi WHERE kode_transaksi = ? AND (konsumen_id = ? OR produsen_id = ?) LIMIT 1");
+    if (!$stmt_kode) {
+        header('Location: ../customer_service.php?error=db_error');
+        exit();
+    }
+    mysqli_stmt_bind_param($stmt_kode, "sii", $kode_transaksi, $pengguna_id, $pengguna_id);
+    mysqli_stmt_execute($stmt_kode);
+    $res_kode = mysqli_stmt_get_result($stmt_kode);
+    $ada_kode = mysqli_fetch_assoc($res_kode);
+    mysqli_stmt_close($stmt_kode);
+    if (!$ada_kode) {
+        header('Location: ../customer_service.php?error=trx_code_invalid');
+        exit();
+    }
 }
 
 $pesan_lengkap = '[' . $topik . '] ' . $subjek . ' - ' . $pesan_inti;

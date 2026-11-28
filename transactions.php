@@ -31,6 +31,12 @@ if ($conn && !$data_pengguna) {
     header("Location: login.php?error=login_required");
     exit();
 }
+if ($data_pengguna) {
+    sinkronSesiPengguna($data_pengguna);
+    if (isset($data_pengguna['peran'])) {
+        $user_role = $data_pengguna['peran'];
+    }
+}
 $nama_user_tampil = ($data_pengguna && isset($data_pengguna['nama_lengkap']))
     ? $data_pengguna['nama_lengkap']
     : (isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Pengguna');
@@ -162,13 +168,21 @@ if ($conn) {
 $tiket_aktif = null;
 $kode_fokus = (isset($_GET['code']) && is_string($_GET['code'])) ? trim($_GET['code']) : '';
 
-foreach ($daftar_transaksi as $t) {
-    if ($kode_fokus !== '' && $t['kode_transaksi'] === $kode_fokus) {
-        $tiket_aktif = $t;
-        break;
+if ($kode_fokus !== '') {
+    foreach ($daftar_transaksi as $t) {
+        if ($t['kode_transaksi'] === $kode_fokus) {
+            $tiket_aktif = $t;
+            break;
+        }
     }
-    if ($tiket_aktif === null && ($t['status'] === 'menunggu' || $t['status'] === 'siap_diambil')) {
-        $tiket_aktif = $t;
+}
+
+if ($tiket_aktif === null) {
+    foreach ($daftar_transaksi as $t) {
+        if ($t['status'] === 'menunggu' || $t['status'] === 'siap_diambil') {
+            $tiket_aktif = $t;
+            break;
+        }
     }
 }
 
@@ -177,8 +191,46 @@ if ($tiket_aktif === null && !empty($daftar_transaksi)) {
     $tiket_aktif = $daftar_transaksi[0];
 }
 
-$page_title = 'Riwayat Klaim & Tiket Transaksi - Pangkalan Pangan';
-$extra_css = array('checkout.css?v=6', 'components.css?v=6');
+if ($user_role === 'admin') {
+    $judul_halaman_trx = 'Manajemen Semua Transaksi Klaim';
+    $judul_tiket_kiri = 'Rincian Tiket Klaim';
+    $judul_riwayat_kanan = 'Daftar Semua Transaksi';
+    $back_home_url = 'views/admin/dashboard.php';
+    $back_home_label = 'Kembali ke Dashboard Admin';
+    $empty_title = 'Belum ada transaksi klaim tercatat';
+    $empty_desc = 'Transaksi klaim pangan dari seluruh konsumen dan mitra produsen akan otomatis tercatat di sini.';
+    $help_url = 'views/admin/manage_users.php#antrean-cs';
+    $help_prefix = 'Kelola aduan pengguna di ';
+    $help_link_text = 'Verifikasi & CS';
+    $catatan_tiket_role = 'Pantau kode transaksi, pihak terkait, serta status pengambilan atau pembatalan pesanan.';
+} elseif ($user_role === 'produsen') {
+    $judul_halaman_trx = 'Kelola Klaim Masuk Gerai';
+    $judul_tiket_kiri = 'Rincian Tiket Klaim';
+    $judul_riwayat_kanan = 'Semua Klaim Masuk Gerai';
+    $back_home_url = 'producer_dashboard.php';
+    $back_home_label = 'Kembali ke Dashboard Produsen';
+    $empty_title = 'Belum ada klaim masuk untuk gerai Anda';
+    $empty_desc = 'Daftar pesanan klaim paket pangan yang masuk dari konsumen untuk gerai Anda akan otomatis tercatat di sini.';
+    $help_url = 'customer_service.php';
+    $help_prefix = 'Mengalami kendala klaim? ';
+    $help_link_text = 'Bantuan';
+    $catatan_tiket_role = 'Cocokkan kode transaksi ini dengan tiket yang ditunjukkan penerima manfaat saat pengambilan pangan di gerai Anda.';
+} else {
+    $judul_halaman_trx = 'Riwayat Klaim & Tiket Transaksi';
+    $judul_tiket_kiri = 'Tiket Pengambilan Pangan';
+    $judul_riwayat_kanan = 'Semua Riwayat Klaim';
+    $back_home_url = 'katalog.php';
+    $back_home_label = 'Kembali ke Katalog';
+    $empty_title = 'Belum ada riwayat klaim';
+    $empty_desc = 'Daftar makanan yang berhasil Anda klaim dan ambil di gerai produsen akan otomatis tercatat di sini.';
+    $help_url = 'customer_service.php';
+    $help_prefix = 'Mengalami kendala klaim? ';
+    $help_link_text = 'Bantuan';
+    $catatan_tiket_role = 'Tunjukkan kode transaksi kepada staf gerai produsen saat pengambilan makanan sebelum batas waktu operasional berakhir.';
+}
+
+$page_title = $judul_halaman_trx . ' - Pangkalan Pangan';
+$extra_css = array('checkout.css?v=7', 'components.css?v=10');
 $extra_js = array('crud1_navbar.js?v=1');
 require_once 'includes/header.php';
 require_once 'includes/navbar.php';
@@ -186,7 +238,12 @@ require_once 'includes/navbar.php';
 
 <div class="checkout-main-section">
     <div class="checkout-container">
-        <h1 class="checkout-page-title">Riwayat Klaim &amp; Tiket Transaksi</h1>
+<?php if ($user_role === 'admin' || $user_role === 'produsen'): ?>
+        <div class="back-link-wrap" style="margin-bottom: 14px;">
+            <a href="<?php echo escapeHtml($back_home_url); ?>" class="back-link-btn">&#8592; <?php echo escapeHtml($back_home_label); ?></a>
+        </div>
+<?php endif; ?>
+        <h1 class="checkout-page-title"><?php echo escapeHtml($judul_halaman_trx); ?></h1>
 
         <?php if (isset($_SESSION['flash_success'])): ?>
             <div class="alert alert-success" style="margin-bottom: 20px; padding: 12px 16px; background-color: #d4edda; border: 1px solid #c3e6cb; color: #155724; border-radius: 6px;">
@@ -203,7 +260,7 @@ require_once 'includes/navbar.php';
         <div class="claim-history-grid">
             <!-- Kolom Kiri: Tiket Pengambilan Aktif -->
             <div class="checkout-card claim-ticket-card">
-                <h2 class="summary-title" style="text-align: center;">Tiket Pengambilan Pangan</h2>
+                <h2 class="summary-title" style="text-align: center;"><?php echo escapeHtml($judul_tiket_kiri); ?></h2>
                 <hr class="summary-divider" />
 
                 <?php if ($tiket_aktif): ?>
@@ -256,6 +313,14 @@ require_once 'includes/navbar.php';
                         <li class="summary-item">
                             <span class="summary-item-label">Tempat Pengambilan</span>
                             <span class="summary-item-val val-dark"><?php echo escapeHtml($tiket_aktif['pihak_terkait']); ?></span>
+                        </li>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Total Pembayaran</span>
+                            <span class="summary-item-val val-green"><?php echo formatRupiah($tiket_aktif['total_harga']); ?></span>
+                        </li>
+                        <li class="summary-item">
+                            <span class="summary-item-label">Waktu Pemesanan</span>
+                            <span class="summary-item-val val-dark"><?php echo escapeHtml(date('d M Y, H:i', strtotime($tiket_aktif['dibuat_pada']))); ?> WIB</span>
                         </li>
 <?php else: ?>
                         <li class="summary-item">
@@ -310,7 +375,7 @@ require_once 'includes/navbar.php';
 
                     <?php if ($tiket_aktif['status'] !== 'dibatalkan'): ?>
                         <p class="ticket-reminder-note" style="font-size: 12px; color: #718096; line-height: 1.4; margin-bottom: 16px;">
-                            Tunjukkan kode transaksi kepada staf gerai produsen saat pengambilan makanan sebelum batas waktu operasional berakhir.
+                            <?php echo escapeHtml($catatan_tiket_role); ?>
                         </p>
                     <?php endif; ?>
 
@@ -318,6 +383,7 @@ require_once 'includes/navbar.php';
                     <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tiket_aktif['status'] === 'menunggu'): ?>
                         <form action="actions/crud2_status_update.php" method="post" style="margin: 0 0 12px 0;" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ini? Stok porsi akan dikembalikan ke inventaris.');">
                             <div>
+                                <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                 <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                 <input type="hidden" name="aksi" value="batal" />
                                 <button type="submit" class="btn-cancel-checkout" style="width: 100%; border: 1px solid #E53E3E; background-color: #FFF5F5; color: #E53E3E; cursor: pointer; padding: 10px; border-radius: 6px; font-weight: bold;">
@@ -332,6 +398,7 @@ require_once 'includes/navbar.php';
                         <?php if ($tiket_aktif['status'] === 'menunggu'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
                                 <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                     <input type="hidden" name="status" value="siap_diambil" />
                                     <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer;">
@@ -342,6 +409,7 @@ require_once 'includes/navbar.php';
                         <?php elseif ($tiket_aktif['status'] === 'siap_diambil'): ?>
                             <form action="actions/crud2_status_update.php" method="post" style="margin-bottom: 10px;">
                                 <div>
+                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tiket_aktif['id']; ?>" />
                                     <input type="hidden" name="status" value="selesai" />
                                     <button type="submit" class="btn-confirm-claim" style="width: 100%; border: none; cursor: pointer; background-color: #2B6CB0;">
@@ -352,21 +420,21 @@ require_once 'includes/navbar.php';
                         <?php endif; ?>
                     <?php endif; ?>
 
-                    <a href="katalog.php" class="btn-ticket-catalog" style="display: block; text-align: center; text-decoration: none;">Kembali ke Katalog</a>
+                    <a href="<?php echo escapeHtml($back_home_url); ?>" class="btn-ticket-catalog" style="display: block; text-align: center; text-decoration: none;"><?php echo escapeHtml($back_home_label); ?></a>
 
                 <?php else: ?>
                     <p style="text-align: center; color: #718096; padding: 24px 0;">Belum ada tiket aktif yang dipilih.</p>
-                    <a href="katalog.php" class="btn-ticket-catalog" style="display: block; text-align: center; text-decoration: none;">Jelajahi Makanan</a>
+                    <a href="<?php echo escapeHtml($back_home_url); ?>" class="btn-ticket-catalog" style="display: block; text-align: center; text-decoration: none;"><?php echo escapeHtml($back_home_label); ?></a>
                 <?php endif; ?>
 
                 <p class="checkout-trouble-note" style="margin-top: 16px; text-align: center;">
-                    Mengalami kendala klaim? <a href="customer_service.php" class="checkout-trouble-link">Bantuan</a>
+                    <?php echo escapeHtml($help_prefix); ?><a href="<?php echo escapeHtml($help_url); ?>" class="checkout-trouble-link"><?php echo escapeHtml($help_link_text); ?></a>
                 </p>
             </div>
 
             <!-- Kolom Kanan: Riwayat Transaksi Lengkap -->
             <div class="checkout-card claim-past-card">
-                <h2 class="past-history-title">Semua Riwayat Klaim</h2>
+                <h2 class="past-history-title"><?php echo escapeHtml($judul_riwayat_kanan); ?></h2>
                 <hr class="summary-divider" />
 
                 <?php if (empty($daftar_transaksi)): ?>
@@ -374,9 +442,9 @@ require_once 'includes/navbar.php';
                         <div class="history-empty-icon-wrap">
                             <img src="assets/images/logo_sprout.svg" alt="Pangkalan Pangan" class="history-empty-icon" />
                         </div>
-                        <h3 class="history-empty-title">Belum ada riwayat klaim</h3>
-                        <p class="history-empty-desc">Daftar makanan yang berhasil Anda klaim dan ambil di gerai produsen akan otomatis tercatat di sini.</p>
-                        <a href="katalog.php" class="btn-history-catalog" style="text-decoration: none;">Jelajahi Makanan</a>
+                        <h3 class="history-empty-title"><?php echo escapeHtml($empty_title); ?></h3>
+                        <p class="history-empty-desc"><?php echo escapeHtml($empty_desc); ?></p>
+                        <a href="<?php echo escapeHtml($back_home_url); ?>" class="btn-history-catalog" style="text-decoration: none;"><?php echo escapeHtml(($user_role === 'konsumen') ? 'Jelajahi Makanan' : $back_home_label); ?></a>
                     </div>
                 <?php else: ?>
                     <ul class="past-history-list" style="display: block; list-style: none; padding: 0; margin: 0;">
@@ -442,6 +510,7 @@ require_once 'includes/navbar.php';
                                         <?php if (($user_role === 'konsumen' || $user_role === 'admin') && $tr['status'] === 'menunggu'): ?>
                                             <form action="actions/crud2_status_update.php" method="post" style="display: inline; margin: 0;" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan klaim pesanan ini?');">
                                                 <div style="display: inline;">
+                                                    <input type="hidden" name="csrf_token" value="<?php echo escapeHtml($_SESSION['csrf_token']); ?>" />
                                                     <input type="hidden" name="transaksi_id" value="<?php echo (int) $tr['id']; ?>" />
                                                     <input type="hidden" name="aksi" value="batal" />
                                                     <button type="submit" style="background: none; border: none; color: #E53E3E; font-size: 12px; cursor: pointer; text-decoration: underline; padding: 0;">
